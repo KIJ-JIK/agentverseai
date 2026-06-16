@@ -286,21 +286,34 @@
 
         <!-- Tab 3: Unit Test Suite -->
         <div class="tab-panel" id="tests-tab">
-          <div class="test-summary">
-            <div class="test-stat">
-              <span class="test-stat-value">pytest</span>
-              <span class="test-stat-label">Framework</span>
+          <div class="test-suite-layout">
+            <div class="test-left-panel">
+              <div class="test-summary">
+                <div class="test-stat">
+                  <span class="test-stat-value" id="test-framework-val">pytest</span>
+                  <span class="test-stat-label">Framework</span>
+                </div>
+                <div class="test-stat">
+                  <span class="test-stat-value" id="test-file-val">test_profile_api.py</span>
+                  <span class="test-stat-label">Test File</span>
+                </div>
+                <div class="test-stat">
+                  <span class="test-stat-value text-green" id="test-coverage-val">94%</span>
+                  <span class="test-stat-label">Coverage Estimate</span>
+                </div>
+              </div>
+              <div class="test-checklist-card">
+                <div class="checklist-title">Automated Verification Checklist</div>
+                <ul class="test-checklist" id="test-checklist">
+                  <li id="chk-syntax" class="chk-item"><span class="chk-status"></span> Syntax Validation</li>
+                  <li id="chk-security" class="chk-item"><span class="chk-status"></span> Security Scans</li>
+                  <li id="chk-unit" class="chk-item"><span class="chk-status"></span> Unit Assertions</li>
+                  <li id="chk-integration" class="chk-item"><span class="chk-status"></span> Integration Flows</li>
+                </ul>
+              </div>
             </div>
-            <div class="test-stat">
-              <span class="test-stat-value">test_profile_api.py</span>
-              <span class="test-stat-label">Test File</span>
-            </div>
-            <div class="test-stat">
-              <span class="test-stat-value text-green">94%</span>
-              <span class="test-stat-label">Coverage Estimate</span>
-            </div>
-          </div>
-          <pre class="code-block"><code><span class="tok-key">def</span> <span class="tok-fn">test_update_profile_requires_auth</span>():
+            <div class="test-right-panel">
+              <pre class="code-block"><code id="test-code-box"><span class="tok-key">def</span> <span class="tok-fn">test_update_profile_requires_auth</span>():
   response = client.put(<span class="tok-str">"/profile"</span>, json={})
   <span class="tok-key">assert</span> response.status_code == <span class="tok-num">401</span>
 
@@ -313,8 +326,9 @@
   <span class="tok-key">assert</span> response.status_code == <span class="tok-num">200</span>
   <span class="tok-key">assert</span> response.json()[<span class="tok-str">"status"</span>] == <span class="tok-str">"ok"</span>
   <span class="tok-comment"># PASSED — 0.04s</span></code></pre>
+            </div>
+          </div>
         </div>
-
         <!-- Tab 4: Live Communication Stream (event console + docs) -->
         <div class="tab-panel" id="docs-tab">
           <div class="console-docs-split">

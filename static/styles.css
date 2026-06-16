@@ -1310,19 +1310,41 @@ p, .setting-desc, .agent-task {
 .badge-green { background: var(--green-soft); color: var(--green); }
 .badge-ghost { background: var(--gray-soft); color: var(--text-dim); }
 
-/* Tab 3: Unit Test Suite */
+/* Tab 3: Unit Test Suite split layout */
 #tests-tab {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.test-suite-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--sp-4);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.test-left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  height: 100%;
+  overflow: hidden;
+}
+
+.test-right-panel {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  gap: var(--sp-3);
 }
 
 .test-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--sp-3);
+  gap: var(--sp-2);
   flex-shrink: 0;
 }
 
@@ -1339,6 +1361,82 @@ p, .setting-desc, .agent-task {
 .test-stat-value { font-family: var(--font-mono); font-weight: 700; font-size: 0.95rem; }
 .test-stat-label { font-size: 0.7rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
 .text-green { color: var(--green); }
+
+.test-checklist-card {
+  flex-grow: 1;
+  padding: var(--sp-4);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  overflow-y: auto;
+}
+
+.checklist-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--cyan);
+  letter-spacing: 0.05em;
+}
+
+.test-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chk-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  transition: color var(--transition-fast);
+}
+
+.chk-status {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  display: inline-block;
+  flex-shrink: 0;
+  position: relative;
+  transition: all var(--transition-fast);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.chk-item.active {
+  color: var(--amber);
+}
+.chk-item.active .chk-status {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.chk-item.passed {
+  color: var(--green);
+}
+.chk-item.passed .chk-status {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+.chk-item.passed .chk-status::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 3px;
+  height: 7px;
+  border: solid var(--green);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
 
 /* Tab 4: Live Communication Stream & Docs split */
 .console-docs-split {

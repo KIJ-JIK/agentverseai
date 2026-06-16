@@ -801,6 +801,67 @@
       }
     }
 
+    // 🧪 Update verification checklist from live agent states
+    const syntaxItem = document.getElementById('chk-syntax');
+    const securityItem = document.getElementById('chk-security');
+    const unitItem = document.getElementById('chk-unit');
+    const integrationItem = document.getElementById('chk-integration');
+
+    if (state.agents) {
+      const fe = (state.agents['FrontendDevAgent'] || 'IDLE').toLowerCase();
+      const be = (state.agents['BackendDevAgent'] || 'IDLE').toLowerCase();
+      const rev = (state.agents['CodeReviewerAgent'] || 'IDLE').toLowerCase();
+      const qa = (state.agents['QATesterAgent'] || 'IDLE').toLowerCase();
+      const wr = (state.agents['TechWriterAgent'] || 'IDLE').toLowerCase();
+      const rel = (state.agents['ReleaseManagerAgent'] || 'IDLE').toLowerCase();
+
+      // Syntax check
+      if (fe === 'processing' || be === 'processing' || fe === 'compiling' || be === 'compiling') {
+        if (syntaxItem) syntaxItem.className = 'chk-item active';
+      } else if (fe === 'complete' || be === 'complete' || fe === 'rejected' || be === 'rejected' || rev !== 'idle') {
+        if (syntaxItem) syntaxItem.className = 'chk-item passed';
+      }
+
+      // Security scans
+      if (rev === 'processing' || rev === 'rejected') {
+        if (securityItem) securityItem.className = 'chk-item active';
+      } else if (rev === 'complete' || qa !== 'idle') {
+        if (securityItem) securityItem.className = 'chk-item passed';
+      }
+
+      // Unit assertions
+      if (qa === 'processing') {
+        if (unitItem) unitItem.className = 'chk-item active';
+      } else if (qa === 'complete' || wr !== 'idle' || rel !== 'idle') {
+        if (unitItem) unitItem.className = 'chk-item passed';
+      }
+
+      // Integration flows
+      if (rel === 'processing' || wr === 'processing') {
+        if (integrationItem) integrationItem.className = 'chk-item active';
+      } else if (rel === 'complete') {
+        if (integrationItem) integrationItem.className = 'chk-item passed';
+      }
+    }
+
+    // 📊 Update credit resource pools from live events
+    if (state.events) {
+      const eventCount = state.events.length;
+      const maxEvents = 13;
+      const reasoningLeft = (10.00 - Math.min(1.0, eventCount / maxEvents) * 1.60).toFixed(2);
+      const productionLeft = (25.00 - Math.min(1.0, eventCount / maxEvents) * 2.20).toFixed(2);
+      
+      const rValueEl = document.getElementById('reasoning-pool-value');
+      const rFillEl = document.getElementById('reasoning-pool-fill');
+      const pValueEl = document.getElementById('production-pool-value');
+      const pFillEl = document.getElementById('production-pool-fill');
+
+      if (rValueEl) rValueEl.textContent = `$${reasoningLeft} remaining`;
+      if (rFillEl) rFillEl.style.width = `${(reasoningLeft / 10.00 * 100).toFixed(1)}%`;
+      if (pValueEl) pValueEl.textContent = `$${productionLeft} remaining`;
+      if (pFillEl) pFillEl.style.width = `${(productionLeft / 25.00 * 100).toFixed(1)}%`;
+    }
+
     updateVisualizationFromStates(state.agents, state.review_cycle);
 
     if (state.events) {
@@ -1005,6 +1066,16 @@
       appendLog('tag-info', 'PIPELINE', 'Trigger received — initializing run', false);
       showToast('info', 'Pipeline triggered', 'AgentVerse AI is processing your feature request.');
 
+      // Reset credit pools initially
+      const rValueEl = document.getElementById('reasoning-pool-value');
+      const rFillEl = document.getElementById('reasoning-pool-fill');
+      const pValueEl = document.getElementById('production-pool-value');
+      const pFillEl = document.getElementById('production-pool-fill');
+      if (rValueEl) rValueEl.textContent = `$10.00 remaining`;
+      if (rFillEl) rFillEl.style.width = `100%`;
+      if (pValueEl) pValueEl.textContent = `$25.00 remaining`;
+      if (pFillEl) pFillEl.style.width = `100%`;
+
       let activeAgentsCount = 1;
       bumpStat('stat-active-agents', activeAgentsCount);
 
@@ -1017,6 +1088,50 @@
           agentState[id] = { state: step.state, task: step.task, progress: step.progress };
           updateAgentCard(id);
         });
+
+        // 📊 Dynamically decrease resource pool metrics during run
+        const reasoningLeft = (10.00 - (i / (script.length - 1)) * 1.60).toFixed(2);
+        const productionLeft = (25.00 - (i / (script.length - 1)) * 2.20).toFixed(2);
+        if (rValueEl) rValueEl.textContent = `$${reasoningLeft} remaining`;
+        if (rFillEl) rFillEl.style.width = `${(reasoningLeft / 10.00 * 100).toFixed(1)}%`;
+        if (pValueEl) pValueEl.textContent = `$${productionLeft} remaining`;
+        if (pFillEl) pFillEl.style.width = `${(productionLeft / 25.00 * 100).toFixed(1)}%`;
+
+        // 🧪 Dynamically update verification checklist state
+        const syntaxItem = document.getElementById('chk-syntax');
+        const securityItem = document.getElementById('chk-security');
+        const unitItem = document.getElementById('chk-unit');
+        const integrationItem = document.getElementById('chk-integration');
+
+        if (i === 0) {
+          [syntaxItem, securityItem, unitItem, integrationItem].forEach(item => {
+            if (item) item.className = 'chk-item';
+          });
+        }
+        if (i >= 3 && i < 6) {
+          if (syntaxItem) syntaxItem.className = 'chk-item active';
+        }
+        if (i >= 6) {
+          if (syntaxItem) syntaxItem.className = 'chk-item passed';
+        }
+        if (i >= 7 && i < 11) {
+          if (securityItem) securityItem.className = 'chk-item active';
+        }
+        if (i >= 11) {
+          if (securityItem) securityItem.className = 'chk-item passed';
+        }
+        if (i >= 12 && i < 13) {
+          if (unitItem) unitItem.className = 'chk-item active';
+        }
+        if (i >= 13) {
+          if (unitItem) unitItem.className = 'chk-item passed';
+        }
+        if (i >= 14 && i < 17) {
+          if (integrationItem) integrationItem.className = 'chk-item active';
+        }
+        if (i >= 17) {
+          if (integrationItem) integrationItem.className = 'chk-item passed';
+        }
 
         const processingCount = AGENTS.filter(a => agentState[a.id].state === STATE.PROCESSING).length;
         bumpStat('stat-active-agents', Math.max(1, processingCount));
