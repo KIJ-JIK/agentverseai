@@ -83,10 +83,10 @@
     }
   ];
 
-  const STATE = { IDLE: 'idle', PROCESSING: 'processing', COMPILING: 'compiling', COMPLETE: 'complete', REJECTED: 'rejected' };
+  const STATE = { IDLE: 'idle', PROCESSING: 'processing', COMPLETE: 'complete', REJECTED: 'rejected' };
 
   const STATE_LABELS = {
-    idle: 'IDLE', processing: 'PROCESSING', compiling: 'COMPILING', complete: 'COMPLETE', rejected: 'REJECTED'
+    idle: 'IDLE', processing: 'PROCESSING', complete: 'COMPLETE', rejected: 'REJECTED'
   };
 
   /* ──────────────────────────────────────────────────────────
@@ -103,9 +103,9 @@
       { agent: 'architect', state: STATE.COMPLETE, task: 'Spec generated · architecture_pattern: REST + React SPA', progress: 100,
         logTag: 'tag-spec', logMsg: 'event: SPEC_GENERATED — sender: ArchitectAgent', nodes: ['n-architect'], event: 'SPEC_GENERATED' },
 
-      { agent: ['frontend','backend'], state: STATE.COMPILING, task: 'Generating component tree from spec', progress: 30,
+      { agent: ['frontend','backend'], state: STATE.PROCESSING, task: 'Generating component tree from spec', progress: 30,
         logTag: 'tag-info', logMsg: 'Parallel dispatch → FrontendDevAgent + BackendDevAgent', nodes: ['n-frontend', 'n-backend'] },
-      { agent: ['frontend','backend'], state: STATE.COMPILING, task: 'Writing implementation code', progress: 75,
+      { agent: ['frontend','backend'], state: STATE.PROCESSING, task: 'Writing implementation code', progress: 75,
         logTag: 'tag-code', logMsg: 'FrontendDevAgent + BackendDevAgent → drafting source files', nodes: ['n-frontend', 'n-backend'] },
       { agent: ['frontend','backend'], state: STATE.COMPLETE, task: 'CODE_EMITTED — implementation ready for review', progress: 100,
         logTag: 'tag-code', logMsg: 'event: CODE_EMITTED ×2 — ProfileDashboard.jsx, backend.py', nodes: ['n-frontend','n-backend','n-reviewer'], event: 'CODE_EMITTED' },
@@ -115,7 +115,7 @@
       { agent: 'reviewer', state: STATE.REJECTED, task: 'CODE_REJECTED — missing auth guard on PUT /profile', progress: 100,
         logTag: 'tag-rejected', logMsg: 'event: CODE_REJECTED — remediation ticket sent to BackendDevAgent', nodes: ['n-reviewer','n-backend'], event: 'CODE_REJECTED' },
 
-      { agent: 'backend', state: STATE.COMPILING, task: 'Applying remediation — adding JWT guard dependency', progress: 60,
+      { agent: 'backend', state: STATE.PROCESSING, task: 'Applying remediation — adding JWT guard dependency', progress: 60,
         logTag: 'tag-info', logMsg: 'BackendDevAgent → patching update_profile() with auth dependency', nodes: ['n-backend'] },
       { agent: 'backend', state: STATE.COMPLETE, task: 'Patch complete — resubmitted for review (iteration 2)', progress: 100,
         logTag: 'tag-code', logMsg: 'event: CODE_EMITTED — iteration 2 — backend.py', nodes: ['n-backend','n-reviewer'], event: 'CODE_EMITTED' },
@@ -419,7 +419,7 @@
 
   function bumpStat(id, newValue) {
     const el = document.getElementById(id);
-    if (el) el.textContent = newValue.toLocaleString();
+    el.textContent = newValue.toLocaleString();
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -642,14 +642,12 @@
     frontend: {
       idle: 'Idle — waiting on spec',
       processing: 'Writing React JSX code tree...',
-      compiling: 'Writing React JSX code tree...',
       complete: 'CODE_EMITTED — frontend implementation ready',
       rejected: 'CODE_REJECTED — applying reviewer fixes...'
     },
     backend: {
       idle: 'Idle — waiting on spec',
       processing: 'Writing FastAPI backend code...',
-      compiling: 'Writing FastAPI backend code...',
       complete: 'CODE_EMITTED — backend implementation ready',
       rejected: 'CODE_REJECTED — applying reviewer fixes...'
     },
@@ -782,15 +780,10 @@
       for (const [dbName, dbState] of Object.entries(state.agents)) {
         const id = AGENT_MAP[dbName];
         if (!id) continue;
-        let lowercaseState = dbState.toLowerCase();
+        const lowercaseState = dbState.toLowerCase();
         
         let progress = 0;
-        if (lowercaseState === 'processing') {
-          progress = 60;
-          if (id === 'frontend' || id === 'backend') {
-            lowercaseState = 'compiling';
-          }
-        }
+        if (lowercaseState === 'processing') progress = 60;
         else if (lowercaseState === 'complete') progress = 100;
         else if (lowercaseState === 'rejected') progress = 100;
 
@@ -799,67 +792,6 @@
         agentState[id] = { state: lowercaseState, task: taskText, progress: progress };
         updateAgentCard(id);
       }
-    }
-
-    // 🧪 Update verification checklist from live agent states
-    const syntaxItem = document.getElementById('chk-syntax');
-    const securityItem = document.getElementById('chk-security');
-    const unitItem = document.getElementById('chk-unit');
-    const integrationItem = document.getElementById('chk-integration');
-
-    if (state.agents) {
-      const fe = (state.agents['FrontendDevAgent'] || 'IDLE').toLowerCase();
-      const be = (state.agents['BackendDevAgent'] || 'IDLE').toLowerCase();
-      const rev = (state.agents['CodeReviewerAgent'] || 'IDLE').toLowerCase();
-      const qa = (state.agents['QATesterAgent'] || 'IDLE').toLowerCase();
-      const wr = (state.agents['TechWriterAgent'] || 'IDLE').toLowerCase();
-      const rel = (state.agents['ReleaseManagerAgent'] || 'IDLE').toLowerCase();
-
-      // Syntax check
-      if (fe === 'processing' || be === 'processing' || fe === 'compiling' || be === 'compiling') {
-        if (syntaxItem) syntaxItem.className = 'chk-item active';
-      } else if (fe === 'complete' || be === 'complete' || fe === 'rejected' || be === 'rejected' || rev !== 'idle') {
-        if (syntaxItem) syntaxItem.className = 'chk-item passed';
-      }
-
-      // Security scans
-      if (rev === 'processing' || rev === 'rejected') {
-        if (securityItem) securityItem.className = 'chk-item active';
-      } else if (rev === 'complete' || qa !== 'idle') {
-        if (securityItem) securityItem.className = 'chk-item passed';
-      }
-
-      // Unit assertions
-      if (qa === 'processing') {
-        if (unitItem) unitItem.className = 'chk-item active';
-      } else if (qa === 'complete' || wr !== 'idle' || rel !== 'idle') {
-        if (unitItem) unitItem.className = 'chk-item passed';
-      }
-
-      // Integration flows
-      if (rel === 'processing' || wr === 'processing') {
-        if (integrationItem) integrationItem.className = 'chk-item active';
-      } else if (rel === 'complete') {
-        if (integrationItem) integrationItem.className = 'chk-item passed';
-      }
-    }
-
-    // 📊 Update credit resource pools from live events
-    if (state.events) {
-      const eventCount = state.events.length;
-      const maxEvents = 13;
-      const reasoningLeft = (10.00 - Math.min(1.0, eventCount / maxEvents) * 1.60).toFixed(2);
-      const productionLeft = (25.00 - Math.min(1.0, eventCount / maxEvents) * 2.20).toFixed(2);
-      
-      const rValueEl = document.getElementById('reasoning-pool-value');
-      const rFillEl = document.getElementById('reasoning-pool-fill');
-      const pValueEl = document.getElementById('production-pool-value');
-      const pFillEl = document.getElementById('production-pool-fill');
-
-      if (rValueEl) rValueEl.textContent = `$${reasoningLeft} remaining`;
-      if (rFillEl) rFillEl.style.width = `${(reasoningLeft / 10.00 * 100).toFixed(1)}%`;
-      if (pValueEl) pValueEl.textContent = `$${productionLeft} remaining`;
-      if (pFillEl) pFillEl.style.width = `${(productionLeft / 25.00 * 100).toFixed(1)}%`;
     }
 
     updateVisualizationFromStates(state.agents, state.review_cycle);
@@ -1066,16 +998,6 @@
       appendLog('tag-info', 'PIPELINE', 'Trigger received — initializing run', false);
       showToast('info', 'Pipeline triggered', 'AgentVerse AI is processing your feature request.');
 
-      // Reset credit pools initially
-      const rValueEl = document.getElementById('reasoning-pool-value');
-      const rFillEl = document.getElementById('reasoning-pool-fill');
-      const pValueEl = document.getElementById('production-pool-value');
-      const pFillEl = document.getElementById('production-pool-fill');
-      if (rValueEl) rValueEl.textContent = `$10.00 remaining`;
-      if (rFillEl) rFillEl.style.width = `100%`;
-      if (pValueEl) pValueEl.textContent = `$25.00 remaining`;
-      if (pFillEl) pFillEl.style.width = `100%`;
-
       let activeAgentsCount = 1;
       bumpStat('stat-active-agents', activeAgentsCount);
 
@@ -1088,50 +1010,6 @@
           agentState[id] = { state: step.state, task: step.task, progress: step.progress };
           updateAgentCard(id);
         });
-
-        // 📊 Dynamically decrease resource pool metrics during run
-        const reasoningLeft = (10.00 - (i / (script.length - 1)) * 1.60).toFixed(2);
-        const productionLeft = (25.00 - (i / (script.length - 1)) * 2.20).toFixed(2);
-        if (rValueEl) rValueEl.textContent = `$${reasoningLeft} remaining`;
-        if (rFillEl) rFillEl.style.width = `${(reasoningLeft / 10.00 * 100).toFixed(1)}%`;
-        if (pValueEl) pValueEl.textContent = `$${productionLeft} remaining`;
-        if (pFillEl) pFillEl.style.width = `${(productionLeft / 25.00 * 100).toFixed(1)}%`;
-
-        // 🧪 Dynamically update verification checklist state
-        const syntaxItem = document.getElementById('chk-syntax');
-        const securityItem = document.getElementById('chk-security');
-        const unitItem = document.getElementById('chk-unit');
-        const integrationItem = document.getElementById('chk-integration');
-
-        if (i === 0) {
-          [syntaxItem, securityItem, unitItem, integrationItem].forEach(item => {
-            if (item) item.className = 'chk-item';
-          });
-        }
-        if (i >= 3 && i < 6) {
-          if (syntaxItem) syntaxItem.className = 'chk-item active';
-        }
-        if (i >= 6) {
-          if (syntaxItem) syntaxItem.className = 'chk-item passed';
-        }
-        if (i >= 7 && i < 11) {
-          if (securityItem) securityItem.className = 'chk-item active';
-        }
-        if (i >= 11) {
-          if (securityItem) securityItem.className = 'chk-item passed';
-        }
-        if (i >= 12 && i < 13) {
-          if (unitItem) unitItem.className = 'chk-item active';
-        }
-        if (i >= 13) {
-          if (unitItem) unitItem.className = 'chk-item passed';
-        }
-        if (i >= 14 && i < 17) {
-          if (integrationItem) integrationItem.className = 'chk-item active';
-        }
-        if (i >= 17) {
-          if (integrationItem) integrationItem.className = 'chk-item passed';
-        }
 
         const processingCount = AGENTS.filter(a => agentState[a.id].state === STATE.PROCESSING).length;
         bumpStat('stat-active-agents', Math.max(1, processingCount));
@@ -1312,10 +1190,7 @@ def test_update_profile_success(auth_headers):
       sysStatus.style.color = '';
 
       bumpStat('stat-active-agents', 0);
-      const completedEl = document.getElementById('stat-tasks-completed');
-      if (completedEl) {
-        bumpStat('stat-tasks-completed', parseInt(completedEl.textContent.replace(/,/g,'')) + 7);
-      }
+      bumpStat('stat-tasks-completed', parseInt(document.getElementById('stat-tasks-completed').textContent.replace(/,/g,'')) + 7);
 
       appendLog('tag-release', 'DONE', 'Pipeline run complete. All artifacts available in the Artifact Hub.', false);
 
@@ -1407,58 +1282,8 @@ def test_update_profile_success(auth_headers):
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  if (triggerBtn) {
-    triggerBtn.addEventListener('click', runPipeline);
-  }
-  if (featureInput) {
-    featureInput.addEventListener('keydown', e => { if (e.key === 'Enter') runPipeline(); });
-  }
-
-  const clearBtn = document.getElementById('clear-btn');
-  if (clearBtn) {
-    clearBtn.addEventListener('click', async () => {
-      // Clear console locally
-      consoleBody.innerHTML = '';
-      appendLog('tag-info', 'CLEAR', 'Log cache and console wiped.', false);
-      showToast('info', 'Logs Cleared', 'Terminal window and session history cleared.');
-      
-      const mockModeToggle = document.getElementById('mock-mode-toggle');
-      const isMockMode = mockModeToggle ? mockModeToggle.checked : true;
-      if (!isMockMode) {
-        // Trigger backend clear session history
-        const headers = { 'Content-Type': 'application/json' };
-        if (currentSession) {
-          headers['Authorization'] = `Bearer ${currentSession.access_token}`;
-        } else if (localBypassActive) {
-          headers['Authorization'] = `Bearer bypass-local-auth`;
-        }
-        
-        try {
-          const res = await fetch('/api/sessions/clear', {
-            method: 'POST',
-            headers: headers
-          });
-          if (res.ok) {
-            showToast('success', 'Backend Reset', 'Database session history wiped successfully.');
-            resetAgents();
-            resetPipelineVisual();
-            bumpStat('stat-active-agents', 0);
-          } else {
-            const txt = await res.text();
-            throw new Error(txt || `Clear failed with status ${res.status}`);
-          }
-        } catch (err) {
-          console.error(err);
-          appendLog('tag-rejected', 'ERROR', `Failed to wipe backend state: ${err.message}`, false);
-          showToast('error', 'Reset Failed', err.message);
-        }
-      } else {
-        resetAgents();
-        resetPipelineVisual();
-        bumpStat('stat-active-agents', 0);
-      }
-    });
-  }
+  triggerBtn.addEventListener('click', runPipeline);
+  featureInput.addEventListener('keydown', e => { if (e.key === 'Enter') runPipeline(); });
 
   /* ──────────────────────────────────────────────────────────
      AMBIENT CONSOLE FEED (idle simulation before trigger)
@@ -1534,48 +1359,39 @@ def test_update_profile_success(auth_headers):
   const mobileToggle = document.getElementById('mobile-nav-toggle');
 
   function openMobileSidebar() {
-    if (sidebar) sidebar.classList.add('open');
-    if (sidebarScrim) sidebarScrim.classList.add('show');
+    sidebar.classList.add('open');
+    sidebarScrim.classList.add('show');
   }
   function closeMobileSidebar() {
-    if (sidebar) sidebar.classList.remove('open');
-    if (sidebarScrim) sidebarScrim.classList.remove('show');
+    sidebar.classList.remove('open');
+    sidebarScrim.classList.remove('show');
   }
-  if (mobileToggle) {
-    mobileToggle.addEventListener('click', () => {
-      sidebar && sidebar.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
-    });
-  }
-  if (sidebarScrim) {
-    sidebarScrim.addEventListener('click', closeMobileSidebar);
-  }
+  mobileToggle.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
+  });
+  sidebarScrim.addEventListener('click', closeMobileSidebar);
 
   /* ──────────────────────────────────────────────────────────
      THEME TOGGLE
      ────────────────────────────────────────────────────────── */
   const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      if (next === 'light') document.documentElement.setAttribute('data-theme', 'light');
-      else document.documentElement.removeAttribute('data-theme');
-    });
-  }
+  themeToggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    if (next === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    else document.documentElement.removeAttribute('data-theme');
+  });
 
   /* ──────────────────────────────────────────────────────────
      FULLSCREEN TOGGLE
      ────────────────────────────────────────────────────────── */
-  const fsToggle = document.getElementById('fullscreen-toggle');
-  if (fsToggle) {
-    fsToggle.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen?.().catch(() => {});
-      } else {
-        document.exitFullscreen?.();
-      }
-    });
-  }
+  document.getElementById('fullscreen-toggle').addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.();
+    }
+  });
 
   /* ──────────────────────────────────────────────────────────
      README DOWNLOAD
@@ -1594,10 +1410,7 @@ def test_update_profile_success(auth_headers):
     showToast('success', 'Download Started', 'Your README.md file is downloading.');
   }
 
-  const downloadReadmeBtn = document.getElementById('download-readme');
-  if (downloadReadmeBtn) {
-    downloadReadmeBtn.addEventListener('click', downloadReadmeHandler);
-  }
+  document.getElementById('download-readme').addEventListener('click', downloadReadmeHandler);
 
   /* ──────────────────────────────────────────────────────────
      PARTICLE BACKGROUND — lightweight AI network visualization

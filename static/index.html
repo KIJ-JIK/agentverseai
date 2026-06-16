@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DevFlow AI// Space Command Room</title>
+<title>AgentVerse AI// Control Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -20,11 +20,11 @@
         <polygon points="20,10 28,14.5 28,25.5 20,30 12,25.5 12,14.5" class="preloader-hex-inner" />
       </svg>
     </div>
-    <div class="preloader-title">DevFlow <span class="accent">AI</span></div>
-    <div class="preloader-subtitle">Booting Space Command Room...</div>
+    <div class="preloader-title">AgentVerse <span class="accent">AI</span></div>
+    <div class="preloader-subtitle">Loading Control Room...</div>
     <div class="preloader-bar"><div class="preloader-bar-fill" id="preloader-bar-fill"></div></div>
     <div class="preloader-percent" id="preloader-percent">0%</div>
-    <div class="preloader-log" id="preloader-log">Initializing systems...</div>
+    <div class="preloader-log" id="preloader-log">Initializing system components...</div>
   </div>
 </div>
 
@@ -35,11 +35,11 @@
 <!-- ░░░ NOTIFICATION TOAST CONTAINER ░░░ -->
 <div id="toast-container" class="toast-container"></div>
 
-<!-- ░░░ APP SHELL (strict 100vh structure) ░░░ -->
-<div class="viewport-wrapper">
+<!-- ░░░ APP SHELL ░░░ -->
+<div class="app-shell">
 
-  <!-- A. CONTROL PANEL SIDEBAR (Width: 24%) -->
-  <aside class="sidebar-control-panel" id="sidebar">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="brand-mark">
         <svg viewBox="0 0 40 40" class="brand-hex">
@@ -48,179 +48,224 @@
         </svg>
       </div>
       <div class="brand-text">
-        <span class="brand-name">DevFlow<span class="accent">AI</span></span>
-        <span class="brand-tag">Space Command</span>
+        <span class="brand-name">AgentVerse<span class="accent">AI</span></span>
+        <span class="brand-tag">Control Room</span>
       </div>
     </div>
 
-    <!-- Credentials / Auth section -->
-    <div class="control-section">
-      <span class="section-title">System Credentials</span>
-      <div class="sidebar-auth" id="sidebar-auth">
-        <div class="sidebar-auth-user" id="auth-status-info">Not signed in</div>
-        <button type="button" class="sidebar-auth-btn" id="sidebar-auth-btn">Sign In</button>
-      </div>
+    <nav class="sidebar-nav">
+      <a href="#dashboard" class="nav-item active" data-section="dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#agents" class="nav-item" data-section="agents">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.2"/><path d="M5 21c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5"/></svg>
+        <span>Agents</span>
+      </a>
+      <a href="#architecture" class="nav-item" data-section="architecture">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M6 9v3a3 3 0 0 0 3 3M18 9v3a3 3 0 0 1-3 3"/></svg>
+        <span>Architecture</span>
+      </a>
+      <a href="#canvas" class="nav-item" data-section="canvas">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m18 16 4-4-4-4M6 8l-4 4 4 4M14.5 4l-5 16"/></svg>
+        <span>Code Canvas</span>
+      </a>
+      <a href="#testing" class="nav-item" data-section="testing">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2v5.5L4 16a2.5 2.5 0 0 0 2.2 3.7h11.6A2.5 2.5 0 0 0 20 16l-5-8.5V2M9 2h6M7.5 14h9"/></svg>
+        <span>Testing</span>
+      </a>
+      <a href="#docs" class="nav-item" data-section="docs">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+        <span>Documentation</span>
+      </a>
+      <a href="#settings" class="nav-item" data-section="settings">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.97 7.97 0 0 0 0-2l2-1.6-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3h-6l-.3 2a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a8 8 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a8 8 0 0 0 1.7 1L9 21h6l.3-2a8 8 0 0 0 1.7-1l2.4 1 2-3.4z"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-auth" id="sidebar-auth">
+      <div class="sidebar-auth-user" id="auth-status-info">Not signed in</div>
+      <button type="button" class="sidebar-auth-btn" id="sidebar-auth-btn">Sign In</button>
     </div>
 
-    <!-- Settings / Room Settings section -->
-    <div class="control-section">
-      <span class="section-title">SDK Settings & Config</span>
-      <div class="settings-group">
-        <div class="setting-item">
-          <div class="setting-meta">
-            <span class="setting-label">Mock Mode</span>
-            <span class="setting-desc">Simulate agent pipelines offline</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="mock-mode-toggle" checked>
-            <span class="switch-track"><span class="switch-thumb"></span></span>
-          </label>
-        </div>
-        <div class="setting-item">
-          <div class="setting-meta">
-            <span class="setting-label">Notifications</span>
-            <span class="setting-desc">Toasts for pipeline actions</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="notif-toggle" checked>
-            <span class="switch-track"><span class="switch-thumb"></span></span>
-          </label>
-        </div>
-        <div class="setting-item column">
-          <span class="setting-label">Band Room ID</span>
-          <input class="setting-input" type="text" id="band-room-input" placeholder="hackathon-devflow-01" />
-        </div>
-        
-        <!-- Band Room Integration Guide -->
-        <div class="band-guide-row">
-          <button class="band-guide-toggle-btn" id="band-guide-toggle" type="button">
-            <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px; transition: transform var(--transition-fast); margin-right: 6px; transform: rotate(0deg);"><path d="M9 18l6-6-6-6"/></svg>
-            How to Connect Your Band Chat Room
-          </button>
-          <div class="band-guide-content collapse" id="band-guide-content" style="display: none;">
-            <div class="guide-card-body">
-              <ol class="guide-steps">
-                <li>Create/open a Band room.</li>
-                <li>Copy the Room ID (UUID).</li>
-                <li>Paste it above (locally cached).</li>
-                <li>Agents broadcast updates directly to your room!</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Floating Metric Tracker (Pools) -->
-    <div class="control-section credit-pools">
-      <span class="section-title">System Resource Metrics</span>
-      <div class="pool-item">
-        <div class="pool-meta">
-          <span class="pool-label">Reasoning Pool</span>
-          <span class="pool-value" id="reasoning-pool-value">$10.00 remaining</span>
-        </div>
-        <div class="pool-bar"><div class="pool-bar-fill" id="reasoning-pool-fill" style="width: 100%;"></div></div>
-      </div>
-      <div class="pool-item">
-        <div class="pool-meta">
-          <span class="pool-label">Featherless Core Pool</span>
-          <span class="pool-value" id="production-pool-value">$25.00 remaining</span>
-        </div>
-        <div class="pool-bar"><div class="pool-bar-fill" id="production-pool-fill" style="width: 100%;"></div></div>
-      </div>
-    </div>
-
-    <!-- Action Execution Area -->
-    <div class="control-section actions-area">
-      <span class="section-title">Execution Controls</span>
-      <div class="prompt-input-wrapper">
-        <textarea id="feature-input" placeholder="Describe a feature request, e.g. 'Build a secure user profile dashboard.'" rows="3"></textarea>
-      </div>
-      <div class="action-buttons">
-        <button type="button" class="btn-trigger" id="trigger-btn">
-          <svg viewBox="0 0 24 24" fill="currentColor" class="bolt-icon" style="width: 14px; height: 14px; margin-right: 6px;"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
-          <span>⚡ TRIGGER NEW PIPELINE</span>
-        </button>
-        <button type="button" class="btn-clear" id="clear-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; margin-right: 6px;"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-          <span>🗑️ CLEAR LOG CACHE</span>
-        </button>
-      </div>
+    <div class="sidebar-footer">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+        <span>Theme</span>
+      </button>
+      <button type="button" class="fullscreen-toggle" id="fullscreen-toggle" aria-label="Toggle fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <span>Fullscreen</span>
+      </button>
     </div>
   </aside>
 
-  <!-- B. COMMAND CENTER CONSOLE (Width: 76%) -->
-  <main class="command-center-console">
-    <!-- Header info -->
-    <header class="console-header">
-      <div class="header-logo-group">
-        <div class="logo-orbit">
-          <div class="logo-core"></div>
-          <div class="logo-ring ring-1"></div>
-          <div class="logo-ring ring-2"></div>
-          <div class="logo-ring ring-3"></div>
-        </div>
-        <div class="console-title-group">
-          <h1>DevFlow <span class="accent">AI</span></h1>
-          <p>Live SDK Command Room</p>
+  <!-- mobile nav toggle -->
+  <button type="button" class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Open navigation">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <div class="sidebar-scrim" id="sidebar-scrim"></div>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main" id="dashboard">
+
+    <!-- ===== HERO HEADER ===== -->
+    <header class="hero-header">
+      <div class="hero-left">
+        <div class="hero-logo">
+          <div class="logo-orbit">
+            <div class="logo-core"></div>
+            <div class="logo-ring ring-1"></div>
+            <div class="logo-ring ring-2"></div>
+            <div class="logo-ring ring-3"></div>
+          </div>
+          <div class="hero-titles">
+            <h1>AgentVerse <span class="accent">AI</span></h1>
+            <p class="hero-sub">Autonomous Multi-Agent Engineering Pipeline</p>
+          </div>
         </div>
       </div>
-      
-      <div class="header-stats-group">
-        <div class="header-stat">
-          <span class="header-stat-label">System Status</span>
+
+      <div class="hero-right">
+        <div class="hero-stat">
+          <span class="hero-stat-label">System Status</span>
           <div class="status-pill" id="system-status">
             <span class="status-dot pulse"></span>
             <span class="status-text">OPERATIONAL</span>
           </div>
         </div>
-        <div class="header-stat">
-          <span class="header-stat-label">Pipeline State</span>
-          <div class="pipeline-state-pill" id="pipeline-state-pill">
-            <span id="pipeline-state-text">IDLE</span>
-          </div>
-        </div>
-        <div class="header-stat">
-          <span class="header-stat-label">Token Usage</span>
+        <div class="hero-stat">
+          <span class="hero-stat-label">Token Usage</span>
           <div class="token-meter">
             <span class="token-count" id="token-count">0</span>
             <span class="token-max">/ 128,000</span>
           </div>
           <div class="token-bar"><div class="token-bar-fill" id="token-bar-fill"></div></div>
         </div>
-        <div class="header-stat header-clock">
-          <span class="header-stat-label">Local Time</span>
+        <div class="hero-stat">
+          <span class="hero-stat-label">Pipeline State</span>
+          <div class="pipeline-state-pill" id="pipeline-state-pill">
+            <span id="pipeline-state-text">IDLE</span>
+          </div>
+        </div>
+        <div class="hero-stat hero-clock">
+          <span class="hero-stat-label">Local Time</span>
           <div class="clock" id="live-clock">00:00:00</div>
         </div>
       </div>
     </header>
 
-    <!-- ROW 1: 7-Agent Status Matrix -->
-    <section class="agent-matrix-section">
-      <div class="agent-grid" id="agent-grid">
-        <!-- Dynamically populated by JS -->
+    <!-- ===== FEATURE INPUT BAR ===== -->
+    <section class="feature-bar glass-card">
+      <div class="feature-bar-input">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="feature-icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <input type="text" id="feature-input" placeholder='Describe a feature, e.g. &quot;Add a JWT-authenticated user profile dashboard&quot;' />
+      </div>
+      <button type="button" class="btn-trigger" id="trigger-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" class="bolt-icon"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
+        <span>Trigger Pipeline</span>
+      </button>
+    </section>
+
+    <!-- ===== ANALYTICS STRIP ===== -->
+    <section class="analytics-strip">
+      <div class="stat-card glass-card">
+        <div class="stat-icon icon-cyan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.2"/><path d="M5 21c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5"/></svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value" data-target="3" id="stat-active-agents">0</span>
+          <span class="stat-label">Active Agents</span>
+        </div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon icon-green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value" data-target="128" id="stat-tasks-completed">0</span>
+          <span class="stat-label">Tasks Completed</span>
+        </div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon icon-cyan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12a10 10 0 1 1-5.93-9.14"/><path d="M22 2 12 12"/></svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value" data-target="96" id="stat-success-rate">0</span>
+          <span class="stat-label">Success Rate (%)</span>
+        </div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon icon-violet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 1 0-16 0"/><path d="M12 8v4l3 2"/></svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value" data-target="2417" id="stat-events">0</span>
+          <span class="stat-label">Events Processed</span>
+        </div>
       </div>
     </section>
 
-    <!-- ROW 2: Primary Reaction Canvas -->
-    <section class="reaction-canvas-section" id="canvas">
-      <div class="tabs-folder-header">
-        <div class="tabs" role="tablist">
-          <button type="button" class="tab active" data-tab="architecture-tab" role="tab">🧠 Architecture Blueprint</button>
-          <button type="button" class="tab" data-tab="code-tab" role="tab">💻 Codebase Canvas</button>
-          <button type="button" class="tab" data-tab="tests-tab" role="tab" id="testing-tab-btn">🧪 Unit Test Suite</button>
-          <button type="button" class="tab" data-tab="docs-tab" role="tab">📟 Live Communication Stream</button>
+    <!-- ===== AGENT STATUS MATRIX ===== -->
+    <section class="section-block" id="agents">
+      <div class="section-header">
+        <h2>Agent Status Matrix</h2>
+        <p>Live state of the 7-agent autonomous pipeline</p>
+      </div>
+      <div class="agent-grid" id="agent-grid"><!-- populated by JS --></div>
+    </section>
+
+    <!-- ===== PIPELINE VISUALIZATION ===== -->
+    <section class="section-block" id="architecture">
+      <div class="section-header">
+        <h2>Pipeline Visualization</h2>
+        <p>Request → Architect → Parallel Dev → Review Loop → QA → Docs → Release</p>
+      </div>
+      <div class="pipeline-wrap glass-card">
+        <svg id="pipeline-svg" viewBox="0 0 1000 480" preserveAspectRatio="xMidYMid meet"><!-- populated by JS --></svg>
+      </div>
+    </section>
+
+    <!-- ===== TWO-COLUMN: CONSOLE + ARTIFACT HUB ===== -->
+    <section class="split-grid">
+
+      <!-- LIVE EVENT CONSOLE -->
+      <div class="section-block console-block">
+        <div class="section-header">
+          <h2>Live Event Console</h2>
+          <p>Band API event stream</p>
+        </div>
+        <div class="console glass-card" id="console">
+          <div class="console-titlebar">
+            <span class="console-dot red"></span>
+            <span class="console-dot yellow"></span>
+            <span class="console-dot green"></span>
+            <span class="console-path">band://room/agentverse-ai/events</span>
+          </div>
+          <div class="console-body" id="console-body"></div>
         </div>
       </div>
-      
-      <div class="tabs-folder-body">
-        <!-- Tab 1: Architecture Blueprint -->
-        <div class="tab-panel active" id="architecture-tab">
-          <div class="architecture-split-view">
-            <div class="pipeline-visual-container">
-              <svg id="pipeline-svg" viewBox="0 0 1000 480" preserveAspectRatio="xMidYMid meet"><!-- Populated by JS --></svg>
-            </div>
-            <div class="json-viewer-container">
+
+      <!-- ARTIFACT HUB -->
+      <div class="section-block artifact-block" id="canvas">
+        <div class="section-header">
+          <h2>Artifact Hub</h2>
+          <p>Outputs generated across the pipeline</p>
+        </div>
+        <div class="artifact-hub glass-card">
+          <div class="tabs" role="tablist">
+            <button type="button" class="tab active" data-tab="architecture-tab" role="tab">Architecture</button>
+            <button type="button" class="tab" data-tab="code-tab" role="tab">Generated Code</button>
+            <button type="button" class="tab" data-tab="tests-tab" role="tab" id="testing">Test Results</button>
+            <button type="button" class="tab" data-tab="docs-tab" role="tab">Documentation</button>
+          </div>
+
+          <div class="tab-panels">
+            <!-- Architecture Panel -->
+            <div class="tab-panel active" id="architecture-tab">
               <div class="json-viewer">
 <pre><code><span class="tok-punc">{</span>
   <span class="tok-key">"architecture_pattern"</span><span class="tok-punc">:</span> <span class="tok-str">"REST + React SPA"</span><span class="tok-punc">,</span>
@@ -236,18 +281,16 @@
 <span class="tok-punc">}</span></code></pre>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Tab 2: Codebase Canvas -->
-        <div class="tab-panel" id="code-tab">
-          <div class="code-columns">
-            <div class="code-col">
-              <div class="code-col-head">
-                <span class="badge badge-cyan">Frontend.jsx</span>
-                <span class="badge badge-ghost" id="iter-badge-fe">Iteration 2</span>
-              </div>
-              <pre class="code-block"><code><span class="tok-key">function</span> <span class="tok-fn">ProfileDashboard</span>() {
+            <!-- Generated Code Panel -->
+            <div class="tab-panel" id="code-tab">
+              <div class="code-columns">
+                <div class="code-col">
+                  <div class="code-col-head">
+                    <span class="badge badge-cyan">Frontend.jsx</span>
+                    <span class="badge badge-ghost" id="iter-badge-fe">Iteration 2</span>
+                  </div>
+                  <pre class="code-block"><code><span class="tok-key">function</span> <span class="tok-fn">ProfileDashboard</span>() {
   <span class="tok-key">const</span> [profile, setProfile] = <span class="tok-fn">useState</span>(<span class="tok-num">null</span>);
   <span class="tok-key">const</span> { token } = <span class="tok-fn">useAuthToken</span>();
 
@@ -263,13 +306,13 @@
     &lt;/<span class="tok-tag">AuthGuard</span>&gt;
   );
 }</code></pre>
-            </div>
-            <div class="code-col">
-              <div class="code-col-head">
-                <span class="badge badge-green">backend.py</span>
-                <span class="badge badge-ghost" id="iter-badge-be">Iteration 1</span>
-              </div>
-              <pre class="code-block"><code><span class="tok-key">@app</span>.put(<span class="tok-str">"/profile"</span>)
+                </div>
+                <div class="code-col">
+                  <div class="code-col-head">
+                    <span class="badge badge-green">backend.py</span>
+                    <span class="badge badge-ghost" id="iter-badge-be">Iteration 1</span>
+                  </div>
+                  <pre class="code-block"><code><span class="tok-key">@app</span>.put(<span class="tok-str">"/profile"</span>)
 <span class="tok-key">async def</span> <span class="tok-fn">update_profile</span>(
     payload: ProfileUpdate,
     user: User = Depends(get_current_user)
@@ -280,69 +323,43 @@
         payload.dict()
     )
     <span class="tok-key">return</span> {<span class="tok-str">"status"</span>: <span class="tok-str">"ok"</span>, <span class="tok-str">"profile"</span>: updated}</code></pre>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Tab 3: Unit Test Suite -->
-        <div class="tab-panel" id="tests-tab">
-          <div class="test-suite-layout">
-            <div class="test-left-panel">
+            <!-- Test Results Panel -->
+            <div class="tab-panel" id="tests-tab">
               <div class="test-summary">
                 <div class="test-stat">
-                  <span class="test-stat-value" id="test-framework-val">pytest</span>
+                  <span class="test-stat-value">pytest</span>
                   <span class="test-stat-label">Framework</span>
                 </div>
                 <div class="test-stat">
-                  <span class="test-stat-value" id="test-file-val">test_profile_api.py</span>
+                  <span class="test-stat-value">test_profile_api.py</span>
                   <span class="test-stat-label">Test File</span>
                 </div>
                 <div class="test-stat">
-                  <span class="test-stat-value text-green" id="test-coverage-val">94%</span>
+                  <span class="test-stat-value text-green">94%</span>
                   <span class="test-stat-label">Coverage Estimate</span>
                 </div>
               </div>
-              <div class="test-checklist-card">
-                <div class="checklist-title">Automated Verification Checklist</div>
-                <ul class="test-checklist" id="test-checklist">
-                  <li id="chk-syntax" class="chk-item"><span class="chk-status"></span> Syntax Validation</li>
-                  <li id="chk-security" class="chk-item"><span class="chk-status"></span> Security Scans</li>
-                  <li id="chk-unit" class="chk-item"><span class="chk-status"></span> Unit Assertions</li>
-                  <li id="chk-integration" class="chk-item"><span class="chk-status"></span> Integration Flows</li>
-                </ul>
-              </div>
-            </div>
-            <div class="test-right-panel">
-              <pre class="code-block"><code id="test-code-box"><span class="tok-key">def</span> <span class="tok-fn">test_update_profile_requires_auth</span>():
-  response = client.put(<span class="tok-str">"/profile"</span>, json={})
-  <span class="tok-key">assert</span> response.status_code == <span class="tok-num">401</span>
+              <pre class="code-block"><code><span class="tok-key">def</span> <span class="tok-fn">test_update_profile_requires_auth</span>():
+    response = client.put(<span class="tok-str">"/profile"</span>, json={})
+    <span class="tok-key">assert</span> response.status_code == <span class="tok-num">401</span>
 
 <span class="tok-key">def</span> <span class="tok-fn">test_update_profile_success</span>(auth_headers):
-  response = client.put(
-      <span class="tok-str">"/profile"</span>,
-      json={<span class="tok-str">"display_name"</span>: <span class="tok-str">"Cloudy"</span>},
-      headers=auth_headers
-  )
-  <span class="tok-key">assert</span> response.status_code == <span class="tok-num">200</span>
-  <span class="tok-key">assert</span> response.json()[<span class="tok-str">"status"</span>] == <span class="tok-str">"ok"</span>
-  <span class="tok-comment"># PASSED — 0.04s</span></code></pre>
+    response = client.put(
+        <span class="tok-str">"/profile"</span>,
+        json={<span class="tok-str">"display_name"</span>: <span class="tok-str">"Cloudy"</span>},
+        headers=auth_headers
+    )
+    <span class="tok-key">assert</span> response.status_code == <span class="tok-num">200</span>
+    <span class="tok-key">assert</span> response.json()[<span class="tok-str">"status"</span>] == <span class="tok-str">"ok"</span>
+    <span class="tok-comment"># PASSED — 0.04s</span></code></pre>
             </div>
-          </div>
-        </div>
-        <!-- Tab 4: Live Communication Stream (event console + docs) -->
-        <div class="tab-panel" id="docs-tab">
-          <div class="console-docs-split">
-            <div class="console glass-card" id="console">
-              <div class="console-titlebar">
-                <span class="console-dot red"></span>
-                <span class="console-dot yellow"></span>
-                <span class="console-dot green"></span>
-                <span class="console-path">band://room/agentverse-ai/events</span>
-              </div>
-              <div class="console-body" id="console-body"></div>
-            </div>
-            
-            <div class="markdown-render-wrapper">
+
+            <!-- Documentation Panel -->
+            <div class="tab-panel" id="docs-tab">
               <div class="markdown-render">
                 <h3># Profile Dashboard Feature</h3>
                 <p>Adds a secure, JWT-authenticated profile dashboard allowing users to view and edit their account details.</p>
@@ -352,8 +369,10 @@
                   <li><code>GET /profile</code> — returns the authenticated user's profile</li>
                   <li><code>PUT /profile</code> — updates profile fields, JWT-validated</li>
                 </ul>
+                <h4>## Frontend Components</h4>
+                <p><code>ProfileDashboard</code>, <code>AuthGuard</code>, and <code>ProfileEditForm</code> compose the client experience, backed by <code>useAuthToken</code> and <code>useProfileData</code> hooks.</p>
                 <button type="button" class="btn-download" id="download-readme">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width: 14px; height: 14px; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                   Download README.md
                 </button>
               </div>
@@ -362,6 +381,81 @@
         </div>
       </div>
     </section>
+
+    <!-- ===== SETTINGS (placeholder section for nav) ===== -->
+    <section class="section-block" id="settings">
+      <div class="section-header">
+        <h2>Settings</h2>
+        <p>Pipeline configuration &amp; credentials</p>
+      </div>
+      <div class="settings-grid glass-card">
+        <div class="setting-row">
+          <div>
+            <span class="setting-label">Mock Mode</span>
+            <span class="setting-desc">Run the dashboard with simulated agent events, no API keys required.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="mock-mode-toggle" checked>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+        <div class="setting-row" style="border-bottom: none; padding-bottom: 0;">
+          <div>
+            <span class="setting-label">Band Room ID</span>
+            <span class="setting-desc">Active coordination room for agent event bus.</span>
+          </div>
+          <input class="setting-input" type="text" id="band-room-input" placeholder="agentverse-ai-room-01" />
+        </div>
+        <div class="band-guide-row">
+          <button class="band-guide-toggle-btn" id="band-guide-toggle" type="button">
+            <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px; transition: transform var(--transition-fast); margin-right: 6px; transform: rotate(0deg);"><path d="M9 18l6-6-6-6"/></svg>
+            How to Connect Your Band Chat Room
+          </button>
+          <div class="band-guide-content collapse" id="band-guide-content" style="display: none;">
+            <div class="guide-card-body">
+              <p class="guide-intro">Integrating your Band chat room allows the AI agents to speak and coordinate in your channel in real-time. Follow these steps:</p>
+              <ol class="guide-steps">
+                <li>
+                  <strong>Create or Open a Band Room</strong>: 
+                  Open the Band application, create or navigate to your target chat room.
+                </li>
+                <li>
+                  <strong>Copy the Room ID</strong>: 
+                  Retrieve your unique Band Room ID (UUID).
+                </li>
+                <li>
+                  <strong>Paste the Room ID</strong>: 
+                  Paste the ID into the <em>Band Room ID</em> field above. It will be cached locally and used for all pipeline runs.
+                </li>
+                <li>
+                  <strong>Launch the Pipeline</strong>: 
+                  When you run a new prompt, the Orchestrator and other agents will publish their live updates directly to that Band room!
+                </li>
+              </ol>
+              <div class="guide-badge-note">
+                <span class="badge badge-gold">Integration Info</span>
+                <span>No Band account is required for the client interface; the site communicates with Band backend APIs transparently.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <span class="setting-label">Notifications</span>
+            <span class="setting-desc">Show toast alerts for pipeline milestones.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="notif-toggle" checked>
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <span>AgentVerse AI — Band of Agents Hackathon 2026</span>
+    </footer>
+
   </main>
 </div>
 
