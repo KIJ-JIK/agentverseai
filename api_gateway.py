@@ -177,6 +177,41 @@ def list_user_sessions(user: AuthenticatedUser = Depends(get_current_user)):
     return get_user_sessions(user.id)
 
 
+@app.post("/api/sessions/clear")
+def clear_sessions(user: AuthenticatedUser = Depends(get_current_user)):
+    """Clear all user sessions and events in database/mock bus for the user."""
+    try:
+        from core.band_wrapper import MOCK_BUS_FILE
+        if MOCK_BUS_FILE.exists():
+            import json
+            with open(MOCK_BUS_FILE, "w", encoding="utf-8") as f:
+                json.dump([], f)
+    except Exception as e:
+        logger.error(f"Failed to clear mock bus: {e}")
+    
+    db = SessionLocal()
+    try:
+        # We need to import Event, Artifact, AgentState if they are not loaded, or simply delete cascadingly
+        # SQLite or Postgres with CASCADE makes this easy, or we delete individually.
+        from core.database import Event, Artifact, AgentState
+        
+        # Find all session IDs for the user
+        session_ids = [s.session_id for s in db.query(UserSession).filter(UserSession.user_id == user.id).all()]
+        if session_ids:
+            db.query(Event).filter(Event.session_id.in_(session_ids)).delete(synchronize_session=False)
+            db.query(Artifact).filter(Artifact.session_id.in_(session_ids)).delete(synchronize_session=False)
+            db.query(AgentState).filter(AgentState.session_id.in_(session_ids)).delete(synchronize_session=False)
+            db.query(UserSession).filter(UserSession.session_id.in_(session_ids)).delete(synchronize_session=False)
+        db.commit()
+        return {"status": "success", "message": "All sessions and events cleared successfully."}
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to clear sessions: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to clear database sessions: {str(e)}")
+    finally:
+        db.close()
+
+
 @app.get("/api/sessions/{session_id}")
 def get_session_details(
     session_id: str,

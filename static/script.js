@@ -83,10 +83,10 @@
     }
   ];
 
-  const STATE = { IDLE: 'idle', PROCESSING: 'processing', COMPLETE: 'complete', REJECTED: 'rejected' };
+  const STATE = { IDLE: 'idle', PROCESSING: 'processing', COMPILING: 'compiling', COMPLETE: 'complete', REJECTED: 'rejected' };
 
   const STATE_LABELS = {
-    idle: 'IDLE', processing: 'PROCESSING', complete: 'COMPLETE', rejected: 'REJECTED'
+    idle: 'IDLE', processing: 'PROCESSING', compiling: 'COMPILING', complete: 'COMPLETE', rejected: 'REJECTED'
   };
 
   /* ──────────────────────────────────────────────────────────
@@ -103,9 +103,9 @@
       { agent: 'architect', state: STATE.COMPLETE, task: 'Spec generated · architecture_pattern: REST + React SPA', progress: 100,
         logTag: 'tag-spec', logMsg: 'event: SPEC_GENERATED — sender: ArchitectAgent', nodes: ['n-architect'], event: 'SPEC_GENERATED' },
 
-      { agent: ['frontend','backend'], state: STATE.PROCESSING, task: 'Generating component tree from spec', progress: 30,
+      { agent: ['frontend','backend'], state: STATE.COMPILING, task: 'Generating component tree from spec', progress: 30,
         logTag: 'tag-info', logMsg: 'Parallel dispatch → FrontendDevAgent + BackendDevAgent', nodes: ['n-frontend', 'n-backend'] },
-      { agent: ['frontend','backend'], state: STATE.PROCESSING, task: 'Writing implementation code', progress: 75,
+      { agent: ['frontend','backend'], state: STATE.COMPILING, task: 'Writing implementation code', progress: 75,
         logTag: 'tag-code', logMsg: 'FrontendDevAgent + BackendDevAgent → drafting source files', nodes: ['n-frontend', 'n-backend'] },
       { agent: ['frontend','backend'], state: STATE.COMPLETE, task: 'CODE_EMITTED — implementation ready for review', progress: 100,
         logTag: 'tag-code', logMsg: 'event: CODE_EMITTED ×2 — ProfileDashboard.jsx, backend.py', nodes: ['n-frontend','n-backend','n-reviewer'], event: 'CODE_EMITTED' },
@@ -115,7 +115,7 @@
       { agent: 'reviewer', state: STATE.REJECTED, task: 'CODE_REJECTED — missing auth guard on PUT /profile', progress: 100,
         logTag: 'tag-rejected', logMsg: 'event: CODE_REJECTED — remediation ticket sent to BackendDevAgent', nodes: ['n-reviewer','n-backend'], event: 'CODE_REJECTED' },
 
-      { agent: 'backend', state: STATE.PROCESSING, task: 'Applying remediation — adding JWT guard dependency', progress: 60,
+      { agent: 'backend', state: STATE.COMPILING, task: 'Applying remediation — adding JWT guard dependency', progress: 60,
         logTag: 'tag-info', logMsg: 'BackendDevAgent → patching update_profile() with auth dependency', nodes: ['n-backend'] },
       { agent: 'backend', state: STATE.COMPLETE, task: 'Patch complete — resubmitted for review (iteration 2)', progress: 100,
         logTag: 'tag-code', logMsg: 'event: CODE_EMITTED — iteration 2 — backend.py', nodes: ['n-backend','n-reviewer'], event: 'CODE_EMITTED' },
@@ -642,12 +642,14 @@
     frontend: {
       idle: 'Idle — waiting on spec',
       processing: 'Writing React JSX code tree...',
+      compiling: 'Writing React JSX code tree...',
       complete: 'CODE_EMITTED — frontend implementation ready',
       rejected: 'CODE_REJECTED — applying reviewer fixes...'
     },
     backend: {
       idle: 'Idle — waiting on spec',
       processing: 'Writing FastAPI backend code...',
+      compiling: 'Writing FastAPI backend code...',
       complete: 'CODE_EMITTED — backend implementation ready',
       rejected: 'CODE_REJECTED — applying reviewer fixes...'
     },
@@ -780,10 +782,15 @@
       for (const [dbName, dbState] of Object.entries(state.agents)) {
         const id = AGENT_MAP[dbName];
         if (!id) continue;
-        const lowercaseState = dbState.toLowerCase();
+        let lowercaseState = dbState.toLowerCase();
         
         let progress = 0;
-        if (lowercaseState === 'processing') progress = 60;
+        if (lowercaseState === 'processing') {
+          progress = 60;
+          if (id === 'frontend' || id === 'backend') {
+            lowercaseState = 'compiling';
+          }
+        }
         else if (lowercaseState === 'complete') progress = 100;
         else if (lowercaseState === 'rejected') progress = 100;
 
@@ -1284,6 +1291,52 @@ def test_update_profile_success(auth_headers):
 
   triggerBtn.addEventListener('click', runPipeline);
   featureInput.addEventListener('keydown', e => { if (e.key === 'Enter') runPipeline(); });
+
+  const clearBtn = document.getElementById('clear-btn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      // Clear console locally
+      consoleBody.innerHTML = '';
+      appendLog('tag-info', 'CLEAR', 'Log cache and console wiped.', false);
+      showToast('info', 'Logs Cleared', 'Terminal window and session history cleared.');
+      
+      const mockModeToggle = document.getElementById('mock-mode-toggle');
+      const isMockMode = mockModeToggle ? mockModeToggle.checked : true;
+      if (!isMockMode) {
+        // Trigger backend clear session history
+        const headers = { 'Content-Type': 'application/json' };
+        if (currentSession) {
+          headers['Authorization'] = `Bearer ${currentSession.access_token}`;
+        } else if (localBypassActive) {
+          headers['Authorization'] = `Bearer bypass-local-auth`;
+        }
+        
+        try {
+          const res = await fetch('/api/sessions/clear', {
+            method: 'POST',
+            headers: headers
+          });
+          if (res.ok) {
+            showToast('success', 'Backend Reset', 'Database session history wiped successfully.');
+            resetAgents();
+            resetPipelineVisual();
+            bumpStat('stat-active-agents', 0);
+          } else {
+            const txt = await res.text();
+            throw new Error(txt || `Clear failed with status ${res.status}`);
+          }
+        } catch (err) {
+          console.error(err);
+          appendLog('tag-rejected', 'ERROR', `Failed to wipe backend state: ${err.message}`, false);
+          showToast('error', 'Reset Failed', err.message);
+        }
+      } else {
+        resetAgents();
+        resetPipelineVisual();
+        bumpStat('stat-active-agents', 0);
+      }
+    });
+  }
 
   /* ──────────────────────────────────────────────────────────
      AMBIENT CONSOLE FEED (idle simulation before trigger)
