@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgentVerse AI// Control Room</title>
+<title>DevFlow AI// Control Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,12 +15,14 @@
 <div id="preloader" class="preloader">
   <div class="preloader-content">
     <div class="preloader-logo">
-      <svg viewBox="0 0 40 40" class="preloader-hex">
-        <polygon points="20,2 35,11 35,29 20,38 5,29 5,11" />
-        <polygon points="20,10 28,14.5 28,25.5 20,30 12,25.5 12,14.5" class="preloader-hex-inner" />
+      <svg viewBox="0 0 40 40" class="brand-logo-svg">
+        <path d="M 8,20 C 12,10 28,10 32,20 C 28,30 12,30 8,20 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" />
+        <circle cx="20" cy="20" r="4.5" fill="var(--violet)" />
+        <circle cx="8" cy="20" r="3" fill="var(--cyan)" />
+        <circle cx="32" cy="20" r="3" fill="var(--cyan)" />
       </svg>
     </div>
-    <div class="preloader-title">AgentVerse <span class="accent">AI</span></div>
+    <div class="preloader-title">devflow<span class="accent">AI</span></div>
     <div class="preloader-subtitle">Loading Control Room...</div>
     <div class="preloader-bar"><div class="preloader-bar-fill" id="preloader-bar-fill"></div></div>
     <div class="preloader-percent" id="preloader-percent">0%</div>
@@ -42,13 +44,15 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="brand-mark">
-        <svg viewBox="0 0 40 40" class="brand-hex">
-          <polygon points="20,2 35,11 35,29 20,38 5,29 5,11" />
-          <polygon points="20,10 28,14.5 28,25.5 20,30 12,25.5 12,14.5" class="brand-hex-inner" />
+        <svg viewBox="0 0 40 40" class="brand-logo-svg">
+          <path d="M 8,20 C 12,10 28,10 32,20 C 28,30 12,30 8,20 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="20" cy="20" r="4.5" fill="var(--violet)" />
+          <circle cx="8" cy="20" r="3" fill="var(--cyan)" />
+          <circle cx="32" cy="20" r="3" fill="var(--cyan)" />
         </svg>
       </div>
       <div class="brand-text">
-        <span class="brand-name">AgentVerse<span class="accent">AI</span></span>
+        <span class="brand-name">devflow<span class="accent">AI</span></span>
         <span class="brand-tag">Control Room</span>
       </div>
     </div>
@@ -115,14 +119,16 @@
     <header class="hero-header">
       <div class="hero-left">
         <div class="hero-logo">
-          <div class="logo-orbit">
-            <div class="logo-core"></div>
-            <div class="logo-ring ring-1"></div>
-            <div class="logo-ring ring-2"></div>
-            <div class="logo-ring ring-3"></div>
+          <div class="logo-orbit-container">
+            <svg viewBox="0 0 40 40" class="brand-logo-svg hero-logo-svg">
+              <path d="M 8,20 C 12,10 28,10 32,20 C 28,30 12,30 8,20 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" />
+              <circle cx="20" cy="20" r="4.5" fill="var(--violet)" />
+              <circle cx="8" cy="20" r="3" fill="var(--cyan)" />
+              <circle cx="32" cy="20" r="3" fill="var(--cyan)" />
+            </svg>
           </div>
           <div class="hero-titles">
-            <h1>AgentVerse <span class="accent">AI</span></h1>
+            <h1>devflow <span class="accent">AI</span></h1>
             <p class="hero-sub">Autonomous Multi-Agent Engineering Pipeline</p>
           </div>
         </div>
@@ -243,7 +249,7 @@
             <span class="console-dot red"></span>
             <span class="console-dot yellow"></span>
             <span class="console-dot green"></span>
-            <span class="console-path">band://room/agentverse-ai/events</span>
+            <span class="console-path">band://room/devflow-ai/events</span>
           </div>
           <div class="console-body" id="console-body"></div>
         </div>
@@ -404,7 +410,7 @@
             <span class="setting-label">Band Room ID</span>
             <span class="setting-desc">Active coordination room for agent event bus.</span>
           </div>
-          <input class="setting-input" type="text" id="band-room-input" placeholder="agentverse-ai-room-01" />
+          <input class="setting-input" type="text" id="band-room-input" placeholder="devflow-ai-room-01" />
         </div>
         <div class="band-guide-row">
           <button class="band-guide-toggle-btn" id="band-guide-toggle" type="button">
@@ -453,7 +459,7 @@
     </section>
 
     <footer class="app-footer">
-      <span>AgentVerse AI — Band of Agents Hackathon 2026</span>
+      <span>DevFlow AI — Band of Agents Hackathon 2026</span>
     </footer>
 
   </main>
