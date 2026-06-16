@@ -106,10 +106,12 @@ def deploy():
       "repo": repo_url,
       "branch": branch,
       "serviceDetails": {
-        "env": "python",
-        "buildCommand": "pip install -r requirements.txt",
-        "startCommand": "uvicorn api_gateway:app --host 0.0.0.0 --port $PORT",
-        "plan": "free"
+        "runtime": "python",
+        "plan": "free",
+        "envSpecificDetails": {
+          "buildCommand": "pip install -r requirements.txt",
+          "startCommand": "uvicorn api_gateway:app --host 0.0.0.0 --port $PORT"
+        }
       },
       "envVars": render_env_vars
     }
