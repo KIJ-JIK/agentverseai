@@ -1,5 +1,5 @@
 """
-AgentVerse AI — Database Adapter
+DevFlow AI — Database Adapter
 ==============================
 Handles connection setup, SQL model schemas, and CRUD utilities.
 Supports Neon/PostgreSQL when DATABASE_URL is provided, with an automatic

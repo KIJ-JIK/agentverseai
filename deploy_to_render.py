@@ -58,7 +58,7 @@ def parse_env_file():
     return env_vars
 
 def deploy():
-    print("=== AgentVerse AI — Automated Render Deployment ===")
+    print("=== DevFlow AI — Automated Render Deployment ===")
     
     # 1. Detect git remote
     repo_url = get_git_remote_url()

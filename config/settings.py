@@ -1,5 +1,5 @@
 """
-AgentVerse AI — Centralised Configuration
+DevFlow AI — Centralised Configuration
 ========================================
 Uses pydantic-settings so every environment variable is validated at startup.
 Copy .env.example → .env and fill in your real keys.
@@ -11,7 +11,7 @@ from pydantic import Field
 
 
 class Settings(BaseSettings):
-    """All environment variables consumed by the AgentVerse AI backend.
+    """All environment variables consumed by the DevFlow AI backend.
 
     Values are loaded from a `.env` file automatically thanks to
     ``SettingsConfigDict(env_file=".env")``.  Any variable that is

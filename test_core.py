@@ -1,5 +1,5 @@
 """
-AgentVerse AI — Core Smoke Test
+DevFlow AI — Core Smoke Test
 ==============================
 Run with:  python test_core.py
 Requires:  MOCK_MODE=True in your .env (default).

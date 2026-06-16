@@ -1,5 +1,5 @@
 """
-AgentVerse AI — Database CRUD Test Suite
+DevFlow AI — Database CRUD Test Suite
 ======================================
 Verifies database operations, schemas, and queries.
 """

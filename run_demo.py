@@ -17,7 +17,7 @@ logging.basicConfig(
 
 async def main():
     print("=" * 60)
-    print("Starting AgentVerse AI Agentic Pipeline Demo")
+    print("Starting DevFlow AI Agentic Pipeline Demo")
     print("=" * 60)
     
     orchestrator = PipelineOrchestrator()

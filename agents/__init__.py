@@ -1,8 +1,8 @@
 """
-AgentVerse AI — Agent Pipeline Module
+DevFlow AI — Agent Pipeline Module
 
 All 7 autonomous agents and the pipeline orchestrator for the
-AgentVerse AI multi-agent feature delivery system.
+DevFlow AI multi-agent feature delivery system.
 """
 
 from agents.architect import ArchitectAgent

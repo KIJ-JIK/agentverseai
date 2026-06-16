@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 class ReleaseManagerAgent(BaseAgent):
     name = "ReleaseManagerAgent"
     system_prompt = (
-        "You are the Release Manager in AgentVerse AI, performing final pre-deployment validation.\n"
+        "You are the Release Manager in DevFlow AI, performing final pre-deployment validation.\n"
         "You receive the final pipeline state after all review loops. "
         "Issue a MERGE_READY verdict if:\n"
         "- Code was eventually approved or max review cycles were met without fatal security errors.\n"

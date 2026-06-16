@@ -1,5 +1,5 @@
 """
-AgentVerse AI — Pipeline Orchestrator
+DevFlow AI — Pipeline Orchestrator
 
 The central conductor that manages the full agent pipeline lifecycle.
 Drives agents directly (imperative flow), emits Band events as side-effects,
@@ -44,7 +44,7 @@ STATE_FILE = Path("pipeline_state.json")
 
 
 class PipelineOrchestrator:
-    """Orchestrates the full AgentVerse AI agent pipeline.
+    """Orchestrates the full DevFlow AI agent pipeline.
 
     Flow:
         1. ArchitectAgent → SPEC_GENERATED
@@ -213,7 +213,7 @@ class PipelineOrchestrator:
     # ══════════════════════════════════════════════════════════════════════
 
     async def run_pipeline(self, feature_request: str, session_id: Optional[str] = None, band_room_id: Optional[str] = None) -> dict:
-        """Execute the full AgentVerse AI pipeline end-to-end.
+        """Execute the full DevFlow AI pipeline end-to-end.
 
         Args:
             feature_request: Natural language feature request from the user.

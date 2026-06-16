@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   AGENTVERSE AI — CONTROL ROOM
+   DEVFLOW AI — CONTROL ROOM
    Vanilla JS: simulation engine, rendering, interactions
    ════════════════════════════════════════════════════════════ */
 
@@ -996,7 +996,7 @@
 
       resetPipelineVisual();
       appendLog('tag-info', 'PIPELINE', 'Trigger received — initializing run', false);
-      showToast('info', 'Pipeline triggered', 'AgentVerse AI is processing your feature request.');
+      showToast('info', 'Pipeline triggered', 'DevFlow AI is processing your feature request.');
 
       let activeAgentsCount = 1;
       bumpStat('stat-active-agents', activeAgentsCount);
@@ -1228,7 +1228,7 @@ def test_update_profile_success(auth_headers):
         resetAgents();
         
         appendLog('tag-info', 'PIPELINE', 'Sending feature trigger to API Gateway...', false);
-        showToast('info', 'Pipeline Triggered', 'AgentVerse AI is triggering backend agents.');
+        showToast('info', 'Pipeline Triggered', 'DevFlow AI is triggering backend agents.');
 
         try {
           const bandRoomInput = document.getElementById('band-room-input');
@@ -1289,7 +1289,7 @@ def test_update_profile_success(auth_headers):
      AMBIENT CONSOLE FEED (idle simulation before trigger)
      ────────────────────────────────────────────────────────── */
   const AMBIENT_LOGS = [
-    { tag: 'tag-info', text: 'Band bus heartbeat — room: agentverse-ai-room-01 — OK' },
+    { tag: 'tag-info', text: 'Band bus heartbeat — room: devflow-ai-room-01 — OK' },
     { tag: 'tag-info', text: 'Polling for new events... 0 pending' },
     { tag: 'tag-info', text: 'All 7 agents standing by' },
     { tag: 'tag-info', text: 'LLM router idle — AI/ML API + Featherless connections healthy' },
@@ -1569,13 +1569,13 @@ def test_update_profile_success(auth_headers):
     const bandRoomInput = document.getElementById('band-room-input');
     if (!bandRoomInput) return;
 
-    const savedRoom = localStorage.getItem('agentverse_band_room_id');
+    const savedRoom = localStorage.getItem('devflow_band_room_id');
     if (savedRoom) {
       bandRoomInput.value = savedRoom;
     }
 
     bandRoomInput.addEventListener('input', () => {
-      localStorage.setItem('agentverse_band_room_id', bandRoomInput.value.trim());
+      localStorage.setItem('devflow_band_room_id', bandRoomInput.value.trim());
     });
 
     const bandGuideToggle = document.getElementById('band-guide-toggle');
@@ -1756,8 +1756,8 @@ def test_update_profile_success(auth_headers):
     setupStatsModal();
     updateAuthUI();
 
-    appendLog('tag-info', 'BOOT', 'AgentVerse AI Control Room initialized.', false);
-    appendLog('tag-info', 'BOOT', 'Connected to Band room: agentverse-ai-room-01', false);
+    appendLog('tag-info', 'BOOT', 'DevFlow AI Control Room initialized.', false);
+    appendLog('tag-info', 'BOOT', 'Connected to Band room: devflow-ai-room-01', false);
 
     setTimeout(ambientTick, 4000);
   }

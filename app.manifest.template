@@ -1,4 +1,4 @@
-# AgentVerse AI — Gramine SGX Manifest Template
+# DevFlow AI — Gramine SGX Manifest Template
 # ==========================================
 # Configures the Intel SGX enclave boundaries, memory allocations,
 # trusted files, and network mounts for the Python agent pipeline.
@@ -46,7 +46,7 @@ sgx.trusted_files = [
   "file:{{ arch_libdir }}/",
   "file:/usr/lib/",
   
-  # AgentVerse AI Source Scripts (Must be trusted and immutable inside TEE)
+  # DevFlow AI Source Scripts (Must be trusted and immutable inside TEE)
   "file:app.py",
   "file:api_gateway.py",
   "file:run_demo.py",

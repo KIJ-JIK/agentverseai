@@ -1,5 +1,5 @@
 """
-AgentVerse AI — API Gateway
+DevFlow AI — API Gateway
 =========================
 FastAPI backend that handles user authentication (via Supabase JWT),
 session persistence (via Neon/PostgreSQL), and triggers the 7-agent pipeline.
@@ -35,7 +35,7 @@ from agents.pipeline_orchestrator import PipelineOrchestrator
 logger = logging.getLogger(__name__)
 
 # Initialize FastAPI App
-app = FastAPI(title="AgentVerse AI — API Gateway")
+app = FastAPI(title="DevFlow AI — API Gateway")
 
 # ── CORS Middleware ──────────────────────────────────────────────────────────
 # Checklist Item 4: Lock the API to allowed domains in production
@@ -94,7 +94,7 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Authenticat
         logger.info("[Auth] Mock Auth fallback active.")
         return AuthenticatedUser(
             user_id="hackathon_test_developer",
-            email="developer@agentverse.ai"
+            email="developer@devflow.ai"
         )
 
     if not authorization or not authorization.startswith("Bearer "):

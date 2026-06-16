@@ -1,5 +1,5 @@
 """
-AgentVerse AI — Band Bus Wrapper
+DevFlow AI — Band Bus Wrapper
 ===============================
 Abstracts the Band multi-agent coordination bus behind a clean async API.
 

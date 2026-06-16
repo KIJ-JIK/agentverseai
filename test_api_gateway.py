@@ -1,5 +1,5 @@
 """
-AgentVerse AI — API Gateway Test Suite
+DevFlow AI — API Gateway Test Suite
 ====================================
 Verifies API gateway routing, authentication, and IDOR protection.
 """
@@ -56,7 +56,7 @@ class TestApiGateway(unittest.TestCase):
         def override_get_current_user():
             return AuthenticatedUser(
                 user_id="user_beta_uuid",
-                email="beta@agentverse.ai"
+                email="beta@devflow.ai"
             )
         
         app.dependency_overrides[get_current_user] = override_get_current_user
@@ -76,7 +76,7 @@ class TestApiGateway(unittest.TestCase):
         def override_get_current_user_alpha():
             return AuthenticatedUser(
                 user_id=user_alpha_id,
-                email="alpha@agentverse.ai"
+                email="alpha@devflow.ai"
             )
         
         app.dependency_overrides[get_current_user] = override_get_current_user_alpha

@@ -1,5 +1,5 @@
 """
-AgentVerse AI — Base Agent
+DevFlow AI — Base Agent
 ========================
 Abstract base class that every pipeline agent inherits from.
 Provides the ``emit()`` helper (Band event publishing) and ``call_json()``
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseAgent(abc.ABC):
-    """Base class for all AgentVerse AI agents."""
+    """Base class for all DevFlow AI agents."""
 
     @property
     @abc.abstractmethod

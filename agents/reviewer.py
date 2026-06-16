@@ -9,7 +9,7 @@ MAX_REVIEW_CYCLES = 3
 class CodeReviewerAgent(BaseAgent):
     name = "CodeReviewerAgent"
     system_prompt = (
-        "You are a senior code security reviewer in the AgentVerse AI pipeline. Audit the provided code and respond ONLY with valid JSON.\n\n"
+        "You are a senior code security reviewer in the DevFlow AI pipeline. Audit the provided code and respond ONLY with valid JSON.\n\n"
         "Your verdict must be one of:\n"
         "- APPROVED: code is functional and meets the specification contracts.\n"
         "- REVISION_NEEDED: there are specific security issues, syntax bugs, or logical errors that MUST be fixed. Provide a list of remediation tickets.\n"

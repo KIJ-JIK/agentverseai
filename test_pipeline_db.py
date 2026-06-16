@@ -1,5 +1,5 @@
 """
-AgentVerse AI — End-to-End Pipeline Database Integration Test
+DevFlow AI — End-to-End Pipeline Database Integration Test
 ============================================================
 Runs the orchestrator in MOCK_MODE, passing a session ID,
 and asserts that all agent actions, state transitions, artifacts,
