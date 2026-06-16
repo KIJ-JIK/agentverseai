@@ -419,7 +419,7 @@
 
   function bumpStat(id, newValue) {
     const el = document.getElementById(id);
-    el.textContent = newValue.toLocaleString();
+    if (el) el.textContent = newValue.toLocaleString();
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -1312,7 +1312,10 @@ def test_update_profile_success(auth_headers):
       sysStatus.style.color = '';
 
       bumpStat('stat-active-agents', 0);
-      bumpStat('stat-tasks-completed', parseInt(document.getElementById('stat-tasks-completed').textContent.replace(/,/g,'')) + 7);
+      const completedEl = document.getElementById('stat-tasks-completed');
+      if (completedEl) {
+        bumpStat('stat-tasks-completed', parseInt(completedEl.textContent.replace(/,/g,'')) + 7);
+      }
 
       appendLog('tag-release', 'DONE', 'Pipeline run complete. All artifacts available in the Artifact Hub.', false);
 
@@ -1404,8 +1407,12 @@ def test_update_profile_success(auth_headers):
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  triggerBtn.addEventListener('click', runPipeline);
-  featureInput.addEventListener('keydown', e => { if (e.key === 'Enter') runPipeline(); });
+  if (triggerBtn) {
+    triggerBtn.addEventListener('click', runPipeline);
+  }
+  if (featureInput) {
+    featureInput.addEventListener('keydown', e => { if (e.key === 'Enter') runPipeline(); });
+  }
 
   const clearBtn = document.getElementById('clear-btn');
   if (clearBtn) {
@@ -1527,39 +1534,48 @@ def test_update_profile_success(auth_headers):
   const mobileToggle = document.getElementById('mobile-nav-toggle');
 
   function openMobileSidebar() {
-    sidebar.classList.add('open');
-    sidebarScrim.classList.add('show');
+    if (sidebar) sidebar.classList.add('open');
+    if (sidebarScrim) sidebarScrim.classList.add('show');
   }
   function closeMobileSidebar() {
-    sidebar.classList.remove('open');
-    sidebarScrim.classList.remove('show');
+    if (sidebar) sidebar.classList.remove('open');
+    if (sidebarScrim) sidebarScrim.classList.remove('show');
   }
-  mobileToggle.addEventListener('click', () => {
-    sidebar.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
-  });
-  sidebarScrim.addEventListener('click', closeMobileSidebar);
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', () => {
+      sidebar && sidebar.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
+    });
+  }
+  if (sidebarScrim) {
+    sidebarScrim.addEventListener('click', closeMobileSidebar);
+  }
 
   /* ──────────────────────────────────────────────────────────
      THEME TOGGLE
      ────────────────────────────────────────────────────────── */
   const themeToggle = document.getElementById('theme-toggle');
-  themeToggle.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'light' ? 'dark' : 'light';
-    if (next === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    else document.documentElement.removeAttribute('data-theme');
-  });
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      if (next === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      else document.documentElement.removeAttribute('data-theme');
+    });
+  }
 
   /* ──────────────────────────────────────────────────────────
      FULLSCREEN TOGGLE
      ────────────────────────────────────────────────────────── */
-  document.getElementById('fullscreen-toggle').addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen?.().catch(() => {});
-    } else {
-      document.exitFullscreen?.();
-    }
-  });
+  const fsToggle = document.getElementById('fullscreen-toggle');
+  if (fsToggle) {
+    fsToggle.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+      } else {
+        document.exitFullscreen?.();
+      }
+    });
+  }
 
   /* ──────────────────────────────────────────────────────────
      README DOWNLOAD
@@ -1578,7 +1594,10 @@ def test_update_profile_success(auth_headers):
     showToast('success', 'Download Started', 'Your README.md file is downloading.');
   }
 
-  document.getElementById('download-readme').addEventListener('click', downloadReadmeHandler);
+  const downloadReadmeBtn = document.getElementById('download-readme');
+  if (downloadReadmeBtn) {
+    downloadReadmeBtn.addEventListener('click', downloadReadmeHandler);
+  }
 
   /* ──────────────────────────────────────────────────────────
      PARTICLE BACKGROUND — lightweight AI network visualization
