@@ -11,6 +11,23 @@
 </head>
 <body>
 
+<!-- ░░░ APP PRELOADER ░░░ -->
+<div id="preloader" class="preloader">
+  <div class="preloader-content">
+    <div class="preloader-logo">
+      <svg viewBox="0 0 40 40" class="preloader-hex">
+        <polygon points="20,2 35,11 35,29 20,38 5,29 5,11" />
+        <polygon points="20,10 28,14.5 28,25.5 20,30 12,25.5 12,14.5" class="preloader-hex-inner" />
+      </svg>
+    </div>
+    <div class="preloader-title">AgentVerse <span class="accent">AI</span></div>
+    <div class="preloader-subtitle">Loading Control Room...</div>
+    <div class="preloader-bar"><div class="preloader-bar-fill" id="preloader-bar-fill"></div></div>
+    <div class="preloader-percent" id="preloader-percent">0%</div>
+    <div class="preloader-log" id="preloader-log">Initializing system components...</div>
+  </div>
+</div>
+
 <!-- ░░░ PARTICLE / GRID BACKGROUND ░░░ -->
 <canvas id="particle-canvas"></canvas>
 <div class="grid-overlay"></div>
@@ -66,6 +83,11 @@
         <span>Settings</span>
       </a>
     </nav>
+
+    <div class="sidebar-auth" id="sidebar-auth">
+      <div class="sidebar-auth-user" id="auth-status-info">Not signed in</div>
+      <button type="button" class="sidebar-auth-btn" id="sidebar-auth-btn">Sign In</button>
+    </div>
 
     <div class="sidebar-footer">
       <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
@@ -382,7 +404,7 @@
             <span class="setting-label">Band Room ID</span>
             <span class="setting-desc">Active coordination room for agent event bus.</span>
           </div>
-          <input class="setting-input" type="text" placeholder="agentverse-ai-room-01" />
+          <input class="setting-input" type="text" id="band-room-input" placeholder="agentverse-ai-room-01" />
         </div>
         <div class="setting-row">
           <div>
@@ -399,11 +421,23 @@
 
     <footer class="app-footer">
       <span>AgentVerse AI — Band of Agents Hackathon 2026</span>
-      <span class="dot-sep">•</span>
-      <span>Member 3 / UI Dashboard</span>
     </footer>
 
   </main>
+</div>
+
+<!-- ░░░ STATS DETAIL MODAL OVERLAY ░░░ -->
+<div id="stats-detail-overlay" class="auth-overlay">
+  <div class="auth-card stats-modal-card">
+    <div class="auth-header">
+      <h2 id="stats-detail-title">Stat Details</h2>
+      <p id="stats-detail-subtitle">Detailed breakdown and analytics</p>
+    </div>
+    <div id="stats-detail-content" class="stats-detail-content">
+      <!-- Dynamically populated -->
+    </div>
+    <button type="button" id="stats-detail-close-btn" class="auth-btn auth-btn-secondary" style="margin-top: 10px; width: 100%;">Close Details</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

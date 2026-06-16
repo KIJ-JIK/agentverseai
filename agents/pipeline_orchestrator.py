@@ -109,12 +109,13 @@ class PipelineOrchestrator:
         This is CRITICAL — every event must land in pipeline_state['events']
         so that Member 3's live event console can display them.
         """
+        room_id = getattr(self, "room_id", None) or "orchestrator-local"
         event = {
             "event_id": str(uuid.uuid4()),
             "event_type": event_type,
             "sender": sender,
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "room_id": "orchestrator-local",
+            "room_id": room_id,
             "payload_data": self._safe_payload(payload_data),
         }
         self.pipeline_state["events"].append(event)
@@ -211,17 +212,30 @@ class PipelineOrchestrator:
     #  MAIN PIPELINE EXECUTION
     # ══════════════════════════════════════════════════════════════════════
 
-    async def run_pipeline(self, feature_request: str, session_id: Optional[str] = None) -> dict:
+    async def run_pipeline(self, feature_request: str, session_id: Optional[str] = None, band_room_id: Optional[str] = None) -> dict:
         """Execute the full AgentVerse AI pipeline end-to-end.
 
         Args:
             feature_request: Natural language feature request from the user.
             session_id: Optional persistent user session ID.
+            band_room_id: Optional custom Band Room ID override.
 
         Returns:
             Final pipeline_state dict.
         """
         self.session_id = session_id
+        self.room_id = band_room_id
+        
+        # Propagate custom room ID override to all agents
+        if band_room_id:
+            self.architect.room_id = band_room_id
+            self.frontend_dev.room_id = band_room_id
+            self.backend_dev.room_id = band_room_id
+            self.reviewer.room_id = band_room_id
+            self.qa_tester.room_id = band_room_id
+            self.tech_writer.room_id = band_room_id
+            self.release_manager.room_id = band_room_id
+
         logger.info(f"[Orchestrator] === Pipeline started for: {feature_request[:100]} ===")
 
 

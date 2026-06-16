@@ -65,6 +65,7 @@ class UserSession(Base):
     prompt = Column(Text, nullable=False)
     status = Column(String(50), default="IDLE")
     review_cycle = Column(Integer, default=0)
+    band_room_id = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
@@ -121,10 +122,24 @@ class Event(Base):
 def init_db() -> None:
     """Initialize database tables if they do not exist."""
     Base.metadata.create_all(bind=engine)
+    
+    # Safely alter table to add band_room_id if it's missing (fallback migration)
+    db = SessionLocal()
+    try:
+        from sqlalchemy import text
+        # Attempt to add band_room_id column; ignores failure if already exists
+        db.execute(text("ALTER TABLE user_sessions ADD COLUMN band_room_id VARCHAR(255)"))
+        db.commit()
+        logger.info("[Database] Added band_room_id column to user_sessions table.")
+    except Exception:
+        db.rollback()
+    finally:
+        db.close()
+        
     logger.info("[Database] Database initialized and tables verified.")
 
 
-def create_session(user_id: str, prompt: str) -> str:
+def create_session(user_id: str, prompt: str, band_room_id: Optional[str] = None) -> str:
     """Create a new session record and initialize all 7 agent states to IDLE."""
     db = SessionLocal()
     try:
@@ -133,7 +148,8 @@ def create_session(user_id: str, prompt: str) -> str:
             session_id=session_id,
             user_id=user_id,
             prompt=prompt,
-            status="RUNNING"
+            status="RUNNING",
+            band_room_id=band_room_id
         )
         db.add(user_sess)
         
@@ -281,7 +297,7 @@ def get_session_state(session_id: str) -> dict:
                 "event_type": evt.event_type,
                 "sender": evt.sender,
                 "timestamp": evt.timestamp.isoformat() + "Z",
-                "room_id": settings.BAND_ROOM_ID,
+                "room_id": sess.band_room_id or settings.BAND_ROOM_ID,
                 "payload_data": evt.payload_data
             })
 
@@ -289,6 +305,7 @@ def get_session_state(session_id: str) -> dict:
             "session_id": sess.session_id,
             "status": sess.status,
             "review_cycle": sess.review_cycle,
+            "band_room_id": sess.band_room_id,
             "agents": agents_dict,
             "artifacts": artifacts_dict,
             "events": events_list

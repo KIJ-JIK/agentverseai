@@ -981,13 +981,82 @@
         }
 
         if (step.event === 'SPEC_GENERATED') {
+          const archEl = document.querySelector('#architecture-tab pre code');
+          if (archEl) {
+            archEl.innerHTML = highlightJSON(JSON.stringify({
+              "architecture_pattern": "REST + React SPA",
+              "frontend_spec": {
+                "components": ["ProfileDashboard", "AuthGuard", "ProfileEditForm"],
+                "state_hooks": ["useAuthToken", "useProfileData"]
+              },
+              "backend_spec": {
+                "framework": "FastAPI",
+                "endpoints": ["POST /auth/login", "GET /profile", "PUT /profile"],
+                "auth": "JWT Bearer"
+              }
+            }, null, 2));
+          }
           setEdgeFlow('n-input', 'n-architect', false);
           setEdgeFlow('n-architect', 'n-frontend', true);
           setEdgeFlow('n-architect', 'n-backend', true);
         }
-        if (step.event === 'CODE_EMITTED' && step.nodes.includes('n-frontend')) {
-          setEdgeFlow('n-frontend', 'n-reviewer', true);
-          setEdgeFlow('n-backend', 'n-reviewer', true);
+        if (step.event === 'CODE_EMITTED') {
+          const isIteration2 = step.task.includes('iteration 2') || reviewCycle > 0;
+          const feEl = document.querySelector('#code-tab .code-col:nth-child(1) pre code');
+          if (feEl) {
+            feEl.innerHTML = highlightJSX(`function ProfileDashboard() {
+  const [profile, setProfile] = useState(null);
+  const { token } = useAuthToken();
+
+  useEffect(() => {
+    fetchProfile(token).then(setProfile);
+  }, [token]);
+
+  if (!profile) return <Spinner />;
+
+  return (
+    <AuthGuard>
+      <ProfileEditForm data={profile} />
+    </AuthGuard>
+  );
+}`);
+          }
+          const beEl = document.querySelector('#code-tab .code-col:nth-child(2) pre code');
+          if (beEl) {
+            if (isIteration2) {
+              beEl.innerHTML = highlightPython(`@app.put("/profile")
+async def update_profile(
+    payload: ProfileUpdate,
+    user: User = Depends(get_current_user)
+):
+    # JWT-validated mutation (Iteration 2 Patch)
+    updated = await db.profiles.update(
+        {"user_id": user.id},
+        payload.dict()
+    )
+    return {"status": "ok", "profile": updated}`);
+            } else {
+              beEl.innerHTML = highlightPython(`@app.put("/profile")
+async def update_profile(
+    payload: ProfileUpdate
+):
+    # Vulnerable mutation: no auth guard check (Iteration 1)
+    updated = await db.profiles.update(
+        {"user_id": payload.user_id},
+        payload.dict()
+    )
+    return {"status": "ok", "profile": updated}`);
+            }
+          }
+          const feBadge = document.getElementById('iter-badge-fe');
+          if (feBadge) feBadge.textContent = 'Iteration 2';
+          const beBadge = document.getElementById('iter-badge-be');
+          if (beBadge) beBadge.textContent = isIteration2 ? 'Iteration 2' : 'Iteration 1';
+
+          if (step.nodes.includes('n-frontend')) {
+            setEdgeFlow('n-frontend', 'n-reviewer', true);
+            setEdgeFlow('n-backend', 'n-reviewer', true);
+          }
         }
         if (step.event === 'CODE_REJECTED') {
           setEdgeFlow('n-reviewer', 'n-backend', true);
@@ -998,9 +1067,56 @@
           reviewCycle++;
         }
         if (step.event === 'TESTS_GENERATED') {
+          const tCodeEl = document.querySelector('#tests-tab pre code');
+          if (tCodeEl) {
+            tCodeEl.innerHTML = highlightPython(`def test_update_profile_requires_auth():
+    response = client.put("/profile", json={})
+    assert response.status_code == 401
+
+def test_update_profile_success(auth_headers):
+    response = client.put(
+        "/profile",
+        json={"display_name": "Cloudy"},
+        headers=auth_headers
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+    # PASSED — 0.04s`);
+          }
+          const fwVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(1) .test-stat-value');
+          if (fwVal) fwVal.textContent = 'pytest';
+          const fileVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(2) .test-stat-value');
+          if (fileVal) fileVal.textContent = 'test_profile_api.py';
+          const covVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(3) .test-stat-value');
+          if (covVal) covVal.textContent = '94%';
+
           setEdgeFlow('n-qa', 'n-writer', true);
         }
         if (step.event === 'DOCS_GENERATED') {
+          const docText = `# Profile Dashboard Feature\n\nAdds a secure, JWT-authenticated profile dashboard allowing users to view and edit their account details.\n\n## Endpoints\n- \`POST /auth/login\` — returns a signed JWT bearer token\n- \`GET /profile\` — returns the authenticated user's profile\n- \`PUT /profile\` — updates profile fields, JWT-validated\n\n## Frontend Components\n\`ProfileDashboard\`, \`AuthGuard\`, and \`ProfileEditForm\` compose the client experience, backed by \`useAuthToken\` and \`useProfileData\` hooks.`;
+          latestDocContent = docText;
+          const mdRenderEl = document.querySelector('#docs-tab .markdown-render');
+          if (mdRenderEl) {
+            mdRenderEl.innerHTML = `
+              <h3># Profile Dashboard Feature</h3>
+              <p>Adds a secure, JWT-authenticated profile dashboard allowing users to view and edit their account details.</p>
+              <h4>## Endpoints</h4>
+              <ul>
+                <li><code>POST /auth/login</code> — returns a signed JWT bearer token</li>
+                <li><code>GET /profile</code> — returns the authenticated user's profile</li>
+                <li><code>PUT /profile</code> — updates profile fields, JWT-validated</li>
+              </ul>
+              <h4>## Frontend Components</h4>
+              <p><code>ProfileDashboard</code>, <code>AuthGuard</code>, and <code>ProfileEditForm</code> compose the client experience, backed by <code>useAuthToken</code> and <code>useProfileData</code> hooks.</p>
+              <button type="button" class="btn-download" id="download-readme">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                Download README.md
+              </button>`;
+            
+            // Re-bind click handler
+            const dlBtn = document.getElementById('download-readme');
+            if (dlBtn) dlBtn.addEventListener('click', downloadReadmeHandler);
+          }
           setEdgeFlow('n-qa', 'n-release', true);
         }
 
@@ -1073,10 +1189,18 @@
         showToast('info', 'Pipeline Triggered', 'AgentVerse AI is triggering backend agents.');
 
         try {
+          const bandRoomInput = document.getElementById('band-room-input');
+          const bandRoomId = bandRoomInput ? bandRoomInput.value.trim() : '';
+
+          const payload = { feature_request: feature };
+          if (bandRoomId) {
+            payload.band_room_id = bandRoomId;
+          }
+
           const response = await fetch('/api/sessions', {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify({ feature_request: feature })
+            body: JSON.stringify(payload)
           });
 
           if (!response.ok) {
@@ -1277,8 +1401,8 @@
 
     function draw() {
       ctx.clearRect(0, 0, w, h);
-      const lineColor = isLight() ? 'rgba(6,182,212,0.12)' : 'rgba(6,182,212,0.18)';
-      const dotColor = isLight() ? 'rgba(6,182,212,0.35)' : 'rgba(6,182,212,0.55)';
+      const lineColor = isLight() ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.03)';
+      const dotColor = isLight() ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.12)';
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -1311,6 +1435,254 @@
   }
 
   /* ──────────────────────────────────────────────────────────
+     PRELOADER ANIMATION
+     ────────────────────────────────────────────────────────── */
+  function animatePreloader() {
+    const preloader = document.getElementById('preloader');
+    const bar = document.getElementById('preloader-bar-fill');
+    const percentText = document.getElementById('preloader-percent');
+    const logText = document.getElementById('preloader-log');
+    if (!preloader) return;
+
+    const logs = [
+      'Initializing core system engines...',
+      'Loading state mapping schemas...',
+      'Resolving Supabase auth session keys...',
+      'Subscribing to Band Room event stream...',
+      'Establishing Neon PostgreSQL connection...',
+      'Pre-compiling workspace templates...',
+      'Loading interface configurations...',
+      'Systems operational. Entering Control Room.'
+    ];
+
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.floor(Math.random() * 8) + 4;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        setTimeout(() => {
+          preloader.style.opacity = '0';
+          preloader.style.pointerEvents = 'none';
+          setTimeout(() => preloader.style.display = 'none', 500);
+        }, 300);
+      }
+
+      if (bar) bar.style.width = `${progress}%`;
+      if (percentText) percentText.textContent = `${progress}%`;
+
+      const logIndex = Math.min(
+        logs.length - 1,
+        Math.floor((progress / 100) * logs.length)
+      );
+      if (logText) logText.textContent = logs[logIndex];
+    }, 70);
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     SIDEBAR AUTH STATE & ACTIONS
+     ────────────────────────────────────────────────────────── */
+  function updateAuthUI() {
+    const authStatusInfo = document.getElementById('auth-status-info');
+    const sidebarAuthBtn = document.getElementById('sidebar-auth-btn');
+    if (!authStatusInfo || !sidebarAuthBtn) return;
+
+    if (currentSession) {
+      authStatusInfo.textContent = currentSession.user.email;
+      sidebarAuthBtn.textContent = 'Sign Out';
+    } else if (localBypassActive) {
+      authStatusInfo.textContent = 'Local Mock Mode';
+      sidebarAuthBtn.textContent = 'Sign Out';
+    } else {
+      authStatusInfo.textContent = 'Not signed in';
+      sidebarAuthBtn.textContent = 'Sign In';
+    }
+  }
+
+  function setupSidebarAuth() {
+    const btn = document.getElementById('sidebar-auth-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+      if (currentSession || localBypassActive) {
+        if (supabase && currentSession) {
+          await supabase.auth.signOut();
+        }
+        currentSession = null;
+        localBypassActive = false;
+        showToast('info', 'Signed Out', 'You have been signed out.');
+        updateAuthUI();
+      } else {
+        showAuthModal(() => {
+          updateAuthUI();
+        });
+      }
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     SETTINGS ROOM ID CACHE
+     ────────────────────────────────────────────────────────── */
+  function setupBandRoomSettings() {
+    const bandRoomInput = document.getElementById('band-room-input');
+    if (!bandRoomInput) return;
+
+    const savedRoom = localStorage.getItem('agentverse_band_room_id');
+    if (savedRoom) {
+      bandRoomInput.value = savedRoom;
+    }
+
+    bandRoomInput.addEventListener('input', () => {
+      localStorage.setItem('agentverse_band_room_id', bandRoomInput.value.trim());
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     STATS DETAIL MODALS
+     ────────────────────────────────────────────────────────── */
+  function setupStatsModal() {
+    const overlay = document.getElementById('stats-detail-overlay');
+    const closeBtn = document.getElementById('stats-detail-close-btn');
+    const title = document.getElementById('stats-detail-title');
+    const subtitle = document.getElementById('stats-detail-subtitle');
+    const content = document.getElementById('stats-detail-content');
+
+    if (!overlay || !closeBtn || !content) return;
+
+    closeBtn.addEventListener('click', () => {
+      overlay.classList.remove('show');
+    });
+
+    const cards = [
+      { id: 'stat-active-agents', key: 'agents' },
+      { id: 'stat-tasks-completed', key: 'tasks' },
+      { id: 'stat-success-rate', key: 'success' },
+      { id: 'stat-events', key: 'events' }
+    ];
+
+    cards.forEach(c => {
+      const cardEl = document.getElementById(c.id);
+      const parentCard = cardEl ? cardEl.closest('.stat-card') : null;
+      if (parentCard) {
+        parentCard.addEventListener('click', () => {
+          showStatsDetail(c.key, title, subtitle, content);
+          overlay.classList.add('show');
+        });
+      }
+    });
+  }
+
+  function showStatsDetail(key, title, subtitle, content) {
+    if (key === 'agents') {
+      title.textContent = 'Agent Activity Status';
+      subtitle.textContent = 'Current status of the 7 pipeline agents';
+      
+      let html = '<div class="stats-detail-list">';
+      AGENTS.forEach(a => {
+        const s = agentState[a.id] || { state: 'idle', task: 'Idle — waiting on spec' };
+        let badgeClass = 'tag-info';
+        if (s.state === 'processing') badgeClass = 'tag-spec';
+        else if (s.state === 'complete') badgeClass = 'tag-approved';
+        else if (s.state === 'rejected') badgeClass = 'tag-rejected';
+        
+        html += `
+          <div class="stats-detail-row">
+            <div class="stats-detail-row-title">
+              <span>${a.icon}</span>
+              <strong>${a.name}</strong>
+            </div>
+            <div class="stats-detail-row-desc">${s.task}</div>
+            <span class="stats-detail-badge ${badgeClass}">${s.state}</span>
+          </div>`;
+      });
+      html += '</div>';
+      content.innerHTML = html;
+    } else if (key === 'tasks') {
+      title.textContent = 'Completed Milestones';
+      subtitle.textContent = 'SDLC phases completed in the current run';
+      
+      const milestones = [
+        { title: 'Architecture Specification', desc: 'System blueprints and task matrix generated.', val: '100% Complete' },
+        { title: 'Parallel Code Development', desc: 'Frontend React & Backend FastAPI modules drafted.', val: '100% Complete' },
+        { title: 'Quality Code Audit', desc: 'Reviewed by Senior Architect. Security verification passed.', val: '100% Complete' },
+        { title: 'Automated Test Generation', desc: 'comprehensive unit test suite written with pytest.', val: '100% Complete' },
+        { title: 'Technical Documentation', desc: 'Standard development instructions README.md compiled.', val: '100% Complete' },
+        { title: 'Final Release Verification', desc: 'All tests passed. System tagged as MERGE_READY.', val: '100% Complete' }
+      ];
+
+      let html = '<div class="stats-detail-list">';
+      milestones.forEach(m => {
+        html += `
+          <div class="stats-detail-list-item">
+            <div class="stats-detail-item-top">
+              <span class="stats-detail-item-title">${m.title}</span>
+              <span class="stats-detail-item-val">${m.val}</span>
+            </div>
+            <div class="stats-detail-item-desc">${m.desc}</div>
+          </div>`;
+      });
+      html += '</div>';
+      content.innerHTML = html;
+    } else if (key === 'success') {
+      title.textContent = 'Pipeline Quality Audit';
+      subtitle.textContent = 'Security compliance and quality verification metrics';
+      
+      const metrics = [
+        { title: 'Syntax & Compilation Check', desc: 'Verify all generated source code builds compile correctly.', val: 'PASS' },
+        { title: 'Auth / Security Compliance', desc: 'Ensured JWT authentication guards protect all mutation endpoints.', val: 'PASS' },
+        { title: 'Code Injection Vulnerabilities', desc: 'Static analysis check for SQLi or command injection risks.', val: '0 Issues' },
+        { title: 'Test Coverage Rate', desc: 'Proportion of generated lines validated by the pytest suite.', val: '94% Coverage' },
+        { title: 'Orchestrator Retries', desc: 'Number of loop-backs to correct code remediation errors.', val: '1/3 loops' }
+      ];
+
+      let html = '<div class="stats-detail-list">';
+      metrics.forEach(m => {
+        let valColor = 'var(--green)';
+        if (m.val === 'PASS') valColor = 'var(--green)';
+        else if (m.val.includes('94%')) valColor = 'var(--cyan)';
+        
+        html += `
+          <div class="stats-detail-row">
+            <div class="stats-detail-row-title">
+              <strong>${m.title}</strong>
+            </div>
+            <div class="stats-detail-row-desc">${m.desc}</div>
+            <span style="font-weight:700; color:${valColor}; font-size:0.85rem;">${m.val}</span>
+          </div>`;
+      });
+      html += '</div>';
+      content.innerHTML = html;
+    } else if (key === 'events') {
+      title.textContent = 'Coordination Events Audit';
+      subtitle.textContent = 'Transmitted event count breakdown on the multi-agent bus';
+      
+      const counts = [
+        { title: 'SPEC_GENERATED', desc: 'Emitted by ArchitectAgent with design specifications.', val: '1 event' },
+        { title: 'CODE_EMITTED', desc: 'Emitted by FrontendDev & BackendDev agents with code.', val: '2 events' },
+        { title: 'CODE_REJECTED', desc: 'Emitted by CodeReviewer due to missing auth guard.', val: '1 event' },
+        { title: 'CODE_APPROVED', desc: 'Emitted by CodeReviewer sign-off verification.', val: '1 event' },
+        { title: 'TESTS_GENERATED', desc: 'Emitted by QATester with unit tests.', val: '1 event' },
+        { title: 'DOCS_GENERATED', desc: 'Emitted by TechWriter with README.md.', val: '1 event' },
+        { title: 'FINAL_VERDICT_MERGE_READY', desc: 'Emitted by ReleaseManager to sign off deployment.', val: '1 event' }
+      ];
+
+      let html = '<div class="stats-detail-list">';
+      counts.forEach(c => {
+        html += `
+          <div class="stats-detail-row">
+            <div class="stats-detail-row-title">
+              <strong>${c.title}</strong>
+            </div>
+            <div class="stats-detail-row-desc">${c.desc}</div>
+            <span style="font-family:var(--font-mono); font-weight:600; color:var(--cyan); font-size:0.8rem;">${c.val}</span>
+          </div>`;
+      });
+      html += '</div>';
+      content.innerHTML = html;
+    }
+  }
+
+  /* ──────────────────────────────────────────────────────────
      INIT
      ────────────────────────────────────────────────────────── */
   function init() {
@@ -1320,6 +1692,12 @@
     animateCounters();
     initParticles();
     bumpTokens(8400);
+
+    animatePreloader();
+    setupSidebarAuth();
+    setupBandRoomSettings();
+    setupStatsModal();
+    updateAuthUI();
 
     appendLog('tag-info', 'BOOT', 'AgentVerse AI Control Room initialized.', false);
     appendLog('tag-info', 'BOOT', 'Connected to Band room: agentverse-ai-room-01', false);

@@ -127,13 +127,14 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Authenticat
 
 class TriggerPipelineRequest(BaseModel):
     feature_request: str
+    band_room_id: Optional[str] = None
 
 
-async def run_pipeline_task(feature_request: str, session_id: str):
+async def run_pipeline_task(feature_request: str, session_id: str, band_room_id: Optional[str] = None):
     """Executes the pipeline orchestrator in a background thread."""
     orchestrator = PipelineOrchestrator()
     try:
-        await orchestrator.run_pipeline(feature_request, session_id=session_id)
+        await orchestrator.run_pipeline(feature_request, session_id=session_id, band_room_id=band_room_id)
     except Exception as e:
         logger.error(f"[Gateway] Background run failed for session {session_id}: {e}")
 
@@ -155,10 +156,10 @@ def start_pipeline_run(
 
     try:
         # Create session in DB
-        session_id = create_session(user.id, prompt)
+        session_id = create_session(user.id, prompt, request.band_room_id)
         
         # Dispatch orchestrator run as background task (non-blocking)
-        background_tasks.add_task(run_pipeline_task, prompt, session_id)
+        background_tasks.add_task(run_pipeline_task, prompt, session_id, request.band_room_id)
         
         return {
             "status": "success",

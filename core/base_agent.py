@@ -57,11 +57,12 @@ class BaseAgent(abc.ABC):
             payload: The event payload dict.
         """
         logger.info(f"[{self.name}] Emitting {event_type}")
+        room_id = getattr(self, "room_id", None) or settings.BAND_ROOM_ID
         await publish_event(
             event_type=event_type,
             sender=self.name,
             payload_data=payload,
-            room_id=settings.BAND_ROOM_ID,
+            room_id=room_id,
         )
 
     async def call_json(self, user_prompt: str) -> dict:
