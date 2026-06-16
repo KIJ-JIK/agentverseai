@@ -138,13 +138,12 @@ def deploy():
         with urllib.request.urlopen(req) as response:
             res_data = json.loads(response.read().decode())
             print("\n[+] SUCCESS: Render service created successfully!")
-            print(f"Service ID: {res_data.get('id')}")
+            service_obj = res_data.get("service", {})
+            service_id = service_obj.get("id")
+            live_url = service_obj.get("url")
+            dashboard_url = f"https://dashboard.render.com/web/{service_id}" if service_id else "https://dashboard.render.com"
             
-            # Find the dashboard URL or deploy status URL
-            service_details = res_data.get("serviceDetails", {})
-            dashboard_url = f"https://dashboard.render.com/web/{res_data.get('id')}"
-            live_url = res_data.get("url")
-            
+            print(f"Service ID: {service_id}")
             print(f"Dashboard URL: {dashboard_url}")
             print(f"Live Application URL: {live_url}")
             print("\nYour application is now building on Render. Monitor the progress in the Render dashboard.")
