@@ -1159,8 +1159,31 @@
       e.preventDefault();
       navItems.forEach(n => n.classList.remove('active'));
       item.classList.add('active');
-      const target = document.getElementById(item.dataset.section);
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      const section = item.dataset.section;
+      if (section === 'testing') {
+        const target = document.getElementById('canvas');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const tabBtn = document.querySelector('.tab[data-tab="tests-tab"]');
+        if (tabBtn) tabBtn.click();
+      } else if (section === 'docs') {
+        const target = document.getElementById('canvas');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const tabBtn = document.querySelector('.tab[data-tab="docs-tab"]');
+        if (tabBtn) tabBtn.click();
+      } else if (section === 'canvas') {
+        const target = document.getElementById('canvas');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const tabBtn = document.querySelector('.tab[data-tab="code-tab"]');
+        if (tabBtn) tabBtn.click();
+      } else {
+        const target = document.getElementById(section);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (section === 'dashboard') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
       closeMobileSidebar();
     });
   });
@@ -1207,6 +1230,20 @@
   /* ──────────────────────────────────────────────────────────
      README DOWNLOAD
      ────────────────────────────────────────────────────────── */
+  function downloadReadmeHandler() {
+    const content = latestDocContent || `# Profile Dashboard Feature\n\nAdds a secure, JWT-authenticated profile dashboard allowing users to view and edit their account details.`;
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'README.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('success', 'Download Started', 'Your README.md file is downloading.');
+  }
+
   document.getElementById('download-readme').addEventListener('click', downloadReadmeHandler);
 
   /* ──────────────────────────────────────────────────────────
