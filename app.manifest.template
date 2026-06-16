@@ -1,0 +1,78 @@
+# AgentVerse AI — Gramine SGX Manifest Template
+# ==========================================
+# Configures the Intel SGX enclave boundaries, memory allocations,
+# trusted files, and network mounts for the Python agent pipeline.
+
+# ── Entrypoint Configuration ────────────────────────────────────────────────
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "{{ entrypoint }}"
+
+# Log level (error, warning, info, debug, trace)
+loader.log_level = "{{ log_level }}"
+
+# ── Environment Variables ───────────────────────────────────────────────────
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/lib:/usr/lib/{{ arch_libdir }}"
+loader.env.PATH = "/bin:/usr/bin"
+loader.env.PYTHONPATH = "/app:/usr/lib/python3.10:/usr/lib/python3.10/lib-dynload:/usr/local/lib/python3.10/dist-packages:/usr/lib/python3/dist-packages"
+loader.env.PYTHONUNBUFFERED = "1"
+
+# Pass config keys securely via the loader env (filled in at runtime)
+loader.env.MOCK_MODE = { passthrough = true }
+loader.env.DATABASE_URL = { passthrough = true }
+loader.env.AIML_API_KEY = { passthrough = true }
+loader.env.FEATHERLESS_API_KEY = { passthrough = true }
+loader.env.BAND_ROOM_ID = { passthrough = true }
+
+# ── Enclave Resource Allocations ─────────────────────────────────────────────
+# Python runtime requires significant enclave heap memory
+sgx.enclave_size = "1G"
+sgx.max_threads = 32
+
+# ── Mounts / Filesystem Virtualization ───────────────────────────────────────
+fs.mounts = [
+  { uri = "file:{{ gramine.runtimedir() }}/lib", path = "/lib" },
+  { uri = "file:{{ arch_libdir }}", path = "/lib/{{ arch_libdir }}" },
+  { uri = "file:/usr", path = "/usr" },
+  { uri = "file:/etc", path = "/etc" },
+  { uri = "file:.", path = "/app" }
+]
+
+# ── SGX Trusted Files (Cryptographically Hashed & Checked) ──────────────────
+# Gramine validates the SHA256 signatures of these files before startup.
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ entrypoint }}",
+  "file:{{ gramine.runtimedir() }}/lib/",
+  "file:{{ arch_libdir }}/",
+  "file:/usr/lib/",
+  
+  # AgentVerse AI Source Scripts (Must be trusted and immutable inside TEE)
+  "file:app.py",
+  "file:api_gateway.py",
+  "file:run_demo.py",
+  "file:config/settings.py",
+  "file:core/base_agent.py",
+  "file:core/database.py",
+  "file:core/llm_router.py",
+  "file:core/band_wrapper.py",
+  "file:agents/__init__.py",
+  "file:agents/architect.py",
+  "file:agents/frontend_dev.py",
+  "file:agents/backend_dev.py",
+  "file:agents/reviewer.py",
+  "file:agents/qa_tester.py",
+  "file:agents/tech_writer.py",
+  "file:agents/release_manager.py",
+  "file:agents/pipeline_orchestrator.py",
+]
+
+# ── SGX Allowed Files (Mutable/Untrusted Files) ──────────────────────────────
+# Files that are allowed to change (e.g. host configuration or local SQLite)
+sgx.allowed_files = [
+  "file:/etc/hosts",
+  "file:/etc/resolv.conf",
+  "file:/etc/nsswitch.conf",
+  "file:devflow_local.db",
+  "file:pipeline_state.json",
+  "file:pipeline_state.json.tmp",
+]

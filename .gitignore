@@ -1,0 +1,33 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+
+# Python caches and build files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Local pipeline state and temp files
+pipeline_state.json
+pipeline_state.json.tmp
+.band_mock_bus.json
+
+# IDE config files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Databases
+*.db
+*.db-journal
