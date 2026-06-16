@@ -130,11 +130,12 @@ class TriggerPipelineRequest(BaseModel):
     band_room_id: Optional[str] = None
 
 
-async def run_pipeline_task(feature_request: str, session_id: str, band_room_id: Optional[str] = None):
+def run_pipeline_task(feature_request: str, session_id: str, band_room_id: Optional[str] = None):
     """Executes the pipeline orchestrator in a background thread."""
     orchestrator = PipelineOrchestrator()
     try:
-        await orchestrator.run_pipeline(feature_request, session_id=session_id, band_room_id=band_room_id)
+        import asyncio
+        asyncio.run(orchestrator.run_pipeline(feature_request, session_id=session_id, band_room_id=band_room_id))
     except Exception as e:
         logger.error(f"[Gateway] Background run failed for session {session_id}: {e}")
 

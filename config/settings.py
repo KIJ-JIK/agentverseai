@@ -51,7 +51,7 @@ class Settings(BaseSettings):
 
     # ── Band API (Multi-Agent Coordination Bus) ──────────────────────────
     BAND_BASE_URL: str = Field(
-        default="https://api.band.bot/v1",
+        default="https://app.band.ai",
         description="Base URL for the Band multi-agent bus",
     )
     BAND_ROOM_ID: str = Field(

@@ -141,10 +141,17 @@ def _sync_publish_event(
 
     # Initialize SDK RestClient
     base_url = settings.BAND_BASE_URL
-    if base_url == "https://api.band.bot/v1" or not base_url:
-        client = RestClient(api_key=api_key)
+    if not base_url or "band.bot" in base_url or "thenvoi.com" in base_url:
+        base_url = "https://app.band.ai"
     else:
-        client = RestClient(api_key=api_key, base_url=base_url)
+        if base_url.endswith("/api/v1"):
+            base_url = base_url[:-7]
+        elif base_url.endswith("/v1"):
+            base_url = base_url[:-3]
+        if base_url.endswith("/"):
+            base_url = base_url[:-1]
+
+    client = RestClient(api_key=api_key, base_url=base_url, timeout=10.0)
 
     # 1. Build and publish Chat Event
     content = f"[{sender}] Emitted event {event_type}"
