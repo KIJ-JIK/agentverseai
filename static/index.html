@@ -16,10 +16,12 @@
   <div class="preloader-content">
     <div class="preloader-logo">
       <svg viewBox="0 0 40 40" class="brand-logo-svg">
-        <path d="M 8,20 C 12,10 28,10 32,20 C 28,30 12,30 8,20 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" />
-        <circle cx="20" cy="20" r="4.5" fill="var(--violet)" />
-        <circle cx="8" cy="20" r="3" fill="var(--cyan)" />
-        <circle cx="32" cy="20" r="3" fill="var(--cyan)" />
+        <path d="M 12 28 L 20 12 L 28 28 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linejoin="round" />
+        <path d="M 12 28 C 16 22, 24 22, 28 28" fill="none" stroke="var(--violet)" stroke-width="1.8" stroke-dasharray="2,2" />
+        <circle cx="20" cy="12" r="4.5" fill="var(--cyan)" />
+        <circle cx="20" cy="12" r="7.5" fill="none" stroke="var(--cyan)" stroke-width="1" opacity="0.5" />
+        <circle cx="12" cy="28" r="4.5" fill="var(--violet)" />
+        <circle cx="28" cy="28" r="4.5" fill="var(--violet)" />
       </svg>
     </div>
     <div class="preloader-title">devflow<span class="accent">AI</span></div>
@@ -42,13 +44,19 @@
 
   <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar" id="sidebar">
+    <button type="button" class="sidebar-collapse-btn" id="sidebar-collapse-btn" aria-label="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    
     <div class="sidebar-brand">
       <div class="brand-mark">
         <svg viewBox="0 0 40 40" class="brand-logo-svg">
-          <path d="M 8,20 C 12,10 28,10 32,20 C 28,30 12,30 8,20 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" />
-          <circle cx="20" cy="20" r="4.5" fill="var(--violet)" />
-          <circle cx="8" cy="20" r="3" fill="var(--cyan)" />
-          <circle cx="32" cy="20" r="3" fill="var(--cyan)" />
+          <path d="M 12 28 L 20 12 L 28 28 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linejoin="round" />
+          <path d="M 12 28 C 16 22, 24 22, 28 28" fill="none" stroke="var(--violet)" stroke-width="1.8" stroke-dasharray="2,2" />
+          <circle cx="20" cy="12" r="4.5" fill="var(--cyan)" />
+          <circle cx="20" cy="12" r="7.5" fill="none" stroke="var(--cyan)" stroke-width="1" opacity="0.5" />
+          <circle cx="12" cy="28" r="4.5" fill="var(--violet)" />
+          <circle cx="28" cy="28" r="4.5" fill="var(--violet)" />
         </svg>
       </div>
       <div class="brand-text">
@@ -88,10 +96,7 @@
       </a>
     </nav>
 
-    <div class="sidebar-auth" id="sidebar-auth">
-      <div class="sidebar-auth-user" id="auth-status-info">Not signed in</div>
-      <button type="button" class="sidebar-auth-btn" id="sidebar-auth-btn">Sign In</button>
-    </div>
+    <div class="sidebar-auth" id="sidebar-auth"></div>
 
     <div class="sidebar-footer">
       <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
@@ -121,10 +126,12 @@
         <div class="hero-logo">
           <div class="logo-orbit-container">
             <svg viewBox="0 0 40 40" class="brand-logo-svg hero-logo-svg">
-              <path d="M 8,20 C 12,10 28,10 32,20 C 28,30 12,30 8,20 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" />
-              <circle cx="20" cy="20" r="4.5" fill="var(--violet)" />
-              <circle cx="8" cy="20" r="3" fill="var(--cyan)" />
-              <circle cx="32" cy="20" r="3" fill="var(--cyan)" />
+              <path d="M 12 28 L 20 12 L 28 28 Z" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linejoin="round" />
+              <path d="M 12 28 C 16 22, 24 22, 28 28" fill="none" stroke="var(--violet)" stroke-width="1.8" stroke-dasharray="2,2" />
+              <circle cx="20" cy="12" r="4.5" fill="var(--cyan)" />
+              <circle cx="20" cy="12" r="7.5" fill="none" stroke="var(--cyan)" stroke-width="1" opacity="0.5" />
+              <circle cx="12" cy="28" r="4.5" fill="var(--violet)" />
+              <circle cx="28" cy="28" r="4.5" fill="var(--violet)" />
             </svg>
           </div>
           <div class="hero-titles">
@@ -274,16 +281,19 @@
             <div class="tab-panel active" id="architecture-tab">
               <div class="json-viewer">
 <pre><code><span class="tok-punc">{</span>
-  <span class="tok-key">"architecture_pattern"</span><span class="tok-punc">:</span> <span class="tok-str">"REST + React SPA"</span><span class="tok-punc">,</span>
-  <span class="tok-key">"frontend_spec"</span><span class="tok-punc">:</span> <span class="tok-punc">{</span>
-    <span class="tok-key">"components"</span><span class="tok-punc">:</span> <span class="tok-punc">[</span><span class="tok-str">"ProfileDashboard"</span><span class="tok-punc">,</span> <span class="tok-str">"AuthGuard"</span><span class="tok-punc">,</span> <span class="tok-str">"ProfileEditForm"</span><span class="tok-punc">]</span><span class="tok-punc">,</span>
-    <span class="tok-key">"state_hooks"</span><span class="tok-punc">:</span> <span class="tok-punc">[</span><span class="tok-str">"useAuthToken"</span><span class="tok-punc">,</span> <span class="tok-str">"useProfileData"</span><span class="tok-punc">]</span>
-  <span class="tok-punc">}</span><span class="tok-punc">,</span>
-  <span class="tok-key">"backend_spec"</span><span class="tok-punc">:</span> <span class="tok-punc">{</span>
-    <span class="tok-key">"framework"</span><span class="tok-punc">:</span> <span class="tok-str">"FastAPI"</span><span class="tok-punc">,</span>
-    <span class="tok-key">"endpoints"</span><span class="tok-punc">:</span> <span class="tok-punc">[</span><span class="tok-str">"POST /auth/login"</span><span class="tok-punc">,</span> <span class="tok-str">"GET /profile"</span><span class="tok-punc">,</span> <span class="tok-str">"PUT /profile"</span><span class="tok-punc">]</span><span class="tok-punc">,</span>
-    <span class="tok-key">"auth"</span><span class="tok-punc">:</span> <span class="tok-str">"JWT Bearer"</span>
-  <span class="tok-punc">}</span>
+  <span class="tok-key">"platform"</span><span class="tok-punc">:</span> <span class="tok-str">"DevFlow AI Control Room"</span><span class="tok-punc">,</span>
+  <span class="tok-key">"pattern"</span><span class="tok-punc">:</span> <span class="tok-str">"Multi-Agent Orchestration"</span><span class="tok-punc">,</span>
+  <span class="tok-key">"communication_layer"</span><span class="tok-punc">:</span> <span class="tok-str">"Band Event Bus (app.band.ai)"</span><span class="tok-punc">,</span>
+  <span class="tok-key">"pipeline"</span><span class="tok-punc">:</span> <span class="tok-punc">[</span>
+    <span class="tok-punc">{</span> <span class="tok-key">"agent"</span><span class="tok-punc">:</span> <span class="tok-str">"ArchitectAgent"</span><span class="tok-punc">,</span> <span class="tok-key">"role"</span><span class="tok-punc">:</span> <span class="tok-str">"Compiles system specifications"</span> <span class="tok-punc">}</span><span class="tok-punc">,</span>
+    <span class="tok-punc">{</span> <span class="tok-key">"agent"</span><span class="tok-punc">:</span> <span class="tok-str">"FrontendDevAgent"</span><span class="tok-punc">,</span> <span class="tok-key">"role"</span><span class="tok-punc">:</span> <span class="tok-str">"Generates React component code"</span> <span class="tok-punc">}</span><span class="tok-punc">,</span>
+    <span class="tok-punc">{</span> <span class="tok-key">"agent"</span><span class="tok-punc">:</span> <span class="tok-str">"BackendDevAgent"</span><span class="tok-punc">,</span> <span class="tok-key">"role"</span><span class="tok-punc">:</span> <span class="tok-str">"Generates FastAPI route handlers"</span> <span class="tok-punc">}</span><span class="tok-punc">,</span>
+    <span class="tok-punc">{</span> <span class="tok-key">"agent"</span><span class="tok-punc">:</span> <span class="tok-str">"CodeReviewerAgent"</span><span class="tok-punc">,</span> <span class="tok-key">"role"</span><span class="tok-punc">:</span> <span class="tok-str">"Performs security and bug checks"</span> <span class="tok-punc">}</span><span class="tok-punc">,</span>
+    <span class="tok-punc">{</span> <span class="tok-key">"agent"</span><span class="tok-punc">:</span> <span class="tok-str">"QATesterAgent"</span><span class="tok-punc">,</span> <span class="tok-key">"role"</span><span class="tok-punc">:</span> <span class="tok-str">"Writes complete pytest suites"</span> <span class="tok-punc">}</span><span class="tok-punc">,</span>
+    <span class="tok-punc">{</span> <span class="tok-key">"agent"</span><span class="tok-punc">:</span> <span class="tok-str">"TechWriterAgent"</span><span class="tok-punc">,</span> <span class="tok-key">"role"</span><span class="tok-punc">:</span> <span class="tok-str">"Writes README documentation"</span> <span class="tok-punc">}</span><span class="tok-punc">,</span>
+    <span class="tok-punc">{</span> <span class="tok-key">"agent"</span><span class="tok-punc">:</span> <span class="tok-str">"ReleaseManagerAgent"</span><span class="tok-punc">,</span> <span class="tok-key">"role"</span><span class="tok-punc">:</span> <span class="tok-str">"Verifies gates and merges changes"</span> <span class="tok-punc">}</span>
+  <span class="tok-punc">]</span><span class="tok-punc">,</span>
+  <span class="tok-key">"status"</span><span class="tok-punc">:</span> <span class="tok-str">"Ready. Enter a prompt to trigger the agent network."</span>
 <span class="tok-punc">}</span></code></pre>
               </div>
             </div>
@@ -294,41 +304,57 @@
                 <div class="code-col">
                   <div class="code-col-head">
                     <span class="badge badge-cyan">Frontend.jsx</span>
-                    <span class="badge badge-ghost" id="iter-badge-fe">Iteration 2</span>
+                    <span class="badge badge-ghost" id="iter-badge-fe">Iteration 1</span>
                   </div>
-                  <pre class="code-block"><code><span class="tok-key">function</span> <span class="tok-fn">ProfileDashboard</span>() {
-  <span class="tok-key">const</span> [profile, setProfile] = <span class="tok-fn">useState</span>(<span class="tok-num">null</span>);
-  <span class="tok-key">const</span> { token } = <span class="tok-fn">useAuthToken</span>();
+                  <pre class="code-block"><code><span class="tok-comment">// DevFlow AI - Default Demo Component</span>
+<span class="tok-key">import</span> React<span class="tok-punc">,</span> <span class="tok-punc">{</span> useState<span class="tok-punc">,</span> useEffect <span class="tok-punc">}</span> <span class="tok-key">from</span> <span class="tok-str">'react'</span><span class="tok-punc">;</span>
+<span class="tok-key">import</span> <span class="tok-punc">{</span> useBandBus <span class="tok-punc">}</span> <span class="tok-key">from</span> <span class="tok-str">'@band-sdk/react'</span><span class="tok-punc">;</span>
 
-  <span class="tok-fn">useEffect</span>(() => {
-    <span class="tok-fn">fetchProfile</span>(token).then(setProfile);
-  }, [token]);
-
-  <span class="tok-key">if</span> (!profile) <span class="tok-key">return</span> &lt;<span class="tok-tag">Spinner</span> /&gt;;
+<span class="tok-key">export</span> <span class="tok-key">default</span> <span class="tok-key">function</span> <span class="tok-fn">AgentPipelineMonitor</span>() <span class="tok-punc">{</span>
+  <span class="tok-key">const</span> <span class="tok-punc">{</span> events<span class="tok-punc">,</span> triggerPipeline <span class="tok-punc">}</span> <span class="tok-punc">=</span> <span class="tok-fn">useBandBus</span>()<span class="tok-punc">;</span>
+  <span class="tok-key">const</span> <span class="tok-punc">[</span>activeRuns<span class="tok-punc">,</span> setActiveRuns<span class="tok-punc">]</span> <span class="tok-punc">=</span> <span class="tok-fn">useState</span>(<span class="tok-punc">[</span><span class="tok-punc">]</span>)<span class="tok-punc">;</span>
 
   <span class="tok-key">return</span> (
-    &lt;<span class="tok-tag">AuthGuard</span>&gt;
-      &lt;<span class="tok-tag">ProfileEditForm</span> data={profile} /&gt;
-    &lt;/<span class="tok-tag">AuthGuard</span>&gt;
+    &lt;<span class="tok-tag">div</span> className<span class="tok-punc">=</span><span class="tok-str">"p-6 bg-slate-900 rounded-xl"</span>&gt;
+      &lt;<span class="tok-tag">h3</span> className<span class="tok-punc">=</span><span class="tok-str">"text-lg font-bold"</span>&gt;Orchestration Monitor&lt;/<span class="tok-tag">h3</span>&gt;
+      &lt;<span class="tok-tag">div</span> className<span class="tok-punc">=</span><span class="tok-str">"space-y-2 mt-4"</span>&gt;
+        <span class="tok-punc">{</span>events<span class="tok-fn">.map</span>(evt <span class="tok-punc">=&gt;</span> (
+          &lt;<span class="tok-tag">div</span> key<span class="tok-punc">=</span><span class="tok-punc">{</span>evt.id<span class="tok-punc">}</span> className<span class="tok-punc">=</span><span class="tok-str">"flex justify-between"</span>&gt;
+            &lt;<span class="tok-tag">span</span> className<span class="tok-punc">=</span><span class="tok-str">"text-cyan-400"</span>&gt;<span class="tok-punc">{</span>evt.sender<span class="tok-punc">}</span>&lt;/<span class="tok-tag">span</span>&gt;
+            &lt;<span class="tok-tag">span</span> className<span class="tok-punc">=</span><span class="tok-str">"text-slate-400"</span>&gt;<span class="tok-punc">{</span>evt.message<span class="tok-punc">}</span>&lt;/<span class="tok-tag">span</span>&gt;
+          &lt;/div&gt;
+        ))<span class="tok-punc">}</span>
+      &lt;/<span class="tok-tag">div</span>&gt;
+    &lt;/<span class="tok-tag">div</span>&gt;
   );
-}</code></pre>
+<span class="tok-punc">}</span></code></pre>
                 </div>
                 <div class="code-col">
                   <div class="code-col-head">
                     <span class="badge badge-green">backend.py</span>
                     <span class="badge badge-ghost" id="iter-badge-be">Iteration 1</span>
                   </div>
-                  <pre class="code-block"><code><span class="tok-key">@app</span>.put(<span class="tok-str">"/profile"</span>)
-<span class="tok-key">async def</span> <span class="tok-fn">update_profile</span>(
-    payload: ProfileUpdate,
-    user: User = Depends(get_current_user)
+                  <pre class="code-block"><code><span class="tok-comment"># DevFlow AI - Default Demo FastAPI Gateway</span>
+<span class="tok-key">from</span> fastapi <span class="tok-key">import</span> FastAPI<span class="tok-punc">,</span> Depends<span class="tok-punc">,</span> HTTPException
+<span class="tok-key">from</span> core.orchestrator <span class="tok-key">import</span> run_agent_pipeline
+<span class="tok-key">from</span> core.auth <span class="tok-key">import</span> get_current_user
+
+app = FastAPI(title="DevFlow AI Gateway")
+
+<span class="tok-key">@app</span>.post("/api/sessions")
+<span class="tok-key">async def</span> <span class="tok-fn">trigger_pipeline</span>(
+    prompt: str,
+    user = Depends(get_current_user)
 ):
-    <span class="tok-comment"># JWT-validated mutation</span>
-    updated = <span class="tok-key">await</span> db.profiles.update(
-        {<span class="tok-str">"user_id"</span>: user.id},
-        payload.dict()
+    <span class="tok-comment"># Triggers the autonomous agent pipeline</span>
+    <span class="tok-key">if not</span> prompt:
+        <span class="tok-key">raise</span> HTTPException(status_code=400, detail="Prompt empty")
+    
+    session_id = <span class="tok-key">await</span> run_agent_pipeline(
+        user_id=user.id,
+        feature_prompt=prompt
     )
-    <span class="tok-key">return</span> {<span class="tok-str">"status"</span>: <span class="tok-str">"ok"</span>, <span class="tok-str">"profile"</span>: updated}</code></pre>
+    <span class="tok-key">return</span> {"status": "success", "session_id": session_id}</code></pre>
                 </div>
               </div>
             </div>
@@ -341,42 +367,49 @@
                   <span class="test-stat-label">Framework</span>
                 </div>
                 <div class="test-stat">
-                  <span class="test-stat-value">test_profile_api.py</span>
+                  <span class="test-stat-value">test_pipeline.py</span>
                   <span class="test-stat-label">Test File</span>
                 </div>
                 <div class="test-stat">
-                  <span class="test-stat-value text-green">94%</span>
+                  <span class="test-stat-value text-green">98%</span>
                   <span class="test-stat-label">Coverage Estimate</span>
                 </div>
               </div>
-              <pre class="code-block"><code><span class="tok-key">def</span> <span class="tok-fn">test_update_profile_requires_auth</span>():
-    response = client.put(<span class="tok-str">"/profile"</span>, json={})
+              <pre class="code-block"><code><span class="tok-comment"># DevFlow AI - Default Demo Test Suite</span>
+<span class="tok-key">import</span> pytest
+<span class="tok-key">from</span> fastapi.testclient <span class="tok-key">import</span> TestClient
+<span class="tok-key">from</span> api_gateway <span class="tok-key">import</span> app
+
+client = TestClient(app)
+
+<span class="tok-key">def</span> <span class="tok-fn">test_pipeline_trigger_unauthorized</span>():
+    response = client.post("/api/sessions", params={"prompt": "Build dashboard"})
     <span class="tok-key">assert</span> response.status_code == <span class="tok-num">401</span>
 
-<span class="tok-key">def</span> <span class="tok-fn">test_update_profile_success</span>(auth_headers):
-    response = client.put(
-        <span class="tok-str">"/profile"</span>,
-        json={<span class="tok-str">"display_name"</span>: <span class="tok-str">"Cloudy"</span>},
-        headers=auth_headers
+<span class="tok-key">def</span> <span class="tok-fn">test_pipeline_trigger_success</span>(mock_auth):
+    response = client.post(
+        "/api/sessions",
+        params={"prompt": "Build dashboard"},
+        headers={"Authorization": "Bearer mock-token"}
     )
-    <span class="tok-key">assert</span> response.status_code == <span class="tok-num">200</span>
-    <span class="tok-key">assert</span> response.json()[<span class="tok-str">"status"</span>] == <span class="tok-str">"ok"</span>
-    <span class="tok-comment"># PASSED — 0.04s</span></code></pre>
+    <span class="tok-key">assert</span> response.status_code == <span class="tok-num">201</span>
+    <span class="tok-key">assert</span> <span class="tok-str">"session_id"</span> <span class="tok-key">in</span> response.json()</code></pre>
             </div>
 
             <!-- Documentation Panel -->
             <div class="tab-panel" id="docs-tab">
               <div class="markdown-render">
-                <h3># Profile Dashboard Feature</h3>
-                <p>Adds a secure, JWT-authenticated profile dashboard allowing users to view and edit their account details.</p>
-                <h4>## Endpoints</h4>
-                <ul>
-                  <li><code>POST /auth/login</code> — returns a signed JWT bearer token</li>
-                  <li><code>GET /profile</code> — returns the authenticated user's profile</li>
-                  <li><code>PUT /profile</code> — updates profile fields, JWT-validated</li>
-                </ul>
-                <h4>## Frontend Components</h4>
-                <p><code>ProfileDashboard</code>, <code>AuthGuard</code>, and <code>ProfileEditForm</code> compose the client experience, backed by <code>useAuthToken</code> and <code>useProfileData</code> hooks.</p>
+                <h3># DevFlow AI Platform</h3>
+                <p>DevFlow AI is an autonomous, multi-agent software engineering platform that designs, implements, reviews, and tests features from simple natural language prompts.</p>
+                <h4>## Agent System Architecture</h4>
+                <ol>
+                  <li><strong>ArchitectAgent</strong> — analyzes requests and compiles JSON specification layout.</li>
+                  <li><strong>FrontendDevAgent / BackendDevAgent</strong> — writes production React components and FastAPI route handlers.</li>
+                  <li><strong>CodeReviewerAgent</strong> — checks code for quality gates, security vulnerabilities, and logic flaws.</li>
+                  <li><strong>QATesterAgent</strong> — generates complete pytest suites targeting generated endpoints.</li>
+                  <li><strong>TechWriterAgent</strong> — compiles developer documentation and markdown READMEs.</li>
+                  <li><strong>ReleaseManagerAgent</strong> — runs final validation gates and merges code to the feature branch.</li>
+                </ol>
                 <button type="button" class="btn-download" id="download-readme">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                   Download README.md
@@ -407,7 +440,7 @@
         </div>
         <div class="setting-row" style="border-bottom: none; padding-bottom: 0;">
           <div>
-            <span class="setting-label">Band Room ID</span>
+            <span class="setting-label">Band Room ID <span class="setting-optional">(Optional)</span></span>
             <span class="setting-desc">Active coordination room for agent event bus.</span>
           </div>
           <input class="setting-input" type="text" id="band-room-input" placeholder="devflow-ai-room-01" />
@@ -415,7 +448,7 @@
         <div class="band-guide-row">
           <button class="band-guide-toggle-btn" id="band-guide-toggle" type="button">
             <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px; transition: transform var(--transition-fast); margin-right: 6px; transform: rotate(0deg);"><path d="M9 18l6-6-6-6"/></svg>
-            How to Connect Your Band Chat Room
+            How to Connect Your Band Chat Room (Optional)
           </button>
           <div class="band-guide-content collapse" id="band-guide-content" style="display: none;">
             <div class="guide-card-body">
@@ -459,7 +492,19 @@
     </section>
 
     <footer class="app-footer">
-      <span>DevFlow AI — Band of Agents Hackathon 2026</span>
+      <div class="footer-links">
+        <a href="#terms" class="footer-link">Terms &amp; Conditions</a>
+        <span class="footer-divider">•</span>
+        <a href="#privacy" class="footer-link">Privacy Policy</a>
+      </div>
+      <div class="footer-credits">
+        <span>Created by <span class="footer-highlight">@ansh</span>, <span class="footer-highlight">@abdullah</span>, and <span class="footer-highlight">@malatesh</span></span>
+        <span class="footer-divider">•</span>
+        <span>Contact: <a href="mailto:anshvasant1647@gmail.com" class="footer-email">anshvasant1647@gmail.com</a></span>
+      </div>
+      <div class="footer-copyright">
+        &copy; 2026 DevFlow AI. All rights reserved. DevFlow AI is an autonomous engineering platform built for the Band of Agents Hackathon.
+      </div>
     </footer>
 
   </main>

@@ -869,7 +869,7 @@
         }
         const feEl = document.querySelector('#code-tab .code-col:nth-child(1) pre code');
         if (feEl) {
-          feEl.innerHTML = highlightJSX(arts.frontend_code.source_code);
+          feEl.innerHTML = highlightJSX(extractCode(arts.frontend_code));
         }
       }
       if (arts.backend_code && Object.keys(arts.backend_code).length > 0) {
@@ -879,7 +879,7 @@
         }
         const beEl = document.querySelector('#code-tab .code-col:nth-child(2) pre code');
         if (beEl) {
-          beEl.innerHTML = highlightPython(arts.backend_code.source_code);
+          beEl.innerHTML = highlightPython(extractCode(arts.backend_code));
         }
       }
       
@@ -896,7 +896,7 @@
         
         const tCodeEl = document.querySelector('#tests-tab pre code');
         if (tCodeEl) {
-          tCodeEl.innerHTML = highlightPython(t.source_code);
+          tCodeEl.innerHTML = highlightPython(extractCode(t));
         }
       }
       
@@ -949,20 +949,24 @@
     }
   }
 
+  async function getSessionDetail(sessionId, headers) {
+    const response = await fetch(`/api/sessions/${sessionId}`, { headers });
+    if (!response.ok) throw new Error(`Fetch session status error: ${response.status}`);
+    return await response.json();
+  }
+
   function startPolling(sessionId, headers) {
     processedEventIds.clear();
     let pollInterval = setInterval(async () => {
       try {
-        const response = await fetch(`/api/sessions/${sessionId}`, { headers });
-        if (!response.ok) throw new Error(`Polling status error: ${response.status}`);
-        const state = await response.json();
-        
+        const state = await getSessionDetail(sessionId, headers);
         updateDashboardFromLiveState(state);
 
         const status = state.status;
         if (status === 'COMPLETE' || status === 'HOLD' || status === 'ERROR') {
           clearInterval(pollInterval);
           finalizeLiveRun(status, state);
+          localStorage.removeItem('devflow_active_session_id'); // Session complete, remove from active recovery
         }
       } catch (err) {
         console.error("Polling error:", err);
@@ -974,6 +978,9 @@
   async function runPipeline() {
     if (pipelineRunning) return;
 
+  async function runPipeline() {
+    if (pipelineRunning) return;
+
     const mockModeToggle = document.getElementById('mock-mode-toggle');
     const isMockMode = mockModeToggle ? mockModeToggle.checked : true;
 
@@ -981,8 +988,10 @@
       pipelineRunning = true;
       triggerBtn.classList.add('is-loading');
       triggerBtn.querySelector('span').textContent = 'Running...';
+      localStorage.setItem('devflow_active_session_id', 'mock-session');
 
       const feature = featureInput.value.trim();
+      const info = getFeatureInfo(feature);
       const script = buildPipelineScript(feature);
 
       setPipelineStatePill('RUNNING', 'processing');
@@ -995,8 +1004,26 @@
       sysStatus.style.color = 'var(--cyan)';
 
       resetPipelineVisual();
-      appendLog('tag-info', 'PIPELINE', 'Trigger received — initializing run', false);
+      resetAgents();
+      resetArtifactHub();
+      appendLog('tag-info', 'PIPELINE', 'Trigger received — initializing mock run', false);
       showToast('info', 'Pipeline triggered', 'DevFlow AI is processing your feature request.');
+
+      const mockState = {
+        session_id: 'mock-session',
+        status: 'RUNNING',
+        review_cycle: 0,
+        agents: {},
+        artifacts: {
+          architecture: {},
+          frontend_code: {},
+          backend_code: {},
+          tests: {},
+          documentation: {}
+        },
+        events: []
+      };
+      localStorage.setItem('devflow_mock_state', JSON.stringify(mockState));
 
       let activeAgentsCount = 1;
       bumpStat('stat-active-agents', activeAgentsCount);
@@ -1009,6 +1036,7 @@
         agentIds.forEach(id => {
           agentState[id] = { state: step.state, task: step.task, progress: step.progress };
           updateAgentCard(id);
+          mockState.agents[id] = step.state;
         });
 
         const processingCount = AGENTS.filter(a => agentState[a.id].state === STATE.PROCESSING).length;
@@ -1023,20 +1051,22 @@
         }
 
         if (step.event === 'SPEC_GENERATED') {
+          const specData = {
+            "architecture_pattern": "REST + React SPA",
+            "frontend_spec": {
+              "components": [`${info.entity}Header`, `${info.entity}Details`, `${info.entity}Form`],
+              "state_hooks": [`use${info.entity}State`, `use${info.entity}Actions`]
+            },
+            "backend_spec": {
+              "framework": "FastAPI",
+              "endpoints": [`POST /api/${info.entity.toLowerCase()}`, `GET /api/${info.entity.toLowerCase()}`, `PUT /api/${info.entity.toLowerCase()}`],
+              "auth": "JWT Bearer"
+            }
+          };
+          mockState.artifacts.architecture = specData;
           const archEl = document.querySelector('#architecture-tab pre code');
           if (archEl) {
-            archEl.innerHTML = highlightJSON(JSON.stringify({
-              "architecture_pattern": "REST + React SPA",
-              "frontend_spec": {
-                "components": ["ProfileDashboard", "AuthGuard", "ProfileEditForm"],
-                "state_hooks": ["useAuthToken", "useProfileData"]
-              },
-              "backend_spec": {
-                "framework": "FastAPI",
-                "endpoints": ["POST /auth/login", "GET /profile", "PUT /profile"],
-                "auth": "JWT Bearer"
-              }
-            }, null, 2));
+            archEl.innerHTML = highlightJSON(JSON.stringify(specData, null, 2));
           }
           setEdgeFlow('n-input', 'n-architect', false);
           setEdgeFlow('n-architect', 'n-frontend', true);
@@ -1044,54 +1074,76 @@
         }
         if (step.event === 'CODE_EMITTED') {
           const isIteration2 = step.task.includes('iteration 2') || reviewCycle > 0;
-          const feEl = document.querySelector('#code-tab .code-col:nth-child(1) pre code');
-          if (feEl) {
-            feEl.innerHTML = highlightJSX(`function ProfileDashboard() {
-  const [profile, setProfile] = useState(null);
+          
+          const feCode = `function ${info.entity}Dashboard() {
+  const [data, setData] = useState(null);
   const { token } = useAuthToken();
 
   useEffect(() => {
-    fetchProfile(token).then(setProfile);
+    fetch${info.entity}Data(token).then(setData);
   }, [token]);
 
-  if (!profile) return <Spinner />;
+  if (!data) return <Spinner />;
 
   return (
     <AuthGuard>
-      <ProfileEditForm data={profile} />
+      <${info.entity}Details data={data} />
+      <${info.entity}Form onSubmit={save${info.entity}} />
     </AuthGuard>
   );
-}`);
+}`;
+          const feCodeData = {
+            file_target: `${info.entity}Dashboard.jsx`,
+            language: "react",
+            source_code: feCode,
+            iteration_count: isIteration2 ? 2 : 1
+          };
+          mockState.artifacts.frontend_code = feCodeData;
+          const feEl = document.querySelector('#code-tab .code-col:nth-child(1) pre code');
+          if (feEl) {
+            feEl.innerHTML = highlightJSX(feCode);
           }
-          const beEl = document.querySelector('#code-tab .code-col:nth-child(2) pre code');
-          if (beEl) {
-            if (isIteration2) {
-              beEl.innerHTML = highlightPython(`@app.put("/profile")
-async def update_profile(
-    payload: ProfileUpdate,
+
+          let beCode = '';
+          if (isIteration2) {
+            beCode = `@app.put("/${info.entity.toLowerCase()}")
+async def update_${info.entity.toLowerCase()}(
+    payload: ${info.entity}Update,
     user: User = Depends(get_current_user)
 ):
     # JWT-validated mutation (Iteration 2 Patch)
-    updated = await db.profiles.update(
+    updated = await db.${info.entity.toLowerCase()}s.update(
         {"user_id": user.id},
         payload.dict()
     )
-    return {"status": "ok", "profile": updated}`);
-            } else {
-              beEl.innerHTML = highlightPython(`@app.put("/profile")
-async def update_profile(
-    payload: ProfileUpdate
+    return {"status": "ok", "${info.entity.toLowerCase()}": updated}`;
+          } else {
+            beCode = `@app.put("/${info.entity.toLowerCase()}")
+async def update_${info.entity.toLowerCase()}(
+    payload: ${info.entity}Update
 ):
     # Vulnerable mutation: no auth guard check (Iteration 1)
-    updated = await db.profiles.update(
+    updated = await db.${info.entity.toLowerCase()}s.update(
         {"user_id": payload.user_id},
         payload.dict()
     )
-    return {"status": "ok", "profile": updated}`);
-            }
+    return {"status": "ok", "${info.entity.toLowerCase()}": updated}`;
           }
+
+          const beCodeData = {
+            file_target: "routes.py",
+            language: "python",
+            source_code: beCode,
+            iteration_count: isIteration2 ? 2 : 1
+          };
+          mockState.artifacts.backend_code = beCodeData;
+          const beEl = document.querySelector('#code-tab .code-col:nth-child(2) pre code');
+          if (beEl) {
+            beEl.innerHTML = highlightPython(beCode);
+          }
+
           const feBadge = document.getElementById('iter-badge-fe');
-          if (feBadge) feBadge.textContent = 'Iteration 2';
+          if (feBadge) feBadge.textContent = isIteration2 ? 'Iteration 2' : 'Iteration 1';
           const beBadge = document.getElementById('iter-badge-be');
           if (beBadge) beBadge.textContent = isIteration2 ? 'Iteration 2' : 'Iteration 1';
 
@@ -1107,49 +1159,59 @@ async def update_profile(
           setEdgeFlow('n-reviewer', 'n-backend', false);
           setEdgeFlow('n-reviewer', 'n-qa', true);
           reviewCycle++;
+          mockState.review_cycle = reviewCycle;
         }
         if (step.event === 'TESTS_GENERATED') {
-          const tCodeEl = document.querySelector('#tests-tab pre code');
-          if (tCodeEl) {
-            tCodeEl.innerHTML = highlightPython(`def test_update_profile_requires_auth():
-    response = client.put("/profile", json={})
+          const testCode = `def test_update_${info.entity.toLowerCase()}_requires_auth():
+    response = client.put("/${info.entity.toLowerCase()}", json={})
     assert response.status_code == 401
 
-def test_update_profile_success(auth_headers):
+def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     response = client.put(
-        "/profile",
-        json={"display_name": "Cloudy"},
+        "/${info.entity.toLowerCase()}",
+        json={"name": "${info.entity} Test"},
         headers=auth_headers
     )
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
-    # PASSED — 0.04s`);
+    # PASSED — 0.04s`;
+          const testData = {
+            test_framework: "pytest",
+            test_file: `test_${info.entity.toLowerCase()}_api.py`,
+            coverage_estimate: "94%",
+            source_code: testCode
+          };
+          mockState.artifacts.tests = testData;
+          const tCodeEl = document.querySelector('#tests-tab pre code');
+          if (tCodeEl) {
+            tCodeEl.innerHTML = highlightPython(testCode);
           }
           const fwVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(1) .test-stat-value');
           if (fwVal) fwVal.textContent = 'pytest';
           const fileVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(2) .test-stat-value');
-          if (fileVal) fileVal.textContent = 'test_profile_api.py';
+          if (fileVal) fileVal.textContent = `test_${info.entity.toLowerCase()}_api.py`;
           const covVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(3) .test-stat-value');
           if (covVal) covVal.textContent = '94%';
 
           setEdgeFlow('n-qa', 'n-writer', true);
         }
         if (step.event === 'DOCS_GENERATED') {
-          const docText = `# Profile Dashboard Feature\n\nAdds a secure, JWT-authenticated profile dashboard allowing users to view and edit their account details.\n\n## Endpoints\n- \`POST /auth/login\` — returns a signed JWT bearer token\n- \`GET /profile\` — returns the authenticated user's profile\n- \`PUT /profile\` — updates profile fields, JWT-validated\n\n## Frontend Components\n\`ProfileDashboard\`, \`AuthGuard\`, and \`ProfileEditForm\` compose the client experience, backed by \`useAuthToken\` and \`useProfileData\` hooks.`;
+          const docText = `# ${info.entity} Feature\n\nAdds a secure, JWT-authenticated ${info.entity.toLowerCase()} service allowing users to manage their ${info.entity.toLowerCase()} details.\n\n## Endpoints\n- \`POST /auth/login\` — returns a signed JWT bearer token\n- \`GET /${info.entity.toLowerCase()}\` — returns the authenticated user's ${info.entity.toLowerCase()}\n- \`PUT /${info.entity.toLowerCase()}\` — updates ${info.entity.toLowerCase()} fields, JWT-validated\n\n## Frontend Components\n\`${info.entity}Dashboard\`, \`AuthGuard\`, and \`${info.entity}Form\` compose the client experience, backed by \`useAuthToken\` and \`use${info.entity}Data\` hooks.`;
           latestDocContent = docText;
+          mockState.artifacts.documentation = { content: docText };
           const mdRenderEl = document.querySelector('#docs-tab .markdown-render');
           if (mdRenderEl) {
             mdRenderEl.innerHTML = `
-              <h3># Profile Dashboard Feature</h3>
-              <p>Adds a secure, JWT-authenticated profile dashboard allowing users to view and edit their account details.</p>
+              <h3># ${info.entity} Feature</h3>
+              <p>Adds a secure, JWT-authenticated ${info.entity.toLowerCase()} service allowing users to manage their ${info.entity.toLowerCase()} details.</p>
               <h4>## Endpoints</h4>
               <ul>
                 <li><code>POST /auth/login</code> — returns a signed JWT bearer token</li>
-                <li><code>GET /profile</code> — returns the authenticated user's profile</li>
-                <li><code>PUT /profile</code> — updates profile fields, JWT-validated</li>
+                <li><code>GET /${info.entity.toLowerCase()}</code> — returns the authenticated user's ${info.entity.toLowerCase()}</li>
+                <li><code>PUT /${info.entity.toLowerCase()}</code> — updates ${info.entity.toLowerCase()} fields, JWT-validated</li>
               </ul>
               <h4>## Frontend Components</h4>
-              <p><code>ProfileDashboard</code>, <code>AuthGuard</code>, and <code>ProfileEditForm</code> compose the client experience, backed by <code>useAuthToken</code> and <code>useProfileData</code> hooks.</p>
+              <p><code>${info.entity}Dashboard</code>, <code>AuthGuard</code>, and <code>${info.entity}Form</code> compose the client experience, backed by <code>useAuthToken</code> and <code>use${info.entity}Data</code> hooks.</p>
               <button type="button" class="btn-download" id="download-readme">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                 Download README.md
@@ -1163,7 +1225,14 @@ def test_update_profile_success(auth_headers):
         }
 
         if (step.logMsg) {
-          appendLog(step.logTag, eventTagLabel(step), step.logMsg, i < 3);
+          appendLog(step.logTag, eventTagLabel(step), step.logMsg, false);
+          mockState.events.push({
+            event_id: `mock-evt-${i}-${Date.now()}`,
+            event_type: step.event || 'INFO',
+            sender: step.agent ? (Array.isArray(step.agent) ? step.agent[0] : step.agent) : 'Orchestrator',
+            timestamp: new Date().toISOString(),
+            payload_data: { message: step.logMsg }
+          });
         }
 
         bumpTokens(Math.floor(800 + Math.random() * 1800));
@@ -1179,6 +1248,9 @@ def test_update_profile_success(auth_headers):
           showToast('success', 'Merge Ready', 'Feature pipeline complete — ready for deployment.');
         }
 
+        // Save local state
+        localStorage.setItem('devflow_mock_state', JSON.stringify(mockState));
+
         await sleep(950);
       }
 
@@ -1193,6 +1265,10 @@ def test_update_profile_success(auth_headers):
       bumpStat('stat-tasks-completed', parseInt(document.getElementById('stat-tasks-completed').textContent.replace(/,/g,'')) + 7);
 
       appendLog('tag-release', 'DONE', 'Pipeline run complete. All artifacts available in the Artifact Hub.', false);
+
+      mockState.status = 'COMPLETE';
+      localStorage.setItem('devflow_mock_state', JSON.stringify(mockState));
+      localStorage.removeItem('devflow_active_session_id'); // mock complete
 
       triggerBtn.classList.remove('is-loading');
       triggerBtn.querySelector('span').textContent = 'Trigger Pipeline';
@@ -1226,6 +1302,7 @@ def test_update_profile_success(auth_headers):
         
         resetPipelineVisual();
         resetAgents();
+        resetArtifactHub();
         
         appendLog('tag-info', 'PIPELINE', 'Sending feature trigger to API Gateway...', false);
         showToast('info', 'Pipeline Triggered', 'DevFlow AI is triggering backend agents.');
@@ -1252,6 +1329,7 @@ def test_update_profile_success(auth_headers):
 
           const data = await response.json();
           const sessionId = data.session_id;
+          localStorage.setItem('devflow_active_session_id', sessionId); // Save active session ID for reload recovery
           appendLog('tag-info', 'PIPELINE', `Session created: ${sessionId}. Starting database polling...`, false);
           
           startPolling(sessionId, headers);
@@ -1524,42 +1602,312 @@ def test_update_profile_success(auth_headers):
   /* ──────────────────────────────────────────────────────────
      SIDEBAR AUTH STATE & ACTIONS
      ────────────────────────────────────────────────────────── */
-  function updateAuthUI() {
-    const authStatusInfo = document.getElementById('auth-status-info');
-    const sidebarAuthBtn = document.getElementById('sidebar-auth-btn');
-    if (!authStatusInfo || !sidebarAuthBtn) return;
+  /* ──────────────────────────────────────────────────────────
+     SIDEBAR COLLAPSE
+     ────────────────────────────────────────────────────────── */
+  function setupSidebarCollapse() {
+    const sidebar = document.getElementById('sidebar');
+    const collapseBtn = document.getElementById('sidebar-collapse-btn');
+    if (!sidebar || !collapseBtn) return;
 
-    if (currentSession) {
-      authStatusInfo.textContent = currentSession.user.email;
-      sidebarAuthBtn.textContent = 'Sign Out';
-    } else if (localBypassActive) {
-      authStatusInfo.textContent = 'Local Mock Mode';
-      sidebarAuthBtn.textContent = 'Sign Out';
-    } else {
-      authStatusInfo.textContent = 'Not signed in';
-      sidebarAuthBtn.textContent = 'Sign In';
+    const savedState = localStorage.getItem('devflow_sidebar_collapsed');
+    if (savedState === 'true') {
+      sidebar.classList.add('collapsed');
     }
+
+    collapseBtn.addEventListener('click', () => {
+      const isCollapsed = sidebar.classList.toggle('collapsed');
+      localStorage.setItem('devflow_sidebar_collapsed', isCollapsed);
+      window.dispatchEvent(new Event('resize'));
+    });
   }
 
-  function setupSidebarAuth() {
+  /* ──────────────────────────────────────────────────────────
+     SIDEBAR AUTH STATE & ACTIONS
+     ────────────────────────────────────────────────────────── */
+  function updateAuthUI() {
+    const sidebarAuth = document.getElementById('sidebar-auth');
+    if (!sidebarAuth) return;
+    
+    let email = '';
+    let name = '';
+    let initials = '';
+    let signedIn = false;
+    
+    if (currentSession) {
+      email = currentSession.user.email;
+      signedIn = true;
+    } else if (localBypassActive) {
+      email = 'developer@devflow.ai';
+      signedIn = true;
+    }
+    
+    if (signedIn) {
+      if (email === 'vasantansh@gmail.com') {
+        name = 'Ansh Vasant';
+        initials = 'AV';
+      } else {
+        const parts = email.split('@');
+        const namePart = parts[0];
+        const nameSubparts = namePart.split(/[._-]/);
+        name = nameSubparts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+        initials = nameSubparts.map(p => p.charAt(0).toUpperCase()).join('').substring(0, 2);
+        if (!initials) initials = 'DV';
+      }
+      
+      sidebarAuth.innerHTML = `
+        <div class="account-profile">
+          <div class="account-avatar" title="${name}">${initials}</div>
+          <div class="account-info">
+            <div class="account-name" title="${name}">${name}</div>
+            <div class="account-email" title="${email}">${email}</div>
+          </div>
+        </div>
+        <button type="button" class="sidebar-auth-btn account-logout-btn" id="sidebar-auth-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <span>Sign Out</span>
+        </button>
+      `;
+    } else {
+      sidebarAuth.innerHTML = `
+        <div class="account-profile">
+          <div class="account-avatar guest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="account-info">
+            <div class="account-name">Guest User</div>
+            <div class="account-email">Not signed in</div>
+          </div>
+        </div>
+        <button type="button" class="sidebar-auth-btn account-login-btn" id="sidebar-auth-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+          <span>Sign In</span>
+        </button>
+      `;
+    }
+    
+    // Rebind event listener since we replaced innerHTML
+    setupSidebarAuthListeners();
+  }
+
+  function setupSidebarAuthListeners() {
     const btn = document.getElementById('sidebar-auth-btn');
     if (!btn) return;
 
-    btn.addEventListener('click', async () => {
+    btn.replaceWith(btn.cloneNode(true)); // Clear previous listeners
+    const cleanBtn = document.getElementById('sidebar-auth-btn');
+    
+    cleanBtn.addEventListener('click', async () => {
       if (currentSession || localBypassActive) {
         if (supabase && currentSession) {
           await supabase.auth.signOut();
         }
         currentSession = null;
         localBypassActive = false;
+        localStorage.removeItem('devflow_active_session_id'); // Clear active session on signout
         showToast('info', 'Signed Out', 'You have been signed out.');
         updateAuthUI();
       } else {
         showAuthModal(() => {
           updateAuthUI();
+          // Try to recover sessions for this newly signed-in user
+          recoverSession();
         });
       }
     });
+  }
+
+  function setupSidebarAuth() {
+    setupSidebarAuthListeners();
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     ROBUST CODE EXTRACTOR
+     ────────────────────────────────────────────────────────── */
+  function extractCode(payload) {
+    if (!payload) return '';
+    
+    // If payload is a string containing JSON or raw text
+    if (typeof payload === 'string') {
+      try {
+        const parsed = JSON.parse(payload);
+        return extractCode(parsed);
+      } catch (e) {
+        // Regex search inside stringified JSON
+        const match = payload.match(/"source_code"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+        if (match) {
+          try {
+            return JSON.parse(`"${match[1]}"`);
+          } catch (err) {
+            return match[1];
+          }
+        }
+        return payload; // fallback to raw string
+      }
+    }
+    
+    // If payload is an object containing code
+    if (payload.source_code) {
+      let code = payload.source_code;
+      if (typeof code === 'string' && code.trim().startsWith('{')) {
+        try {
+          const parsed = JSON.parse(code);
+          if (parsed.source_code) {
+            return parsed.source_code;
+          }
+        } catch (e) {
+          const match = code.match(/"source_code"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+          if (match) {
+            try {
+              return JSON.parse(`"${match[1]}"`);
+            } catch (err) {
+              return match[1];
+            }
+          }
+        }
+      }
+      return code;
+    }
+    
+    if (payload.content) return payload.content;
+    
+    return JSON.stringify(payload, null, 2);
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     DYNAMIC MOCK DETAILS GENERATOR
+     ────────────────────────────────────────────────────────── */
+  function getFeatureInfo(prompt) {
+    const text = (prompt || '').toLowerCase().trim();
+    let entity = 'Profile';
+    let desc = 'secure user profile dashboard allowing account editing';
+    
+    if (text.includes('cart') || text.includes('shop') || text.includes('checkout') || text.includes('order')) {
+      entity = 'Cart';
+      desc = 'e-commerce shopping cart with real-time checkout and stock validation';
+    } else if (text.includes('todo') || text.includes('task') || text.includes('list')) {
+      entity = 'Todo';
+      desc = 'collaborative project task board and list filtering system';
+    } else if (text.includes('chat') || text.includes('message') || text.includes('room') || text.includes('slack')) {
+      entity = 'Chat';
+      desc = 'multi-channel encrypted real-time chat room and notification center';
+    } else if (text.includes('auth') || text.includes('login') || text.includes('register') || text.includes('signup')) {
+      entity = 'Auth';
+      desc = 'JWT-authenticated user registration, login, and MFA security gateway';
+    } else if (text.includes('payment') || text.includes('billing') || text.includes('stripe') || text.includes('invoice')) {
+      entity = 'Payment';
+      desc = 'Stripe-integrated subscription billing portal and invoice processor';
+    } else {
+      const words = text.split(/\s+/).filter(w => w.length > 2 && !['add', 'build', 'create', 'make', 'new'].includes(w));
+      if (words.length > 0) {
+        entity = words[0].charAt(0).toUpperCase() + words[0].slice(1).replace(/[^a-zA-Z]/g, '');
+      }
+      if (prompt) {
+        desc = prompt;
+      }
+    }
+    return { entity, desc };
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     RESET ARTIFACT HUB TO LOADING PLACEHOLDERS
+     ────────────────────────────────────────────────────────── */
+  function resetArtifactHub() {
+    const archEl = document.querySelector('#architecture-tab pre code');
+    if (archEl) archEl.innerHTML = '<span class="tok-comment">// Awaiting architecture specification...</span>';
+
+    const feEl = document.querySelector('#code-tab .code-col:nth-child(1) pre code');
+    if (feEl) feEl.innerHTML = '<span class="tok-comment">// Awaiting React components...</span>';
+
+    const beEl = document.querySelector('#code-tab .code-col:nth-child(2) pre code');
+    if (beEl) beEl.innerHTML = '<span class="tok-comment"># Awaiting backend implementation...</span>';
+
+    const tCodeEl = document.querySelector('#tests-tab pre code');
+    if (tCodeEl) tCodeEl.innerHTML = '<span class="tok-comment"># Awaiting QA test generation...</span>';
+
+    const mdRenderEl = document.querySelector('#docs-tab .markdown-render');
+    if (mdRenderEl) {
+      mdRenderEl.innerHTML = `
+        <h3>Awaiting Documentation</h3>
+        <p>Markdown documentation will render here once TechWriterAgent completes the documentation phase.</p>
+      `;
+    }
+    
+    const feBadge = document.getElementById('iter-badge-fe');
+    if (feBadge) feBadge.textContent = 'Awaiting...';
+    const beBadge = document.getElementById('iter-badge-be');
+    if (beBadge) beBadge.textContent = 'Awaiting...';
+    
+    const fwVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(1) .test-stat-value');
+    if (fwVal) fwVal.textContent = '...';
+    const fileVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(2) .test-stat-value');
+    if (fileVal) fileVal.textContent = '...';
+    const covVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(3) .test-stat-value');
+    if (covVal) covVal.textContent = '...';
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     SESSION STATE RECOVERY
+     ────────────────────────────────────────────────────────── */
+  async function recoverSession() {
+    const activeSessionId = localStorage.getItem('devflow_active_session_id');
+    if (!activeSessionId) {
+      if (currentSession) {
+        try {
+          const headers = { 'Content-Type': 'application/json' };
+          headers['Authorization'] = `Bearer ${currentSession.access_token}`;
+          const response = await fetch('/api/sessions', { headers });
+          if (response.ok) {
+            const sessions = await response.json();
+            if (sessions && sessions.length > 0) {
+              const latestSession = sessions[0];
+              const state = await getSessionDetail(latestSession.session_id, headers);
+              updateDashboardFromLiveState(state);
+              localStorage.setItem('devflow_active_session_id', latestSession.session_id);
+            }
+          }
+        } catch (e) {
+          console.error("Failed to recover user history:", e);
+        }
+      }
+      return;
+    }
+
+    if (activeSessionId === 'mock-session') {
+      try {
+        const mockStateStr = localStorage.getItem('devflow_mock_state');
+        if (mockStateStr) {
+          const mockState = JSON.parse(mockStateStr);
+          updateDashboardFromLiveState(mockState);
+        }
+      } catch (e) {
+        console.error("Failed to restore mock state:", e);
+      }
+      return;
+    }
+
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (currentSession) {
+        headers['Authorization'] = `Bearer ${currentSession.access_token}`;
+      } else if (localBypassActive) {
+        headers['Authorization'] = `Bearer bypass-local-auth`;
+      }
+
+      const state = await getSessionDetail(activeSessionId, headers);
+      if (state && Object.keys(state).length > 0) {
+        updateDashboardFromLiveState(state);
+        
+        if (state.status === 'RUNNING') {
+          pipelineRunning = true;
+          triggerBtn.classList.add('is-loading');
+          triggerBtn.querySelector('span').textContent = 'Running...';
+          startPolling(activeSessionId, headers);
+        }
+      } else {
+        localStorage.removeItem('devflow_active_session_id');
+      }
+    } catch (e) {
+      console.error("Failed to recover session details:", e);
+    }
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -1751,10 +2099,12 @@ def test_update_profile_success(auth_headers):
     bumpTokens(8400);
 
     animatePreloader();
+    setupSidebarCollapse();
     setupSidebarAuth();
     setupBandRoomSettings();
     setupStatsModal();
     updateAuthUI();
+    recoverSession();
 
     appendLog('tag-info', 'BOOT', 'DevFlow AI Control Room initialized.', false);
     appendLog('tag-info', 'BOOT', 'Connected to Band room: devflow-ai-room-01', false);
