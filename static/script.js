@@ -32,13 +32,55 @@
      AGENT DEFINITIONS
      ────────────────────────────────────────────────────────── */
   const AGENTS = [
-    { id: 'architect',  name: 'Architect Agent',     role: 'AI/ML API · High Reasoning', icon: '🏛️', task: 'Awaiting feature request' },
-    { id: 'frontend',   name: 'Frontend Agent',      role: 'Featherless · React',         task: 'Idle — waiting on spec' , icon: '🎨'},
-    { id: 'backend',    name: 'Backend Agent',       role: 'Featherless · FastAPI',       task: 'Idle — waiting on spec', icon: '⚙️' },
-    { id: 'reviewer',   name: 'Code Reviewer',       role: 'AI/ML API · Quality Gate',    task: 'Idle — waiting on code', icon: '🔍' },
-    { id: 'qa',         name: 'QA Tester',           role: 'Featherless · Test Suite',    task: 'Idle — waiting on approval', icon: '🧪' },
-    { id: 'writer',     name: 'Tech Writer',         role: 'Featherless · Docs Gen',      task: 'Idle — waiting on tests', icon: '📝' },
-    { id: 'release',    name: 'Release Manager',     role: 'AI/ML API · Final Verdict',   task: 'Idle — awaiting docs', icon: '🚀' },
+    { 
+      id: 'architect',  
+      name: 'Architect Agent',     
+      role: 'AI/ML API · High Reasoning', 
+      task: 'Awaiting feature request',
+      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-arc" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,20 25,15 35,45" fill="url(#g-arc)" opacity="0.95"/><polygon points="50,20 75,15 65,45" fill="url(#g-arc)" opacity="0.8"/><polygon points="50,20 35,45 50,50" fill="url(#g-arc)" opacity="0.7"/><polygon points="50,20 65,45 50,50" fill="url(#g-arc)" opacity="0.6"/><polygon points="25,15 20,40 35,45" fill="url(#g-arc)" opacity="0.5"/><polygon points="75,15 80,40 65,45" fill="url(#g-arc)" opacity="0.45"/><polygon points="42,50 58,50 50,70" fill="url(#g-arc)" opacity="0.9"/><polygon points="20,40 35,75 50,50" fill="url(#g-arc)" opacity="0.65"/><polygon points="80,40 65,75 50,50" fill="url(#g-arc)" opacity="0.55"/><polygon points="35,75 50,85 50,70" fill="url(#g-arc)" opacity="0.85"/><polygon points="65,75 50,85 50,70" fill="url(#g-arc)" opacity="0.75"/></svg>`
+    },
+    { 
+      id: 'frontend',   
+      name: 'Frontend Agent',      
+      role: 'Featherless · React',         
+      task: 'Idle — waiting on spec', 
+      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-frn" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,35 15,10 5,45" fill="url(#g-frn)" opacity="0.95"/><polygon points="50,35 15,10 50,20" fill="url(#g-frn)" opacity="0.75"/><polygon points="50,55 5,45 20,85" fill="url(#g-frn)" opacity="0.85"/><polygon points="50,55 20,85 50,80" fill="url(#g-frn)" opacity="0.6"/><polygon points="50,35 85,10 95,45" fill="url(#g-frn)" opacity="0.9"/><polygon points="50,35 85,10 50,20" fill="url(#g-frn)" opacity="0.7"/><polygon points="50,55 95,45 80,85" fill="url(#g-frn)" opacity="0.8"/><polygon points="50,55 80,85 50,80" fill="url(#g-frn)" opacity="0.5"/><polygon points="50,20 54,50 50,80 46,50" fill="url(#g-frn)" opacity="1"/></svg>`
+    },
+    { 
+      id: 'backend',    
+      name: 'Backend Agent',       
+      role: 'Featherless · FastAPI',       
+      task: 'Idle — waiting on spec', 
+      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-bck" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,25 35,30 50,60" fill="url(#g-bck)" opacity="0.95"/><polygon points="50,25 65,30 50,60" fill="url(#g-bck)" opacity="0.8"/><polygon points="35,30 44,65 50,60" fill="url(#g-bck)" opacity="0.7"/><polygon points="65,30 56,65 50,60" fill="url(#g-bck)" opacity="0.6"/><polygon points="44,65 45,80 50,85" fill="url(#g-bck)" opacity="0.85"/><polygon points="56,65 55,80 50,85" fill="url(#g-bck)" opacity="0.75"/><polygon points="35,30 10,20 20,45" fill="url(#g-bck)" opacity="0.5"/><polygon points="35,30 20,45 38,45" fill="url(#g-bck)" opacity="0.65"/><polygon points="65,30 90,20 80,45" fill="url(#g-bck)" opacity="0.45"/><polygon points="65,30 80,45 62,45" fill="url(#g-bck)" opacity="0.55"/></svg>`
+    },
+    { 
+      id: 'reviewer',   
+      name: 'Code Reviewer',       
+      role: 'AI/ML API · Quality Gate',    
+      task: 'Idle — waiting on code', 
+      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-rev" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,40 20,15 35,48" fill="url(#g-rev)" opacity="0.95"/><polygon points="50,40 80,15 65,48" fill="url(#g-rev)" opacity="0.8"/><polygon points="50,40 35,48 50,65" fill="url(#g-rev)" opacity="0.85"/><polygon points="50,40 65,48 50,65" fill="url(#g-rev)" opacity="0.7"/><polygon points="35,48 15,60 50,65" fill="url(#g-rev)" opacity="0.6"/><polygon points="65,48 85,60 50,65" fill="url(#g-rev)" opacity="0.5"/><polygon points="15,60 50,85 50,65" fill="url(#g-rev)" opacity="0.75"/><polygon points="85,60 50,85 50,65" fill="url(#g-rev)" opacity="0.65"/></svg>`
+    },
+    { 
+      id: 'qa',         
+      name: 'QA Tester',           
+      role: 'Featherless · Test Suite',    
+      task: 'Idle — waiting on approval', 
+      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-qas" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="20,50 30,20 40,42" fill="url(#g-qas)" opacity="0.95"/><polygon points="40,42 30,20 50,40" fill="url(#g-qas)" opacity="0.8"/><polygon points="80,50 70,20 60,42" fill="url(#g-qas)" opacity="0.9"/><polygon points="60,42 70,20 50,40" fill="url(#g-qas)" opacity="0.75"/><polygon points="20,50 50,40 50,65" fill="url(#g-qas)" opacity="0.7"/><polygon points="80,50 50,40 50,65" fill="url(#g-qas)" opacity="0.6"/><polygon points="20,50 50,80 50,65" fill="url(#g-qas)" opacity="0.85"/><polygon points="80,50 50,80 50,65" fill="url(#g-qas)" opacity="0.55"/></svg>`
+    },
+    { 
+      id: 'writer',     
+      name: 'Tech Writer',         
+      role: 'Featherless · Docs Gen',      
+      task: 'Idle — waiting on tests', 
+      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-wri" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,15 30,35 50,35" fill="url(#g-wri)" opacity="0.95"/><polygon points="50,15 70,35 50,35" fill="url(#g-wri)" opacity="0.8"/><polygon points="30,35 44,45 50,35" fill="url(#g-wri)" opacity="0.7"/><polygon points="70,35 56,45 50,35" fill="url(#g-wri)" opacity="0.6"/><polygon points="44,45 50,85 50,35" fill="url(#g-wri)" opacity="0.85"/><polygon points="56,45 50,85 50,35" fill="url(#g-wri)" opacity="0.75"/></svg>`
+    },
+    { 
+      id: 'release',    
+      name: 'Release Manager',     
+      role: 'AI/ML API · Final Verdict',   
+      task: 'Idle — awaiting docs', 
+      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-rel" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,15 25,38 50,48" fill="url(#g-rel)" opacity="0.95"/><polygon points="50,15 75,38 50,48" fill="url(#g-rel)" opacity="0.8"/><polygon points="25,38 20,55 40,52" fill="url(#g-rel)" opacity="0.7"/><polygon points="75,38 80,55 60,52" fill="url(#g-rel)" opacity="0.6"/><polygon points="40,52 20,55 50,60" fill="url(#g-rel)" opacity="0.85"/><polygon points="60,52 80,55 50,60" fill="url(#g-rel)" opacity="0.75"/><polygon points="40,52 50,82 50,60" fill="url(#g-rel)" opacity="0.9"/><polygon points="60,52 50,82 50,60" fill="url(#g-rel)" opacity="0.8"/></svg>`
+    }
   ];
 
   const STATE = { IDLE: 'idle', PROCESSING: 'processing', COMPLETE: 'complete', REJECTED: 'rejected' };
@@ -1535,6 +1577,21 @@ def test_update_profile_success(auth_headers):
     bandRoomInput.addEventListener('input', () => {
       localStorage.setItem('agentverse_band_room_id', bandRoomInput.value.trim());
     });
+
+    const bandGuideToggle = document.getElementById('band-guide-toggle');
+    const bandGuideContent = document.getElementById('band-guide-content');
+    if (bandGuideToggle && bandGuideContent) {
+      bandGuideToggle.addEventListener('click', () => {
+        const isCollapsed = bandGuideContent.style.display === 'none';
+        if (isCollapsed) {
+          bandGuideContent.style.display = 'block';
+          bandGuideToggle.querySelector('.toggle-icon').style.transform = 'rotate(90deg)';
+        } else {
+          bandGuideContent.style.display = 'none';
+          bandGuideToggle.querySelector('.toggle-icon').style.transform = 'rotate(0deg)';
+        }
+      });
+    }
   }
 
   /* ──────────────────────────────────────────────────────────

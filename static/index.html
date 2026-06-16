@@ -6,7 +6,7 @@
 <title>AgentVerse AI// Control Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -399,12 +399,45 @@
             <span class="switch-track"><span class="switch-thumb"></span></span>
           </label>
         </div>
-        <div class="setting-row">
+        <div class="setting-row" style="border-bottom: none; padding-bottom: 0;">
           <div>
             <span class="setting-label">Band Room ID</span>
             <span class="setting-desc">Active coordination room for agent event bus.</span>
           </div>
           <input class="setting-input" type="text" id="band-room-input" placeholder="agentverse-ai-room-01" />
+        </div>
+        <div class="band-guide-row">
+          <button class="band-guide-toggle-btn" id="band-guide-toggle" type="button">
+            <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px; transition: transform var(--transition-fast); margin-right: 6px; transform: rotate(0deg);"><path d="M9 18l6-6-6-6"/></svg>
+            How to Connect Your Band Chat Room
+          </button>
+          <div class="band-guide-content collapse" id="band-guide-content" style="display: none;">
+            <div class="guide-card-body">
+              <p class="guide-intro">Integrating your Band chat room allows the AI agents to speak and coordinate in your channel in real-time. Follow these steps:</p>
+              <ol class="guide-steps">
+                <li>
+                  <strong>Create or Open a Band Room</strong>: 
+                  Open the Band application, create or navigate to your target chat room.
+                </li>
+                <li>
+                  <strong>Copy the Room ID</strong>: 
+                  Retrieve your unique Band Room ID (UUID).
+                </li>
+                <li>
+                  <strong>Paste the Room ID</strong>: 
+                  Paste the ID into the <em>Band Room ID</em> field above. It will be cached locally and used for all pipeline runs.
+                </li>
+                <li>
+                  <strong>Launch the Pipeline</strong>: 
+                  When you run a new prompt, the Orchestrator and other agents will publish their live updates directly to that Band room!
+                </li>
+              </ol>
+              <div class="guide-badge-note">
+                <span class="badge badge-gold">Integration Info</span>
+                <span>No Band account is required for the client interface; the site communicates with Band backend APIs transparently.</span>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="setting-row">
           <div>

@@ -28,7 +28,7 @@
   --text-faint: #4B5563;
 
   /* ---- Typography ---- */
-  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
@@ -112,6 +112,43 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Premium Typography & Heading Gradients */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.hero-titles h1, 
+.section-header h2, 
+.auth-header h2, 
+.tab-panel h3,
+.agent-name,
+.stat-value {
+  background: linear-gradient(135deg, #FFFFFF 30%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+[data-theme="light"] .hero-titles h1,
+[data-theme="light"] .section-header h2,
+[data-theme="light"] .auth-header h2,
+[data-theme="light"] .tab-panel h3,
+[data-theme="light"] .agent-name,
+[data-theme="light"] .stat-value {
+  background: linear-gradient(135deg, #111827 30%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+/* Adjust layout descriptions line-height */
+p, .setting-desc, .agent-task {
+  line-height: 1.6 !important;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1149,6 +1186,91 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .switch input:checked + .switch-track .switch-thumb {
   transform: translateX(20px);
   background: #06141a;
+}
+
+/* ---- Band Integration Guide ---- */
+.band-guide-row {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.band-guide-toggle-btn {
+  display: flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--cyan);
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: opacity var(--transition-fast);
+}
+.band-guide-toggle-btn:hover {
+  opacity: 0.85;
+}
+.band-guide-content {
+  margin-top: 12px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  transition: all var(--transition-med) ease;
+}
+[data-theme="light"] .band-guide-content {
+  background: rgba(15, 23, 42, 0.02);
+}
+.guide-card-body {
+  padding: 16px;
+}
+.guide-intro {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: var(--sp-3);
+}
+.guide-steps {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: var(--sp-4);
+}
+.guide-steps li {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.guide-badge-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  background: rgba(158, 138, 120, 0.05);
+  border: 1px solid rgba(158, 138, 120, 0.15);
+}
+.guide-badge-note span:last-child {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.badge-gold {
+  background: rgba(158, 138, 120, 0.15);
+  color: var(--cyan);
+}
+
+/* ---- Origami SVGs Styling ---- */
+.agent-avatar svg {
+  width: 28px;
+  height: 28px;
+  transition: transform var(--transition-med), filter var(--transition-med);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+}
+.agent-card:hover .agent-avatar svg {
+  transform: scale(1.1) rotate(6deg);
+  filter: drop-shadow(0 4px 10px rgba(158, 138, 120, 0.35));
 }
 
 /* ════════════════════════════════════════════════════════════
