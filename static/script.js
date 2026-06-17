@@ -997,9 +997,6 @@
   async function runPipeline() {
     if (pipelineRunning) return;
 
-  async function runPipeline() {
-    if (pipelineRunning) return;
-
     const mockModeToggle = document.getElementById('mock-mode-toggle');
     const isMockMode = mockModeToggle ? mockModeToggle.checked : true;
 
