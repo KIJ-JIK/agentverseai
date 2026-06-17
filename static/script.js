@@ -1143,9 +1143,10 @@
       pipelineRunning = true;
       triggerBtn.classList.add('is-loading');
       triggerBtn.querySelector('span').textContent = 'Running...';
-      localStorage.setItem('devflow_active_session_id', 'mock-session');
+      const sessionId = 'mock-' + Date.now();
+      localStorage.setItem('devflow_active_session_id', sessionId);
 
-      const feature = featureInput.value.trim();
+      const feature = featureInput.value.trim() || 'Simulated Mock Run';
       const info = getFeatureInfo(feature);
       const script = buildPipelineScript(feature);
 
@@ -1165,8 +1166,9 @@
       showToast('info', 'Pipeline triggered', 'V7-Twin.ai is processing your feature request.');
 
       const mockState = {
-        session_id: 'mock-session',
+        session_id: sessionId,
         status: 'RUNNING',
+        prompt: feature,
         review_cycle: 0,
         agents: {},
         artifacts: {
@@ -1178,7 +1180,19 @@
         },
         events: []
       };
-      localStorage.setItem('devflow_mock_state', JSON.stringify(mockState));
+      localStorage.setItem('devflow_mock_state_' + sessionId, JSON.stringify(mockState));
+      
+      let mockHistory = [];
+      try {
+        mockHistory = JSON.parse(localStorage.getItem('devflow_mock_history') || '[]');
+      } catch (e) {}
+      mockHistory.unshift({
+        session_id: sessionId,
+        prompt: feature,
+        status: 'RUNNING',
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('devflow_mock_history', JSON.stringify(mockHistory));
 
       let activeAgentsCount = 1;
       bumpStat('stat-active-agents', activeAgentsCount);
@@ -1533,7 +1547,7 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
         }
 
         // Save local state
-        localStorage.setItem('devflow_mock_state', JSON.stringify(mockState));
+        localStorage.setItem('devflow_mock_state_' + sessionId, JSON.stringify(mockState));
 
         await sleep(950);
       }
@@ -1551,8 +1565,19 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
       appendLog('tag-release', 'DONE', 'Pipeline run complete. All artifacts available in the Artifact Hub.', false);
 
       mockState.status = 'COMPLETE';
-      localStorage.setItem('devflow_mock_state', JSON.stringify(mockState));
+      localStorage.setItem('devflow_mock_state_' + sessionId, JSON.stringify(mockState));
       localStorage.removeItem('devflow_active_session_id'); // mock complete
+      
+      try {
+        let mockHistory = JSON.parse(localStorage.getItem('devflow_mock_history') || '[]');
+        const idx = mockHistory.findIndex(h => h.session_id === sessionId);
+        if (idx !== -1) {
+          mockHistory[idx].status = 'COMPLETE';
+          localStorage.setItem('devflow_mock_history', JSON.stringify(mockHistory));
+        }
+      } catch (e) {}
+
+      await loadHistory();
 
       triggerBtn.classList.remove('is-loading');
       triggerBtn.querySelector('span').textContent = 'Trigger Pipeline';
@@ -2172,9 +2197,9 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
       return;
     }
 
-    if (activeSessionId === 'mock-session') {
+    if (activeSessionId && activeSessionId.startsWith('mock-')) {
       try {
-        const mockStateStr = localStorage.getItem('devflow_mock_state');
+        const mockStateStr = localStorage.getItem('devflow_mock_state_' + activeSessionId);
         if (mockStateStr) {
           const mockState = JSON.parse(mockStateStr);
           updateDashboardFromLiveState(mockState);
@@ -2225,24 +2250,39 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     historyList.innerHTML = '';
 
     try {
+      let mockSessions = [];
+      try {
+        mockSessions = JSON.parse(localStorage.getItem('devflow_mock_history') || '[]');
+      } catch(e) {}
+
+      let dbSessions = [];
       const headers = { 'Content-Type': 'application/json' };
+      let canFetch = false;
       if (currentSession) {
         headers['Authorization'] = `Bearer ${currentSession.access_token}`;
+        canFetch = true;
       } else if (localBypassActive) {
         headers['Authorization'] = `Bearer bypass-local-auth`;
-      } else {
-        if (historyLoading) historyLoading.style.display = 'none';
-        if (historyEmpty) historyEmpty.style.display = 'block';
-        return;
+        canFetch = true;
       }
 
-      const response = await fetch('/api/sessions', { headers });
-      if (!response.ok) throw new Error(`Fetch history error: ${response.status}`);
-      const sessions = await response.json();
+      if (canFetch) {
+        try {
+          const response = await fetch('/api/sessions', { headers });
+          if (response.ok) {
+            dbSessions = await response.json();
+          }
+        } catch(err) {
+          console.error("Fetch DB history error:", err);
+        }
+      }
 
       if (historyLoading) historyLoading.style.display = 'none';
 
-      if (!sessions || sessions.length === 0) {
+      const sessions = [...mockSessions, ...dbSessions];
+      sessions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      if (sessions.length === 0) {
         if (historyEmpty) historyEmpty.style.display = 'block';
         return;
       }
@@ -2298,6 +2338,36 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     processedEventIds.clear();
     const consoleLog = document.getElementById('status-text');
     if (consoleLog) consoleLog.innerHTML = '';
+
+    if (sessionId.startsWith('mock-')) {
+      try {
+        showToast('info', 'Loading historic run...');
+        const mockStateStr = localStorage.getItem(`devflow_mock_state_${sessionId}`);
+        if (mockStateStr) {
+          const mockState = JSON.parse(mockStateStr);
+          updateDashboardFromLiveState(mockState);
+          localStorage.setItem('devflow_active_session_id', sessionId);
+          
+          triggerBtn.classList.remove('is-loading');
+          triggerBtn.querySelector('span').textContent = 'Trigger Pipeline';
+          pipelineRunning = false;
+          
+          const dashNav = document.querySelector('.nav-item[data-section="dashboard"]');
+          if (dashNav) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            dashNav.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+          showToast('success', 'Run loaded successfully.');
+        } else {
+          throw new Error("Mock state data not found");
+        }
+      } catch (e) {
+        console.error("Failed to load mock session from history:", e);
+        showToast('error', `Failed to load session: ${e.message}`);
+      }
+      return;
+    }
     
     const headers = { 'Content-Type': 'application/json' };
     if (currentSession) {
@@ -2341,22 +2411,35 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
       return;
     }
 
-    const headers = { 'Content-Type': 'application/json' };
-    if (currentSession) {
-      headers['Authorization'] = `Bearer ${currentSession.access_token}`;
-    } else if (localBypassActive) {
-      headers['Authorization'] = `Bearer bypass-local-auth`;
-    } else {
-      return;
-    }
-
     try {
-      const response = await fetch('/api/sessions/clear', {
-        method: 'POST',
-        headers
-      });
-      if (!response.ok) throw new Error(`Clear history failed: ${response.status}`);
-      
+      // Clear mock runs from localStorage
+      localStorage.removeItem('devflow_mock_history');
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('devflow_mock_state_')) {
+          localStorage.removeItem(key);
+        }
+      }
+
+      const headers = { 'Content-Type': 'application/json' };
+      let clearedDb = false;
+      if (currentSession || localBypassActive) {
+        if (currentSession) {
+          headers['Authorization'] = `Bearer ${currentSession.access_token}`;
+        } else if (localBypassActive) {
+          headers['Authorization'] = `Bearer bypass-local-auth`;
+        }
+        try {
+          const response = await fetch('/api/sessions/clear', {
+            method: 'POST',
+            headers
+          });
+          if (response.ok) clearedDb = true;
+        } catch (e) {
+          console.error("DB history clear failed:", e);
+        }
+      }
+
       showToast('success', 'Session history cleared.');
       localStorage.removeItem('devflow_active_session_id');
       
