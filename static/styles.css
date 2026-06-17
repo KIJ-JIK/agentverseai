@@ -6,28 +6,28 @@
    ════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ---- Core palette (Custom Dark Organic-Tech Theme) ---- */
-  --bg: #0A3323; /* Dark green base background */
-  --bg-elevated: rgba(16, 86, 102, 0.25); /* Midnight green translucent sidebar */
-  --surface: rgba(16, 86, 102, 0.35); /* Midnight green glassmorphic cards */
-  --surface-2: rgba(16, 86, 102, 0.55);
-  --border: rgba(131, 153, 88, 0.15); /* Moss green thin borders */
-  --border-strong: rgba(131, 153, 88, 0.3);
+  /* ---- Core palette (Beach Dark Theme — 5-color) ---- */
+  --bg: #0F414A; /* Midnight blue base background */
+  --bg-elevated: rgba(15, 65, 74, 0.55); /* Midnight blue translucent sidebar */
+  --surface: rgba(15, 65, 74, 0.65); /* Midnight blue glassmorphic cards */
+  --surface-2: rgba(15, 65, 74, 0.80);
+  --border: rgba(150, 192, 206, 0.15); /* Light blue thin borders */
+  --border-strong: rgba(150, 192, 206, 0.30);
 
-  --cyan: #D3968C; /* Rosy brown primary accent */
-  --cyan-soft: rgba(211, 150, 140, 0.08);
-  --green: #839958; /* Moss green */
-  --green-soft: rgba(131, 153, 88, 0.08);
-  --red: #f87171; /* Soft red fallback */
-  --red-soft: rgba(248, 113, 113, 0.08);
-  --violet: #839958; /* Moss green secondary accent */
-  --violet-soft: rgba(131, 153, 88, 0.08);
-  --gray: #839958;
-  --gray-soft: rgba(131, 153, 88, 0.08);
+  --cyan: #96C0CE; /* Light blue primary accent */
+  --cyan-soft: rgba(150, 192, 206, 0.10);
+  --green: #96C0CE; /* Light blue for success states */
+  --green-soft: rgba(150, 192, 206, 0.08);
+  --red: #7F0303; /* Maroon for errors/rejections */
+  --red-soft: rgba(127, 3, 3, 0.12);
+  --violet: #D8BA98; /* Tan secondary accent */
+  --violet-soft: rgba(216, 186, 152, 0.10);
+  --gray: #D8BA98;
+  --gray-soft: rgba(216, 186, 152, 0.08);
 
-  --text: #F7F4D5; /* Beige high-contrast text */
-  --text-dim: #D3968C; /* Rosy brown secondary text */
-  --text-faint: #839958; /* Moss green muted text */
+  --text: #EFE8DF; /* Alabaster high-contrast text */
+  --text-dim: #D8BA98; /* Tan secondary text */
+  --text-faint: #96C0CE; /* Light blue muted text */
 
   /* ---- Typography ---- */
   --font-display: 'Outfit', sans-serif;
@@ -51,10 +51,10 @@
   --r-pill: 999px;
 
   /* ---- Shadows / glow ---- */
-  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.45);
-  --glow-cyan: 0 0 0 1px rgba(56, 189, 248, 0.15), 0 0 20px rgba(56, 189, 248, 0.05);
-  --glow-green: 0 0 0 1px rgba(52, 211, 153, 0.15), 0 0 20px rgba(52, 211, 153, 0.05);
-  --glow-red: 0 0 0 1px rgba(248, 113, 113, 0.15), 0 0 20px rgba(248, 113, 113, 0.05);
+  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.50);
+  --glow-cyan: 0 0 0 1px rgba(150, 192, 206, 0.20), 0 0 20px rgba(150, 192, 206, 0.08);
+  --glow-green: 0 0 0 1px rgba(150, 192, 206, 0.20), 0 0 20px rgba(150, 192, 206, 0.08);
+  --glow-red: 0 0 0 1px rgba(127, 3, 3, 0.25), 0 0 20px rgba(127, 3, 3, 0.10);
 
   /* ---- Layout ---- */
   --sidebar-w: 240px;
@@ -97,10 +97,10 @@ body {
   font-family: var(--font-body);
   background-color: var(--bg);
   background-image: 
-    linear-gradient(rgba(131, 153, 88, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(131, 153, 88, 0.03) 1px, transparent 1px),
-    radial-gradient(circle at 0% 0%, rgba(211, 150, 140, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(16, 86, 102, 0.25) 0%, transparent 50%);
+    linear-gradient(rgba(150, 192, 206, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150, 192, 206, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 0% 0%, rgba(216, 186, 152, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(15, 65, 74, 0.30) 0%, transparent 50%);
   background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
   background-attachment: fixed;
   color: var(--text);
@@ -799,19 +799,19 @@ p, .setting-desc, .agent-task {
   gap: var(--sp-2);
   padding: 14px 28px;
   border-radius: var(--r-pill); /* Pill shaped button */
-  background: linear-gradient(135deg, var(--cyan) 0%, #0284c7 100%);
-  color: #040d1a;
+  background: linear-gradient(135deg, #0F414A 0%, #D8BA98 100%);
+  color: #EFE8DF;
   font-weight: 700;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;
-  box-shadow: 0 4px 18px rgba(56, 189, 248, 0.22);
+  box-shadow: 0 4px 18px rgba(15, 65, 74, 0.35);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 .btn-trigger:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
+  box-shadow: 0 8px 24px rgba(216, 186, 152, 0.35);
 }
 .btn-trigger:active { transform: translateY(0); }
 .btn-trigger.is-loading { pointer-events: none; opacity: 0.85; }
@@ -819,13 +819,13 @@ p, .setting-desc, .agent-task {
 .btn-trigger.is-loading .bolt-icon { animation: spin-cw 0.8s linear infinite; }
 
 [data-theme="light"] .btn-trigger {
-  background: linear-gradient(135deg, var(--cyan) 0%, #ea580c 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.22);
+  background: linear-gradient(135deg, #0F414A 0%, #105666 100%);
+  color: #EFE8DF;
+  box-shadow: 0 4px 16px rgba(16, 86, 102, 0.25);
 }
 [data-theme="light"] .btn-trigger:hover {
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-  box-shadow: 0 6px 22px rgba(249, 115, 22, 0.35);
+  background: linear-gradient(135deg, #105666 0%, #0F414A 100%);
+  box-shadow: 0 6px 22px rgba(16, 86, 102, 0.40);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1056,7 +1056,7 @@ p, .setting-desc, .agent-task {
 }
 .pipe-node-group:hover .pipe-node-rect {
   stroke: var(--cyan);
-  fill: rgba(6,182,212,0.08);
+  fill: rgba(150, 192, 206, 0.10);
 }
 .pipe-node-label {
   fill: var(--text);
@@ -1086,14 +1086,14 @@ p, .setting-desc, .agent-task {
 }
 .pipe-node-group.active .pipe-node-rect {
   stroke: var(--cyan);
-  fill: rgba(6,182,212,0.08);
+  fill: rgba(150, 192, 206, 0.10);
 }
 .pipe-node-group.done .pipe-node-rect { stroke: var(--green); }
 .pipe-node-group.done .pipe-node-glow { stroke: var(--green); }
 
 @keyframes node-glow-pulse {
-  0%, 100% { stroke-opacity: 0.9; filter: drop-shadow(0 0 6px rgba(6,182,212,0.7)); }
-  50% { stroke-opacity: 0.2; filter: drop-shadow(0 0 14px rgba(6,182,212,0.9)); }
+  0%, 100% { stroke-opacity: 0.9; filter: drop-shadow(0 0 6px rgba(150, 192, 206, 0.7)); }
+  50% { stroke-opacity: 0.2; filter: drop-shadow(0 0 14px rgba(150, 192, 206, 0.9)); }
 }
 
 .pipe-edge {
@@ -1668,7 +1668,7 @@ p, .setting-desc, .agent-task {
 .auth-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(11, 15, 25, 0.75);
+  background: rgba(15, 65, 74, 0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 10000;
@@ -1684,10 +1684,10 @@ p, .setting-desc, .agent-task {
   pointer-events: auto;
 }
 .auth-card {
-  background: rgba(30, 31, 32, 0.45);
-  border: 1px solid var(--border-strong);
+  background: #EFE8DF;
+  border: 1px solid rgba(216, 186, 152, 0.40);
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 16px 48px rgba(15, 65, 74, 0.35);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: var(--sp-6);
@@ -1711,12 +1711,12 @@ p, .setting-desc, .agent-task {
   font-size: 1.6rem;
   font-weight: 600;
   margin-bottom: var(--sp-1);
-  background: linear-gradient(135deg, #FFF 30%, var(--cyan) 100%);
+  background: linear-gradient(135deg, #0F414A 30%, #7F0303 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .auth-header p {
-  color: var(--text-dim);
+  color: #0F414A;
   font-size: 0.9rem;
 }
 .auth-form {
@@ -1730,25 +1730,28 @@ p, .setting-desc, .agent-task {
   gap: var(--sp-1);
 }
 .auth-group label {
-  color: var(--text-dim);
+  color: #0F414A;
   font-size: 0.85rem;
   font-weight: 500;
 }
 .auth-input {
-  background: rgba(15, 21, 37, 0.65);
-  border: 1px solid var(--border);
+  background: #FFFFFF;
+  border: 1px solid rgba(216, 186, 152, 0.45);
   border-radius: var(--r-md);
-  color: var(--text);
+  color: #0F414A;
   padding: var(--sp-3);
   font-family: var(--font-body);
   font-size: 0.95rem;
   width: 100%;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
+.auth-input::placeholder {
+  color: #D8BA98;
+}
 .auth-input:focus {
-  border-color: var(--cyan);
+  border-color: #0F414A;
   outline: none;
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 12px rgba(15, 65, 74, 0.15);
 }
 .auth-btn {
   font-family: var(--font-display);
@@ -1765,22 +1768,23 @@ p, .setting-desc, .agent-task {
   gap: var(--sp-2);
 }
 .auth-btn-primary {
-  background: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 100%);
-  color: #FFFFFF;
+  background: #7F0303;
+  color: #EFE8DF;
 }
 .auth-btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: var(--glow-cyan);
+  background: #5e0202;
+  box-shadow: 0 4px 16px rgba(127, 3, 3, 0.30);
 }
 .auth-btn-secondary {
   background: transparent;
-  color: var(--text-dim);
-  border: 1px solid var(--border-strong);
+  color: #0F414A;
+  border: 1px solid rgba(15, 65, 74, 0.20);
 }
 .auth-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text);
-  border-color: var(--border-strong);
+  background: rgba(15, 65, 74, 0.05);
+  color: #0F414A;
+  border-color: rgba(15, 65, 74, 0.35);
 }
 .auth-btn:active {
   transform: translateY(1px);
@@ -1794,23 +1798,23 @@ p, .setting-desc, .agent-task {
 .auth-switch {
   text-align: center;
   font-size: 0.85rem;
-  color: var(--text-dim);
+  color: #0F414A;
   margin-top: var(--sp-2);
 }
 .auth-switch-link {
-  color: var(--cyan);
+  color: #7F0303;
   font-weight: 500;
   cursor: pointer;
   transition: color var(--transition-fast);
 }
 .auth-switch-link:hover {
-  color: var(--violet);
+  color: #5e0202;
   text-decoration: underline;
 }
 .auth-error {
-  background: var(--red-soft);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: var(--red);
+  background: rgba(127, 3, 3, 0.08);
+  border: 1px solid rgba(127, 3, 3, 0.20);
+  color: #7F0303;
   font-size: 0.85rem;
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--r-sm);
@@ -1823,7 +1827,7 @@ p, .setting-desc, .agent-task {
 .preloader {
   position: fixed;
   inset: 0;
-  background: #060709;
+  background: #0F414A;
   z-index: 99999;
   display: flex;
   align-items: center;
