@@ -6,28 +6,28 @@
    ════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ---- Core palette (Soft Lavender Glassmorphic Dark Theme - inspired by Pic 4) ---- */
-  --bg: #0d0e15; /* Soft dark violet-black */
-  --bg-elevated: rgba(24, 22, 40, 0.7); /* Lilac-tinted translucent sidebar */
-  --surface: rgba(30, 27, 54, 0.45); /* Soft lavender glassmorphic card surface */
-  --surface-2: rgba(38, 34, 68, 0.55);
-  --border: rgba(167, 139, 250, 0.12); /* Soft lilac border */
-  --border-strong: rgba(167, 139, 250, 0.22);
+  /* ---- Core palette (Custom Dark Organic-Tech Theme) ---- */
+  --bg: #0A3323; /* Dark green base background */
+  --bg-elevated: rgba(16, 86, 102, 0.25); /* Midnight green translucent sidebar */
+  --surface: rgba(16, 86, 102, 0.35); /* Midnight green glassmorphic cards */
+  --surface-2: rgba(16, 86, 102, 0.55);
+  --border: rgba(131, 153, 88, 0.15); /* Moss green thin borders */
+  --border-strong: rgba(131, 153, 88, 0.3);
 
-  --cyan: #c084fc; /* Lavender lilac accent instead of blue */
-  --cyan-soft: rgba(192, 132, 252, 0.08);
-  --green: #34d399; /* Soft green */
-  --green-soft: rgba(52, 211, 153, 0.08);
-  --red: #f87171; /* Soft red */
+  --cyan: #D3968C; /* Rosy brown primary accent */
+  --cyan-soft: rgba(211, 150, 140, 0.08);
+  --green: #839958; /* Moss green */
+  --green-soft: rgba(131, 153, 88, 0.08);
+  --red: #f87171; /* Soft red fallback */
   --red-soft: rgba(248, 113, 113, 0.08);
-  --violet: #e879f9; /* Pastel pink/violet */
-  --violet-soft: rgba(232, 121, 249, 0.08);
-  --gray: #a78bfa; /* Lavender-grey tint */
-  --gray-soft: rgba(167, 139, 250, 0.08);
+  --violet: #839958; /* Moss green secondary accent */
+  --violet-soft: rgba(131, 153, 88, 0.08);
+  --gray: #839958;
+  --gray-soft: rgba(131, 153, 88, 0.08);
 
-  --text: #f3f4f6; /* Crisp off-white */
-  --text-dim: #cbd5e1; /* Soft slate gray secondary */
-  --text-faint: #94a3b8; /* Muted description text */
+  --text: #F7F4D5; /* Beige high-contrast text */
+  --text-dim: #D3968C; /* Rosy brown secondary text */
+  --text-faint: #839958; /* Moss green muted text */
 
   /* ---- Typography ---- */
   --font-display: 'Outfit', sans-serif;
@@ -62,26 +62,26 @@
   --transition-med: 0.35s cubic-bezier(.4,0,.2,1);
 }
 
-/* ---- Light theme override (Soft Cream/Sand Tech Theme - inspired by Image 2) ---- */
+/* ---- Light theme override (Custom Light Organic-Tech Theme) ---- */
 [data-theme="light"] {
-  --bg: #f8fafc; /* Softer slate/off-white */
+  --bg: #F7F4D5; /* Beige base background */
   --bg-elevated: #ffffff; /* Crisp white sidebar */
   --surface: #ffffff; /* Clean white cards */
   --surface-2: rgba(255, 255, 255, 0.7);
-  --border: rgba(15, 23, 42, 0.06); /* Soft thin gray borders */
-  --border-strong: rgba(15, 23, 42, 0.1);
-  --text: #0f172a; /* Rich soft charcoal text */
-  --text-dim: #475569; /* Slate gray secondary text */
-  --text-faint: #64748b; /* Muted description gray */
-  --shadow-card: 0 8px 30px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.02);
+  --border: rgba(10, 51, 35, 0.08); /* Dark green thin borders */
+  --border-strong: rgba(10, 51, 35, 0.18);
+  --text: #0A3323; /* Dark green high-contrast text */
+  --text-dim: #105666; /* Midnight green secondary text */
+  --text-faint: #839958; /* Moss green muted text */
+  --shadow-card: 0 8px 30px rgba(10, 51, 35, 0.03), 0 2px 8px rgba(10, 51, 35, 0.01);
 
-  --cyan: #f97316; /* Soft tech orange/amber accent (Image 2 style) */
-  --cyan-soft: rgba(249, 115, 22, 0.08);
-  --violet: #8b5cf6; /* Deep readable violet */
-  --violet-soft: rgba(139, 92, 246, 0.08);
-  --green: #10b981; /* Soft green */
-  --green-soft: rgba(16, 185, 129, 0.08);
-  --red: #ef4444; /* Soft red */
+  --cyan: #105666; /* Midnight green primary accent */
+  --cyan-soft: rgba(16, 86, 102, 0.08);
+  --violet: #D3968C; /* Rosy brown secondary accent */
+  --violet-soft: rgba(211, 150, 140, 0.08);
+  --green: #839958; /* Moss green tertiary accent */
+  --green-soft: rgba(131, 153, 88, 0.08);
+  --red: #ef4444; /* Soft red fallback */
   --red-soft: rgba(239, 68, 68, 0.08);
 }
 
@@ -97,10 +97,10 @@ body {
   font-family: var(--font-body);
   background-color: var(--bg);
   background-image: 
-    linear-gradient(rgba(167, 139, 250, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(167, 139, 250, 0.02) 1px, transparent 1px),
-    radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(232, 121, 249, 0.08) 0%, transparent 50%);
+    linear-gradient(rgba(131, 153, 88, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(131, 153, 88, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 0% 0%, rgba(211, 150, 140, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(16, 86, 102, 0.25) 0%, transparent 50%);
   background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
   background-attachment: fixed;
   color: var(--text);
@@ -111,11 +111,11 @@ body {
 }
 
 [data-theme="light"] body {
-  background-color: #faf9f6 !important;
+  background-color: var(--bg) !important;
   background-image: 
-    linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
-    radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.06) 0%, rgba(212, 163, 115, 0.02) 50%, #faf9f6 100%) !important;
+    linear-gradient(rgba(10, 51, 35, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 51, 35, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 100% 0%, rgba(211, 150, 140, 0.08) 0%, rgba(131, 153, 88, 0.03) 50%, #F7F4D5 100%) !important;
   background-size: 24px 24px, 24px 24px, 100% 100% !important;
   background-attachment: fixed !important;
 }
@@ -169,7 +169,7 @@ h1, h2, h3, h4, h5, h6 {
 [data-theme="light"] .tab-panel h3,
 [data-theme="light"] .agent-name,
 [data-theme="light"] .stat-value {
-  background: linear-gradient(135deg, #111827 30%, var(--cyan) 100%);
+  background: linear-gradient(135deg, var(--text) 30%, var(--cyan) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
