@@ -1973,6 +1973,7 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     const historySection = document.getElementById('history');
     if (signedIn) {
       if (navHistory) navHistory.style.display = '';
+      if (historySection) historySection.style.display = '';
       loadHistory();
     } else {
       if (navHistory) navHistory.style.display = 'none';
