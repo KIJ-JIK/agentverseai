@@ -219,6 +219,8 @@ p, .setting-desc, .agent-task {
   top: 0;
   height: 100vh;
   z-index: 50;
+  overflow-y: auto;
+  overflow-x: hidden;
   transition: width var(--transition-med), padding var(--transition-med), background var(--transition-med), border-color var(--transition-med);
 }
 
@@ -969,6 +971,10 @@ p, .setting-desc, .agent-task {
   align-items: start;
 }
 
+.artifact-block {
+  min-width: 0;
+}
+
 /* ---- Live Console ---- */
 .console {
   padding: 0;
@@ -1050,7 +1056,7 @@ p, .setting-desc, .agent-task {
    ARTIFACT HUB / TABS
    ════════════════════════════════════════════════════════════ */
 
-.artifact-hub { padding: 0; overflow: hidden; }
+.artifact-hub { padding: 0; overflow: hidden; max-width: 100%; }
 
 .tabs {
   display: flex;
@@ -1076,11 +1082,15 @@ p, .setting-desc, .agent-task {
 .tab-panels {
   padding: var(--sp-5);
   min-width: 0;
+  overflow: hidden;
+  max-width: 100%;
 }
 .tab-panel {
   display: none;
   animation: tab-fade 0.35s ease;
   min-width: 0;
+  overflow: hidden;
+  max-width: 100%;
 }
 .tab-panel.active { display: block; }
 @keyframes tab-fade {
@@ -1097,11 +1107,14 @@ p, .setting-desc, .agent-task {
   font-size: 0.78rem;
   line-height: 1.7;
   overflow-x: auto;
+  overflow-y: auto;
   max-height: 380px;
   color: #e3e3e3 !important;
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
+  white-space: pre;
+  word-wrap: normal;
 }
 
 .tok-key { color: #7dd3fc !important; }
@@ -1116,9 +1129,13 @@ p, .setting-desc, .agent-task {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-4);
+  overflow: hidden;
+  max-width: 100%;
 }
 .code-col {
   min-width: 0;
+  overflow: hidden;
+  max-width: 100%;
 }
 .code-col-head {
   display: flex;
@@ -1843,26 +1860,25 @@ p, .setting-desc, .agent-task {
 
 /* ---- Sidebar Collapse button & styles ---- */
 .sidebar-collapse-btn {
-  position: absolute;
-  top: 24px;
-  right: -12px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--bg-elevated);
+  display: none !important;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  background: transparent;
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-dim);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  margin-left: auto;
   transition: transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
 }
 .sidebar-collapse-btn:hover {
   color: var(--text);
   background: var(--surface);
+  border-color: var(--border-strong);
 }
 .sidebar-collapse-btn svg {
   width: 14px;

@@ -854,45 +854,63 @@
 
     if (state.artifacts) {
       const arts = state.artifacts;
+
+      // Helper: safely check if an artifact has content (handles string and object payloads)
+      function hasContent(a) {
+        if (!a) return false;
+        if (typeof a === 'string') return a.trim().length > 0;
+        return Object.keys(a).length > 0;
+      }
+      function ensureObj(a) {
+        if (typeof a === 'string') {
+          try { return JSON.parse(a); } catch (e) { return a; }
+        }
+        return a;
+      }
       
-      if (arts.architecture && Object.keys(arts.architecture).length > 0) {
+      if (hasContent(arts.architecture)) {
+        const archData = ensureObj(arts.architecture);
         const archEl = document.querySelector('#architecture-tab pre code');
         if (archEl) {
-          archEl.innerHTML = highlightJSON(JSON.stringify(arts.architecture, null, 2));
+          archEl.innerHTML = highlightJSON(typeof archData === 'string' ? archData : JSON.stringify(archData, null, 2));
         }
       }
       
-      if (arts.frontend_code && Object.keys(arts.frontend_code).length > 0) {
+      if (hasContent(arts.frontend_code)) {
+        const feData = ensureObj(arts.frontend_code);
         const badge = document.getElementById('iter-badge-fe');
         if (badge) {
-          badge.textContent = `Iteration ${arts.frontend_code.iteration_count || 1}`;
+          badge.textContent = `Iteration ${(typeof feData === 'object' && feData.iteration_count) || 1}`;
         }
         const feEl = document.querySelector('#code-tab .code-col:nth-child(1) pre code');
         if (feEl) {
-          feEl.innerHTML = highlightJSX(extractCode(arts.frontend_code));
+          feEl.innerHTML = highlightJSX(extractCode(feData));
         }
       }
-      if (arts.backend_code && Object.keys(arts.backend_code).length > 0) {
+      if (hasContent(arts.backend_code)) {
+        const beData = ensureObj(arts.backend_code);
         const badge = document.getElementById('iter-badge-be');
         if (badge) {
-          badge.textContent = `Iteration ${arts.backend_code.iteration_count || 1}`;
+          badge.textContent = `Iteration ${(typeof beData === 'object' && beData.iteration_count) || 1}`;
         }
         const beEl = document.querySelector('#code-tab .code-col:nth-child(2) pre code');
         if (beEl) {
-          beEl.innerHTML = highlightPython(extractCode(arts.backend_code));
+          beEl.innerHTML = highlightPython(extractCode(beData));
         }
       }
       
-      if (arts.tests && Object.keys(arts.tests).length > 0) {
-        const t = arts.tests;
-        const fwVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(1) .test-stat-value');
-        if (fwVal) fwVal.textContent = t.test_framework || 'pytest';
-        
-        const fileVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(2) .test-stat-value');
-        if (fileVal) fileVal.textContent = t.test_file || 'test_suite.py';
-        
-        const covVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(3) .test-stat-value');
-        if (covVal) covVal.textContent = t.coverage_estimate || 'N/A';
+      if (hasContent(arts.tests)) {
+        const t = ensureObj(arts.tests);
+        if (typeof t === 'object') {
+          const fwVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(1) .test-stat-value');
+          if (fwVal) fwVal.textContent = t.test_framework || 'pytest';
+          
+          const fileVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(2) .test-stat-value');
+          if (fileVal) fileVal.textContent = t.test_file || 'test_suite.py';
+          
+          const covVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(3) .test-stat-value');
+          if (covVal) covVal.textContent = t.coverage_estimate || 'N/A';
+        }
         
         const tCodeEl = document.querySelector('#tests-tab pre code');
         if (tCodeEl) {
@@ -900,8 +918,9 @@
         }
       }
       
-      if (arts.documentation && Object.keys(arts.documentation).length > 0) {
-        const docText = arts.documentation.content || '';
+      if (hasContent(arts.documentation)) {
+        const docData = ensureObj(arts.documentation);
+        const docText = typeof docData === 'string' ? docData : (docData.content || '');
         if (docText) {
           latestDocContent = docText;
           const mdRenderEl = document.querySelector('#docs-tab .markdown-render');
@@ -1051,18 +1070,51 @@
         }
 
         if (step.event === 'SPEC_GENERATED') {
-          const specData = {
-            "architecture_pattern": "REST + React SPA",
-            "frontend_spec": {
-              "components": [`${info.entity}Header`, `${info.entity}Details`, `${info.entity}Form`],
-              "state_hooks": [`use${info.entity}State`, `use${info.entity}Actions`]
-            },
-            "backend_spec": {
-              "framework": "FastAPI",
-              "endpoints": [`POST /api/${info.entity.toLowerCase()}`, `GET /api/${info.entity.toLowerCase()}`, `PUT /api/${info.entity.toLowerCase()}`],
-              "auth": "JWT Bearer"
-            }
-          };
+          let specData;
+          if (info.entity === 'Calculator') {
+            specData = {
+              "architecture_pattern": "REST + React SPA",
+              "frontend_spec": {
+                "components": ["Calculator", "CalculatorHistory"],
+                "state_hooks": ["useState", "useEffect"]
+              },
+              "backend_spec": {
+                "endpoints": [
+                  {
+                    "path": "/api/calculator/evaluate",
+                    "method": "POST",
+                    "description": "Safely evaluate mathematical expressions"
+                  }
+                ],
+                "db_tables": ["calculation_logs"]
+              },
+              "task_matrix": [
+                {
+                  "id": "T001",
+                  "assigned_to": "FrontendDevAgent",
+                  "objective": "Create a fully functional interactive keypad grid and equation screen"
+                },
+                {
+                  "id": "T002",
+                  "assigned_to": "BackendDevAgent",
+                  "objective": "Implement robust and safe expression parsing routes"
+                }
+              ]
+            };
+          } else {
+            specData = {
+              "architecture_pattern": "REST + React SPA",
+              "frontend_spec": {
+                "components": [`${info.entity}Header`, `${info.entity}Details`, `${info.entity}Form`],
+                "state_hooks": [`use${info.entity}State`, `use${info.entity}Actions`]
+              },
+              "backend_spec": {
+                "framework": "FastAPI",
+                "endpoints": [`POST /api/${info.entity.toLowerCase()}`, `GET /api/${info.entity.toLowerCase()}`, `PUT /api/${info.entity.toLowerCase()}`],
+                "auth": "JWT Bearer"
+              }
+            };
+          }
           mockState.artifacts.architecture = specData;
           const archEl = document.querySelector('#architecture-tab pre code');
           if (archEl) {
@@ -1075,7 +1127,60 @@
         if (step.event === 'CODE_EMITTED') {
           const isIteration2 = step.task.includes('iteration 2') || reviewCycle > 0;
           
-          const feCode = `function ${info.entity}Dashboard() {
+          let feCode = '';
+          if (info.entity === 'Calculator') {
+            feCode = `import React, { useState } from 'react';
+
+export default function Calculator() {
+  const [display, setDisplay] = useState('');
+  const [result, setResult] = useState('');
+
+  const handleButtonClick = (value) => {
+    if (value === '=') {
+      try {
+        const evalResult = Function('"use strict"; return (' + display + ')')();
+        setResult(String(evalResult));
+        setDisplay(String(evalResult));
+      } catch (err) {
+        setResult('Error');
+      }
+    } else if (value === 'C') {
+      setDisplay('');
+      setResult('');
+    } else {
+      setDisplay(prev => prev + value);
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto p-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl">
+      <h3 className="text-xl font-bold text-cyan-400 mb-4 text-center">React Calculator</h3>
+      <div className="bg-slate-950 p-4 rounded-lg mb-4 text-right min-h-[60px] border border-slate-800">
+        <div className="text-slate-400 text-sm overflow-x-auto whitespace-nowrap">{display || '0'}</div>
+        <div className="text-2xl font-bold text-white mt-1">{result}</div>
+      </div>
+      <div className="grid grid-cols-4 gap-2">
+        {['7', '8', '9', '/', '4', '5', '6', '*', '1', '2', '3', '-', '0', 'C', '=', '+'].map(btn => (
+          <button
+            key={btn}
+            onClick={() => handleButtonClick(btn)}
+            className={\`p-4 text-lg font-bold rounded-lg transition-all \${
+              btn === '=' 
+                ? 'bg-cyan-500 hover:bg-cyan-600 text-slate-950' 
+                : btn === 'C'
+                ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400'
+                : 'bg-slate-800 hover:bg-slate-700 text-white'
+            }\`}
+          >
+            {btn}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}`;
+          } else {
+            feCode = `function ${info.entity}Dashboard() {
   const [data, setData] = useState(null);
   const { token } = useAuthToken();
 
@@ -1087,13 +1192,14 @@
 
   return (
     <AuthGuard>
-      <${info.entity}Details data={data} />
-      <${info.entity}Form onSubmit={save${info.entity}} />
+      <\${info.entity}Details data={data} />
+      <\${info.entity}Form onSubmit={save\${info.entity}} />
     </AuthGuard>
   );
 }`;
+          }
           const feCodeData = {
-            file_target: `${info.entity}Dashboard.jsx`,
+            file_target: info.entity === 'Calculator' ? 'Calculator.jsx' : `${info.entity}Dashboard.jsx`,
             language: "react",
             source_code: feCode,
             iteration_count: isIteration2 ? 2 : 1
@@ -1105,8 +1211,34 @@
           }
 
           let beCode = '';
-          if (isIteration2) {
-            beCode = `@app.put("/${info.entity.toLowerCase()}")
+          if (info.entity === 'Calculator') {
+            beCode = `from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI(title="Calculator API")
+
+class CalculationRequest(BaseModel):
+    expression: str
+
+class CalculationResponse(BaseModel):
+    result: float
+    expression: str
+
+@app.post("/api/calculator/evaluate", response_model=CalculationResponse)
+def evaluate_expression(req: CalculationRequest):
+    allowed_chars = set("0123456789+-*/.() ")
+    if not set(req.expression).issubset(allowed_chars):
+        raise HTTPException(status_code=400, detail="Invalid characters in expression")
+    try:
+        res = eval(req.expression, {"__builtins__": None}, {})
+        return CalculationResponse(result=float(res), expression=req.expression)
+    except ZeroDivisionError:
+        raise HTTPException(status_code=400, detail="Division by zero")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid mathematical expression")`;
+          } else {
+            if (isIteration2) {
+              beCode = `@app.put("/${info.entity.toLowerCase()}")
 async def update_${info.entity.toLowerCase()}(
     payload: ${info.entity}Update,
     user: User = Depends(get_current_user)
@@ -1117,8 +1249,8 @@ async def update_${info.entity.toLowerCase()}(
         payload.dict()
     )
     return {"status": "ok", "${info.entity.toLowerCase()}": updated}`;
-          } else {
-            beCode = `@app.put("/${info.entity.toLowerCase()}")
+            } else {
+              beCode = `@app.put("/${info.entity.toLowerCase()}")
 async def update_${info.entity.toLowerCase()}(
     payload: ${info.entity}Update
 ):
@@ -1128,6 +1260,7 @@ async def update_${info.entity.toLowerCase()}(
         payload.dict()
     )
     return {"status": "ok", "${info.entity.toLowerCase()}": updated}`;
+            }
           }
 
           const beCodeData = {
@@ -1162,7 +1295,25 @@ async def update_${info.entity.toLowerCase()}(
           mockState.review_cycle = reviewCycle;
         }
         if (step.event === 'TESTS_GENERATED') {
-          const testCode = `def test_update_${info.entity.toLowerCase()}_requires_auth():
+          let testCode = '';
+          if (info.entity === 'Calculator') {
+            testCode = `import pytest
+from fastapi.testclient import TestClient
+from routes import app
+
+client = TestClient(app)
+
+def test_evaluate_addition():
+    response = client.post("/api/calculator/evaluate", json={"expression": "2 + 2"})
+    assert response.status_code == 200
+    assert response.json()["result"] == 4.0
+
+def test_evaluate_division_by_zero():
+    response = client.post("/api/calculator/evaluate", json={"expression": "10 / 0"})
+    assert response.status_code == 400
+    assert "division by zero" in response.json()["detail"].lower()`;
+          } else {
+            testCode = `def test_update_${info.entity.toLowerCase()}_requires_auth():
     response = client.put("/${info.entity.toLowerCase()}", json={})
     assert response.status_code == 401
 
@@ -1175,9 +1326,10 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
     # PASSED — 0.04s`;
+          }
           const testData = {
             test_framework: "pytest",
-            test_file: `test_${info.entity.toLowerCase()}_api.py`,
+            test_file: info.entity === 'Calculator' ? 'test_calculator_api.py' : `test_${info.entity.toLowerCase()}_api.py`,
             coverage_estimate: "94%",
             source_code: testCode
           };
@@ -1189,33 +1341,29 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
           const fwVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(1) .test-stat-value');
           if (fwVal) fwVal.textContent = 'pytest';
           const fileVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(2) .test-stat-value');
-          if (fileVal) fileVal.textContent = `test_${info.entity.toLowerCase()}_api.py`;
+          if (fileVal) fileVal.textContent = testData.test_file;
           const covVal = document.querySelector('#tests-tab .test-summary .test-stat:nth-child(3) .test-stat-value');
           if (covVal) covVal.textContent = '94%';
 
           setEdgeFlow('n-qa', 'n-writer', true);
         }
         if (step.event === 'DOCS_GENERATED') {
-          const docText = `# ${info.entity} Feature\n\nAdds a secure, JWT-authenticated ${info.entity.toLowerCase()} service allowing users to manage their ${info.entity.toLowerCase()} details.\n\n## Endpoints\n- \`POST /auth/login\` — returns a signed JWT bearer token\n- \`GET /${info.entity.toLowerCase()}\` — returns the authenticated user's ${info.entity.toLowerCase()}\n- \`PUT /${info.entity.toLowerCase()}\` — updates ${info.entity.toLowerCase()} fields, JWT-validated\n\n## Frontend Components\n\`${info.entity}Dashboard\`, \`AuthGuard\`, and \`${info.entity}Form\` compose the client experience, backed by \`useAuthToken\` and \`use${info.entity}Data\` hooks.`;
+          let docText = '';
+          if (info.entity === 'Calculator') {
+            docText = `# Calculator Service\n\nEvaluates mathematical expressions safely.\n\n## Endpoints\n- \`POST /api/calculator/evaluate\` — evaluates mathematical expressions safely.\n\n## Frontend Components\n\`Calculator\` UI panel with interactive grid keypad.`;
+          } else {
+            docText = `# ${info.entity} Feature\n\nAdds a secure, JWT-authenticated ${info.entity.toLowerCase()} service allowing users to manage their ${info.entity.toLowerCase()} details.\n\n## Endpoints\n- \`POST /auth/login\` — returns a signed JWT bearer token\n- \`GET /${info.entity.toLowerCase()}\` — returns the authenticated user's ${info.entity.toLowerCase()}\n- \`PUT /${info.entity.toLowerCase()}\` — updates ${info.entity.toLowerCase()} fields, JWT-validated\n\n## Frontend Components\n\`${info.entity}Dashboard\`, \`AuthGuard\`, and \`${info.entity}Form\` compose the client experience, backed by \`useAuthToken\` and \`use${info.entity}Data\` hooks.`;
+          }
           latestDocContent = docText;
           mockState.artifacts.documentation = { content: docText };
           const mdRenderEl = document.querySelector('#docs-tab .markdown-render');
           if (mdRenderEl) {
-            mdRenderEl.innerHTML = `
-              <h3># ${info.entity} Feature</h3>
-              <p>Adds a secure, JWT-authenticated ${info.entity.toLowerCase()} service allowing users to manage their ${info.entity.toLowerCase()} details.</p>
-              <h4>## Endpoints</h4>
-              <ul>
-                <li><code>POST /auth/login</code> — returns a signed JWT bearer token</li>
-                <li><code>GET /${info.entity.toLowerCase()}</code> — returns the authenticated user's ${info.entity.toLowerCase()}</li>
-                <li><code>PUT /${info.entity.toLowerCase()}</code> — updates ${info.entity.toLowerCase()} fields, JWT-validated</li>
-              </ul>
-              <h4>## Frontend Components</h4>
-              <p><code>${info.entity}Dashboard</code>, <code>AuthGuard</code>, and <code>${info.entity}Form</code> compose the client experience, backed by <code>useAuthToken</code> and <code>use${info.entity}Data</code> hooks.</p>
+            const buttonHtml = `
               <button type="button" class="btn-download" id="download-readme">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                 Download README.md
               </button>`;
+            mdRenderEl.innerHTML = formatMarkdown(docText) + buttonHtml;
             
             // Re-bind click handler
             const dlBtn = document.getElementById('download-readme');

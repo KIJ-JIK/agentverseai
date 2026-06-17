@@ -277,6 +277,22 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # ── Mount Static Files ───────────────────────────────────────────────────────
+# Add cache-control headers to prevent stale JS/CSS in browsers
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response
+
+class NoCacheStaticMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: StarletteRequest, call_next):
+        response = await call_next(request)
+        path = request.url.path
+        if path.endswith(('.js', '.css', '.html')) or path == '/':
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        return response
+
+app.add_middleware(NoCacheStaticMiddleware)
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 

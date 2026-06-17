@@ -163,200 +163,418 @@ async def call_llm(agent_name: str, system_prompt: str, user_prompt: str) -> str
 #  MOCK RESPONSES
 # ══════════════════════════════════════════════════════════════════════════════
 
+import re
+
+def get_feature_info(prompt: str) -> dict:
+    text = prompt.lower().strip()
+    entity = "Profile"
+    desc = "secure user profile dashboard allowing account editing"
+    
+    if "cart" in text or "shop" in text or "checkout" in text or "order" in text:
+        entity = "Cart"
+        desc = "e-commerce shopping cart with real-time checkout and stock validation"
+    elif "todo" in text or "task" in text or "list" in text:
+        entity = "Todo"
+        desc = "collaborative project task board and list filtering system"
+    elif "chat" in text or "message" in text or "room" in text or "slack" in text:
+        entity = "Chat"
+        desc = "multi-channel encrypted real-time chat room and notification center"
+    elif "auth" in text or "login" in text or "register" in text or "signup" in text:
+        entity = "Auth"
+        desc = "JWT-authenticated user registration, login, and MFA security gateway"
+    elif "payment" in text or "billing" in text or "stripe" in text or "invoice" in text:
+        entity = "Payment"
+        desc = "Stripe-integrated subscription billing portal and invoice processor"
+    elif "calculator" in text or "calc" in text:
+        entity = "Calculator"
+        desc = "arithmetic calculator web application with history log"
+    else:
+        # Extract first major word
+        fillers = {"build", "create", "make", "new", "add", "a", "an", "the", "me", "pipeline"}
+        words = [w for w in text.split() if w not in fillers and len(w) > 2]
+        if words:
+            word = "".join(c for c in words[0] if c.isalpha())
+            if word:
+                entity = word.capitalize()
+        desc = prompt
+    return {"entity": entity, "desc": desc}
+
+def extract_entity_name(user_prompt: str) -> str:
+    # Try to find "Feature Request:" block
+    match = re.search(r"Feature Request:\s*(.*?)\n\n", user_prompt, re.DOTALL | re.IGNORECASE)
+    if match:
+        req = match.group(1).strip()
+        return get_feature_info(req)["entity"]
+        
+    # If not, look for components in frontend_spec or backend_spec
+    match = re.search(r'"components":\s*\[\s*"(\w+)(?:Dashboard|Details|Form|Header)"', user_prompt)
+    if match:
+        return match.group(1)
+        
+    # Look for class names or variables in code
+    match = re.search(r'function (\w+)Dashboard', user_prompt)
+    if match:
+        return match.group(1)
+        
+    # Look for endpoints
+    match = re.search(r'/api/(\w+)', user_prompt)
+    if match:
+        return match.group(1).capitalize()
+        
+    # Fallback to Profile
+    return "Profile"
+
 def get_mock_response(agent_name: str, user_prompt: str) -> str:
     """Return pre-generated valid responses matching the schemas expected by each agent."""
-
+    entity = extract_entity_name(user_prompt)
+    
     if agent_name == "ArchitectAgent":
-        return json.dumps(
-            {
-                "architecture_pattern": "REST + React SPA",
-                "frontend_spec": {
-                    "components": [
-                        "Header",
-                        "KeyGenerator",
-                        "AgentList",
-                        "LogsConsole",
-                    ],
-                    "state_hooks": ["useState", "useEffect"],
-                },
-                "backend_spec": {
-                    "endpoints": [
-                        {
-                            "path": "/api/keys",
-                            "method": "GET",
-                            "description": "Retrieve registered Band API keys",
-                        },
-                        {
-                            "path": "/api/agent/create",
-                            "method": "POST",
-                            "description": "Register and start a new Band agent",
-                        },
-                    ],
-                    "db_tables": ["api_keys", "registered_agents"],
-                },
-                "task_matrix": [
-                    {
-                        "id": "T001",
-                        "assigned_to": "FrontendDevAgent",
-                        "objective": "Create KeyGenerator component with key input form",
-                    },
-                    {
-                        "id": "T002",
-                        "assigned_to": "BackendDevAgent",
-                        "objective": "Implement /api/agent/create endpoint with Band SDK",
-                    },
-                ],
-            },
-            indent=2,
-        )
-
-    elif agent_name == "FrontendDevAgent":
-        return json.dumps(
-            {
-                "file_target": "KeyGenerator.jsx",
-                "language": "react",
-                "source_code": (
-                    "import React, { useState } from 'react';\n\n"
-                    "export default function KeyGenerator({ onKeySubmit }) {\n"
-                    "  const [key, setKey] = useState('');\n\n"
-                    "  const handleSubmit = (e) => {\n"
-                    "    e.preventDefault();\n"
-                    "    if (key.trim()) {\n"
-                    "      onKeySubmit(key);\n"
-                    "      setKey('');\n"
-                    "    }\n"
-                    "  };\n\n"
-                    "  return (\n"
-                    '    <div className="p-6 bg-slate-800 rounded-lg shadow-xl border border-slate-700">\n'
-                    '      <h3 className="text-xl font-bold text-sky-400 mb-4">Band API Key Registration</h3>\n'
-                    '      <form onSubmit={handleSubmit} className="flex gap-4">\n'
-                    "        <input\n"
-                    '          type="text"\n'
-                    "          value={key}\n"
-                    "          onChange={(e) => setKey(e.target.value)}\n"
-                    '          placeholder="Enter Band API Key"\n'
-                    '          className="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-2 text-white"\n'
-                    "        />\n"
-                    '        <button type="submit" className="bg-sky-500 hover:bg-sky-600 px-4 py-2 rounded font-bold">\n'
-                    "          Register Key\n"
-                    "        </button>\n"
-                    "      </form>\n"
-                    "    </div>\n"
-                    "  );\n"
-                    "}"
-                ),
-                "iteration_count": 1,
-            },
-            indent=2,
-        )
-
-    elif agent_name == "BackendDevAgent":
-        return json.dumps(
-            {
-                "file_target": "routes.py",
-                "language": "python",
-                "source_code": (
-                    "from fastapi import FastAPI, HTTPException, Depends\n"
-                    "from pydantic import BaseModel\n"
-                    "from sqlalchemy.orm import Session\n"
-                    "import os\n\n"
-                    "app = FastAPI()\n\n"
-                    "class KeySubmit(BaseModel):\n"
-                    "    key: str\n\n"
-                    '@app.post("/api/keys")\n'
-                    "def register_key(data: KeySubmit):\n"
-                    "    if not data.key:\n"
-                    '        raise HTTPException(status_code=400, detail="Key cannot be empty")\n'
-                    "    # Simulate DB write\n"
-                    '    return {"status": "success", "message": "Key registered successfully"}\n'
-                ),
-                "iteration_count": 1,
-            },
-            indent=2,
-        )
-
-    elif agent_name == "CodeReviewerAgent":
-        if "PREVIOUS CODE WAS REJECTED" in user_prompt:
+        if entity == "Calculator":
             return json.dumps(
                 {
-                    "verdict": "APPROVED",
-                    "evaluation_metrics": {
-                        "security": "PASS",
-                        "syntax": "PASS",
-                        "logic": "PASS",
+                    "architecture_pattern": "REST + React SPA",
+                    "frontend_spec": {
+                        "components": [
+                            "Calculator",
+                            "CalculatorHistory"
+                        ],
+                        "state_hooks": ["useState", "useEffect"],
                     },
+                    "backend_spec": {
+                        "endpoints": [
+                            {
+                                "path": "/api/calculator/evaluate",
+                                "method": "POST",
+                                "description": "Safely evaluate mathematical expressions",
+                            }
+                        ],
+                        "db_tables": ["calculation_logs"],
+                    },
+                    "task_matrix": [
+                        {
+                            "id": "T001",
+                            "assigned_to": "FrontendDevAgent",
+                            "objective": "Create a fully functional interactive keypad grid and equation screen",
+                        },
+                        {
+                            "id": "T002",
+                            "assigned_to": "BackendDevAgent",
+                            "objective": "Implement robust and safe expression parsing routes",
+                        },
+                    ],
                 },
                 indent=2,
             )
         else:
             return json.dumps(
                 {
-                    "verdict": "REJECTED",
-                    "evaluation_metrics": {
-                        "security": "FAIL",
-                        "syntax": "PASS",
-                        "logic": "PASS",
+                    "architecture_pattern": "REST + React SPA",
+                    "frontend_spec": {
+                        "components": [
+                            f"{entity}Header",
+                            f"{entity}Details",
+                            f"{entity}Form"
+                        ],
+                        "state_hooks": ["useState", "useEffect"],
                     },
-                    "remediation_tickets": [
+                    "backend_spec": {
+                        "endpoints": [
+                            {
+                                "path": f"/api/{entity.lower()}",
+                                "method": "GET",
+                                "description": f"Retrieve state details of {entity.lower()}",
+                            },
+                            {
+                                "path": f"/api/{entity.lower()}",
+                                "method": "POST",
+                                "description": f"Process mutation request for {entity.lower()}",
+                            },
+                        ],
+                        "db_tables": [f"{entity.lower()}_records"],
+                    },
+                    "task_matrix": [
                         {
-                            "target_agent": "BackendDevAgent",
-                            "file_context": "routes.py",
-                            "line_range": "10-15",
-                            "vulnerability": "Missing rate limit check or payload validation",
-                            "fix_instruction": (
-                                "Add input sanitization and rate limiting check for key "
-                                "submission endpoints to avoid spamming the database."
-                            ),
-                        }
+                            "id": "T001",
+                            "assigned_to": "FrontendDevAgent",
+                            "objective": f"Implement user interaction panel for {entity} data flows",
+                        },
+                        {
+                            "id": "T002",
+                            "assigned_to": "BackendDevAgent",
+                            "objective": f"Configure persistence layer endpoints for {entity.lower()} resources",
+                        },
                     ],
                 },
                 indent=2,
             )
 
-    elif agent_name == "QATesterAgent":
+    elif agent_name == "FrontendDevAgent":
+        if entity == "Calculator":
+            calculator_code = (
+                "import React, { useState } from 'react';\n\n"
+                "export default function Calculator() {\n"
+                "  const [display, setDisplay] = useState('');\n"
+                "  const [result, setResult] = useState('');\n\n"
+                "  const handleButtonClick = (value) => {\n"
+                "    if (value === '=') {\n"
+                "      try {\n"
+                "        const evalResult = Function('\"use strict\"; return (' + display + ')')();\n"
+                "        setResult(String(evalResult));\n"
+                "        setDisplay(String(evalResult));\n"
+                "      } catch (err) {\n"
+                "        setResult('Error');\n"
+                "      }\n"
+                "    } else if (value === 'C') {\n"
+                "      setDisplay('');\n"
+                "      setResult('');\n"
+                "    } else {\n"
+                "      setDisplay(prev => prev + value);\n"
+                "    }\n"
+                "  };\n\n"
+                "  return (\n"
+                "    <div className=\"max-w-md mx-auto p-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl\">\n"
+                "      <h3 className=\"text-xl font-bold text-cyan-400 mb-4 text-center\">React Calculator</h3>\n"
+                "      <div className=\"bg-slate-950 p-4 rounded-lg mb-4 text-right min-h-[60px] border border-slate-800\">\n"
+                "        <div className=\"text-slate-400 text-sm overflow-x-auto whitespace-nowrap\">{display || '0'}</div>\n"
+                "        <div className=\"text-2xl font-bold text-white mt-1\">{result}</div>\n"
+                "      </div>\n"
+                "      <div className=\"grid grid-cols-4 gap-2\">\n"
+                "        {['7', '8', '9', '/', '4', '5', '6', '*', '1', '2', '3', '-', '0', 'C', '=', '+'].map(btn => (\n"
+                "          <button\n"
+                "            key={btn}\n"
+                "            onClick={() => handleButtonClick(btn)}\n"
+                "            className={`p-4 text-lg font-bold rounded-lg transition-all ${\n"
+                "              btn === '=' \n"
+                "                ? 'bg-cyan-500 hover:bg-cyan-600 text-slate-950' \n"
+                "                : btn === 'C'\n"
+                "                ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400'\n"
+                "                : 'bg-slate-800 hover:bg-slate-700 text-white'\n"
+                "            }`}\n"
+                "          >\n"
+                "            {btn}\n"
+                "          </button>\n"
+                "        ))}\n"
+                "      </div>\n"
+                "    </div>\n"
+                "  );\n"
+                "}"
+            )
+            return json.dumps(
+                {
+                    "file_target": "Calculator.jsx",
+                    "language": "react",
+                    "source_code": calculator_code,
+                    "iteration_count": 1,
+                },
+                indent=2,
+            )
+        else:
+            generic_fe = (
+                "import React, { useState, useEffect } from 'react';\n\n"
+                f"export default function {entity}Dashboard() {{\n"
+                "  const [data, setData] = useState(null);\n"
+                "  const [loading, setLoading] = useState(true);\n\n"
+                "  useEffect(() => {\n"
+                f"    fetch('/api/{entity.lower()}')\n"
+                "      .then(res => res.json())\n"
+                "      .then(data => {\n"
+                "        setData(data);\n"
+                "        setLoading(false);\n"
+                "      });\n"
+                "  }, []);\n\n"
+                "  if (loading) return <div className=\"text-slate-400\">Loading {entity} Module...</div>;\n\n"
+                "  return (\n"
+                "    <div className=\"p-6 bg-slate-900 rounded-xl border border-slate-800\">\n"
+                f"      <h3 className=\"text-xl font-bold text-cyan-400 mb-4\">{entity} Service Panel</h3>\n"
+                "      <div className=\"text-white bg-slate-950 p-4 rounded-lg mb-4 border border-slate-850\">\n"
+                "        <pre className=\"overflow-x-auto\">{JSON.stringify(data, null, 2)}</pre>\n"
+                "      </div>\n"
+                "      <button \n"
+                "        onClick={() => setLoading(true)}\n"
+                f"        className=\"bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded text-slate-950 font-bold transition-all\">\n"
+                f"        Refresh {entity}\n"
+                "      </button>\n"
+                "    </div>\n"
+                "  );\n"
+                "}"
+            )
+            return json.dumps(
+                {
+                    "file_target": f"{entity}Dashboard.jsx",
+                    "language": "react",
+                    "source_code": generic_fe,
+                    "iteration_count": 1,
+                },
+                indent=2,
+            )
+
+    elif agent_name == "BackendDevAgent":
+        if entity == "Calculator":
+            calculator_be = (
+                "from fastapi import FastAPI, HTTPException\n"
+                "from pydantic import BaseModel\n\n"
+                "app = FastAPI(title=\"Calculator API\")\n\n"
+                "class CalculationRequest(BaseModel):\n"
+                "    expression: str\n\n"
+                "class CalculationResponse(BaseModel):\n"
+                "    result: float\n"
+                "    expression: str\n\n"
+                "@app.post(\"/api/calculator/evaluate\", response_model=CalculationResponse)\n"
+                "def evaluate_expression(req: CalculationRequest):\n"
+                "    allowed_chars = set(\"0123456789+-*/.() \")\n"
+                "    if not set(req.expression).issubset(allowed_chars):\n"
+                "        raise HTTPException(status_code=400, detail=\"Invalid characters in expression\")\n"
+                "    try:\n"
+                "        res = eval(req.expression, {\"__builtins__\": None}, {})\n"
+                "        return CalculationResponse(result=float(res), expression=req.expression)\n"
+                "    except ZeroDivisionError:\n"
+                "        raise HTTPException(status_code=400, detail=\"Division by zero\")\n"
+                "    except Exception:\n"
+                "        raise HTTPException(status_code=400, detail=\"Invalid mathematical expression\")\n"
+            )
+            return json.dumps(
+                {
+                    "file_target": "routes.py",
+                    "language": "python",
+                    "source_code": calculator_be,
+                    "iteration_count": 1,
+                },
+                indent=2,
+            )
+        else:
+            generic_be = (
+                "from fastapi import FastAPI, HTTPException\n"
+                "from pydantic import BaseModel\n\n"
+                "app = FastAPI()\n\n"
+                f"class {entity}Payload(BaseModel):\n"
+                "    name: str\n"
+                "    value: str\n\n"
+                f"@app.post(\"/api/{entity.lower()}\")\n"
+                f"def handle_{entity.lower()}(payload: {entity}Payload):\n"
+                "    if not payload.name:\n"
+                "        raise HTTPException(status_code=400, detail=\"Name field is required\")\n"
+                f"    return {{\n"
+                f"        \"status\": \"success\", \n"
+                f"        \"message\": \"{entity} resources mutated successfully\",\n"
+                f"        \"payload\": payload.dict()\n"
+                f"    }}\n"
+            )
+            return json.dumps(
+                {
+                    "file_target": "routes.py",
+                    "language": "python",
+                    "source_code": generic_be,
+                    "iteration_count": 1,
+                },
+                indent=2,
+            )
+
+    elif agent_name == "CodeReviewerAgent":
+        # Always approve mock updates directly to keep pipelines successful
         return json.dumps(
             {
-                "test_framework": "pytest",
-                "test_file": "test_routes.py",
-                "test_cases": ["test_register_key_success", "test_register_key_empty"],
-                "source_code": (
-                    'def test_register_key_success(client):\n'
-                    '    response = client.post("/api/keys", json={"key": "test_key"})\n'
-                    '    assert response.status_code == 200\n'
-                    '    assert response.json()["status"] == "success"\n\n'
-                    'def test_register_key_empty(client):\n'
-                    '    response = client.post("/api/keys", json={"key": ""})\n'
-                    '    assert response.status_code == 400\n'
-                ),
-                "coverage_estimate": "85%",
+                "verdict": "APPROVED",
+                "evaluation_metrics": {
+                    "security": "PASS",
+                    "syntax": "PASS",
+                    "logic": "PASS",
+                },
             },
             indent=2,
         )
 
+    elif agent_name == "QATesterAgent":
+        if entity == "Calculator":
+            calculator_tests = (
+                "import pytest\n"
+                "from fastapi.testclient import TestClient\n"
+                "from routes import app\n\n"
+                "client = TestClient(app)\n\n"
+                "def test_evaluate_addition():\n"
+                "    response = client.post(\"/api/calculator/evaluate\", json={\"expression\": \"2 + 2\"})\n"
+                "    assert response.status_code == 200\n"
+                "    assert response.json()[\"result\"] == 4.0\n\n"
+                "def test_evaluate_division_by_zero():\n"
+                "    response = client.post(\"/api/calculator/evaluate\", json={\"expression\": \"10 / 0\"})\n"
+                "    assert response.status_code == 400\n"
+                "    assert \"division by zero\" in response.json()[\"detail\"].lower()\n"
+            )
+            return json.dumps(
+                {
+                    "test_framework": "pytest",
+                    "test_file": "test_calculator_api.py",
+                    "test_cases": ["test_evaluate_addition", "test_evaluate_division_by_zero"],
+                    "source_code": calculator_tests,
+                    "coverage_estimate": "92%",
+                },
+                indent=2,
+            )
+        else:
+            generic_tests = (
+                "import pytest\n"
+                "from fastapi.testclient import TestClient\n"
+                "from routes import app\n\n"
+                "client = TestClient(app)\n\n"
+                f"def test_{entity.lower()}_mutation_success():\n"
+                f"    response = client.post(\"/api/{entity.lower()}\", json={{\"name\": \"test_run\", \"value\": \"verified\"}})\n"
+                "    assert response.status_code == 200\n"
+                "    assert response.json()[\"status\"] == \"success\"\n"
+            )
+            return json.dumps(
+                {
+                    "test_framework": "pytest",
+                    "test_file": f"test_{entity.lower()}_api.py",
+                    "test_cases": [f"test_{entity.lower()}_mutation_success"],
+                    "source_code": generic_tests,
+                    "coverage_estimate": "90%",
+                },
+                indent=2,
+            )
+
     elif agent_name == "TechWriterAgent":
-        return json.dumps(
-            {
-                "doc_type": "README",
-                "title": "Band Key Generator Module",
-                "content": (
-                    "# Band Key Generator\n\n"
-                    "Allows secure submission and registration of Band API keys."
-                ),
-            },
-            indent=2,
-        )
+        if entity == "Calculator":
+            calculator_readme = (
+                f"# Calculator Service\n\n"
+                "Autonomous generated mathematical expression evaluator module.\n\n"
+                "## Endpoints\n\n"
+                "- `POST /api/calculator/evaluate` — Safely parses and evaluates basic math strings.\n"
+            )
+            return json.dumps(
+                {
+                    "doc_type": "README",
+                    "title": "Calculator Service Documentation",
+                    "content": calculator_readme,
+                },
+                indent=2,
+            )
+        else:
+            generic_readme = (
+                f"# {entity} Feature Module\n\n"
+                f"Autonomous microservice managing {entity.lower()} resources.\n\n"
+                "## Endpoints\n\n"
+                f"- `POST /api/{entity.lower()}` — Processes resource actions.\n"
+                f"- `GET /api/{entity.lower()}` — Queries current state.\n"
+            )
+            return json.dumps(
+                {
+                    "doc_type": "README",
+                    "title": f"{entity} Service Documentation",
+                    "content": generic_readme,
+                },
+                indent=2,
+            )
 
     elif agent_name == "ReleaseManagerAgent":
         return json.dumps(
             {
                 "verdict": "MERGE_READY",
                 "summary": (
-                    "All tests passed. Code reviews are approved. "
-                    "Security vulnerability fixed."
+                    f"All checks passed successfully. Dynamic {entity} artifacts compiled "
+                    "and merged cleanly to main."
                 ),
                 "reasons": [
-                    "Review loop successfully remediated initial vulnerability.",
-                    "Unit tests show 85% coverage.",
+                    "Static code review check passed.",
+                    "FastAPI endpoints fully checked by pytest suite.",
                 ],
             },
             indent=2,
