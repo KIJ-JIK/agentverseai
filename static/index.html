@@ -6,7 +6,7 @@
 <title>DevFlow AI// Control Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=2.1">
 </head>
 <body>
@@ -94,6 +94,129 @@
 <!-- ░░░ PARTICLE / GRID BACKGROUND ░░░ -->
 <canvas id="particle-canvas"></canvas>
 <div class="grid-overlay"></div>
+
+<!-- ░░░ BACKGROUND WATERMARK LAYER ░░░ -->
+<div class="background-watermark-container">
+  <div class="watermark-artwork">
+    <svg viewBox="0 0 800 600" width="100%" height="100%" class="watermark-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="watermark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="var(--cyan)" stop-opacity="0.15" />
+          <stop offset="100%" stop-color="var(--violet)" stop-opacity="0.15" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Open Book Artwork -->
+      <g class="watermark-book" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.6">
+        <!-- Spine and center -->
+        <path d="M 400 150 L 400 500" stroke-width="2.5" />
+        
+        <!-- Left page curvature -->
+        <path d="M 400 150 Q 300 120 180 150 L 180 470 Q 300 440 400 470 Z" fill="rgba(255,255,255,0.005)" />
+        
+        <!-- Right page curvature -->
+        <path d="M 400 150 Q 500 120 620 150 L 620 470 Q 500 440 400 470 Z" fill="rgba(255,255,255,0.005)" />
+        
+        <!-- Additional page sheets beneath (to give 3D depth) -->
+        <path d="M 180 155 Q 300 125 400 155" />
+        <path d="M 180 160 Q 300 130 400 160" />
+        <path d="M 620 155 Q 500 125 400 155" />
+        <path d="M 620 160 Q 500 130 400 160" />
+        
+        <!-- Left page lines (Binary grid) -->
+        <g class="watermark-binary" font-family="var(--font-mono)" font-size="12" fill="currentColor" stroke="none" opacity="0.8">
+          <text x="200" y="200">01000101 01101110</text>
+          <text x="210" y="230">01100111 01101001</text>
+          <text x="200" y="260">01101110 01100101</text>
+          <text x="220" y="290">01100101 01110010</text>
+          <text x="205" y="320">01101001 01101110</text>
+          <text x="215" y="350">01100111 00100000</text>
+          <text x="200" y="380">01010000 01101001</text>
+          <text x="210" y="410">01110000 01100101</text>
+          <text x="225" y="440">01101100 01101001</text>
+        </g>
+
+        <!-- Right page lines (flowchart/code schema) -->
+        <g class="watermark-flowchart" stroke-width="1.2" opacity="0.8">
+          <rect x="440" y="190" width="80" height="30" rx="4" />
+          <text x="480" y="210" font-family="var(--font-body)" font-size="10" fill="currentColor" stroke="none" text-anchor="middle">Orchestrator</text>
+          
+          <path d="M 480 220 L 480 250" />
+          <polygon points="480,250 477,245 483,245" fill="currentColor" />
+          
+          <rect x="430" y="250" width="100" height="40" rx="4" />
+          <text x="480" y="274" font-family="var(--font-body)" font-size="10" fill="currentColor" stroke="none" text-anchor="middle">Agent Matrix</text>
+
+          <path d="M 530 270 L 560 270 L 560 330" />
+          <polygon points="560,330 557,325 563,325" fill="currentColor" />
+
+          <rect x="510" y="330" width="90" height="35" rx="4" />
+          <text x="555" y="352" font-family="var(--font-body)" font-size="9" fill="currentColor" stroke="none" text-anchor="middle">Live Code</text>
+
+          <path d="M 480 290 L 480 340" />
+          <polygon points="480,340 477,335 483,335" fill="currentColor" />
+          
+          <circle cx="480" cy="360" r="20" />
+          <text x="480" y="364" font-family="var(--font-body)" font-size="9" fill="currentColor" stroke="none" text-anchor="middle">QA</text>
+
+          <path d="M 440 270 L 410 270 L 410 400 L 440 400" />
+          <polygon points="440,400 435,397 435,403" fill="currentColor" />
+
+          <rect x="440" y="385" width="80" height="30" rx="4" />
+          <text x="480" y="404" font-family="var(--font-body)" font-size="9" fill="currentColor" stroke="none" text-anchor="middle">Release</text>
+        </g>
+      </g>
+
+      <!-- Robotic Arm (coming from bottom-left) -->
+      <g class="watermark-robot-arm" stroke="currentColor" stroke-width="1.8" fill="none" opacity="0.7">
+        <path d="M 50 550 L 120 480 Q 150 450 180 430 L 220 420" />
+        <circle cx="120" cy="480" r="8" fill="none" />
+        <path d="M 60 560 L 130 500" stroke-width="1" />
+        <path d="M 120 480 L 200 450" />
+        <circle cx="200" cy="450" r="6" fill="none" />
+        
+        <rect x="210" y="410" width="25" height="35" rx="4" transform="rotate(-15, 220, 420)" />
+        <path d="M 235 408 L 260 400" stroke-width="2" />
+        <path d="M 232 423 L 265 422" stroke-width="2" />
+        <path d="M 228 438 L 255 442" stroke-width="2" />
+        
+        <path d="M 260 400 Q 280 395 300 405" stroke-linecap="round" />
+        <circle cx="280" cy="397" r="2.5" fill="currentColor" />
+        
+        <path d="M 265 422 Q 295 420 310 430" stroke-linecap="round" />
+        <circle cx="290" cy="421" r="2.5" fill="currentColor" />
+
+        <path d="M 255 442 Q 275 450 290 445" stroke-linecap="round" />
+      </g>
+
+      <!-- Human Hand (coming from bottom-right) -->
+      <g class="watermark-human-hand" stroke="currentColor" stroke-width="1.8" fill="none" opacity="0.7">
+        <path d="M 750 550 L 680 470 C 650 440 610 420 580 420" />
+        <path d="M 720 565 L 660 495 C 640 475 610 460 590 460" />
+        <path d="M 580 420 C 560 420 540 430 535 445 C 530 460 550 480 580 480" />
+        
+        <path d="M 540 435 Q 510 440 495 455 C 490 460 495 465 505 465 C 515 465 535 455 545 455" />
+        <path d="M 535 455 Q 515 465 508 475 C 505 480 512 485 525 480 C 535 475 550 465 555 462" />
+        <path d="M 565 425 Q 530 425 515 440 C 510 445 515 450 525 448 C 535 445 555 435 565 430" />
+
+        <!-- Pen / Stylus -->
+        <g class="watermark-pen" transform="rotate(-35, 480, 460)">
+          <rect x="440" y="452" width="120" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" />
+          <polygon points="440,452 440,460 425,456" fill="none" stroke="currentColor" stroke-width="1.5" />
+          <path d="M 420 458 Q 405 460 395 450" stroke-width="1.2" stroke-dasharray="2 2" />
+        </g>
+      </g>
+    </svg>
+  </div>
+  <div class="floating-tablets-bg">
+    <div class="floating-tablet t1">Python</div>
+    <div class="floating-tablet t2">FastAPI</div>
+    <div class="floating-tablet t3">React</div>
+    <div class="floating-tablet t4">SQL / DB</div>
+    <div class="floating-tablet t5">Git / CI</div>
+    <div class="floating-tablet t6">Band API</div>
+  </div>
+</div>
 
 <!-- ░░░ NOTIFICATION TOAST CONTAINER ░░░ -->
 <div id="toast-container" class="toast-container"></div>
