@@ -30,8 +30,8 @@
   --text-faint: #606266;
 
   /* ---- Typography ---- */
-  --font-display: 'Lora', serif;
-  --font-body: 'Outfit', sans-serif; /* Use Outfit (identical to Google Sans) everywhere */
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   /* ---- Spacing scale ---- */
@@ -2210,4 +2210,60 @@ p, .setting-desc, .agent-task {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   color: var(--text-faint);
+}
+ 
+/* ============================================================
+   PEEKING CHARACTERS AESTHETIC & INTERACTION STYLES
+   ============================================================ */
+.prompt-char-peek {
+  animation: prompt-char-fade-in 1s ease-out forwards;
+}
+.prompt-char-peek .agent-char-svg {
+  transform-origin: center bottom;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.prompt-char-peek:hover .agent-char-svg {
+  transform: scale(1.15) translateY(-4px) rotate(3deg);
+}
+.speech-bubble {
+  position: relative;
+  animation: speech-bubble-bounce 2s ease-in-out infinite alternate;
+}
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-right-color: var(--bg-elevated);
+  border-top-color: var(--bg-elevated);
+  margin-left: -11px;
+}
+
+.sidebar-char-peek {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+.sidebar:hover .sidebar-char-peek {
+  transform: translateX(-15px) rotate(-8deg);
+  opacity: 1 !important;
+}
+
+.history-empty-char-wrapper .agent-char-svg {
+  animation: history-empty-sleep 3s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+}
+
+@keyframes prompt-char-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes speech-bubble-bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+@keyframes history-empty-sleep {
+  0% { transform: scale(1) rotate(0); }
+  100% { transform: scale(0.95) rotate(-3deg); }
 }
