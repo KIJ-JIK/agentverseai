@@ -665,8 +665,14 @@
               <label for="auth-password">Password</label>
               <input type="password" id="auth-password" class="auth-input" placeholder="••••••••" required>
             </div>
+            <div id="auth-terms-group" class="auth-group" style="display: none; flex-direction: row; align-items: flex-start; gap: 8px; margin-bottom: 12px;">
+              <input type="checkbox" id="auth-terms-checkbox" style="margin-top: 3px; cursor: pointer; width: auto;">
+              <label for="auth-terms-checkbox" style="font-size: 0.8rem; cursor: pointer; color: #0F414A; line-height: 1.4;">
+                I accept the <a href="#terms" id="auth-terms-link" style="color: #7F0303; font-weight: 600; text-decoration: underline;">Terms &amp; Conditions</a> and <a href="#privacy" id="auth-privacy-link" style="color: #7F0303; font-weight: 600; text-decoration: underline;">Privacy Policy</a>
+              </label>
+            </div>
             <button type="button" id="auth-submit-btn" class="auth-btn auth-btn-primary">Sign In</button>
-            <button type="button" id="auth-bypass-btn" class="auth-btn auth-btn-secondary">Bypass Auth (Local Mock Mode)</button>
+            <button type="button" id="auth-bypass-btn" class="auth-btn auth-btn-secondary">Use as Guest</button>
           </div>
           <div class="auth-switch">
             <span id="auth-switch-text">Don't have an account?</span>
@@ -689,20 +695,38 @@
       switchLink.addEventListener('click', () => {
         isSignUp = !isSignUp;
         errorDiv.style.display = 'none';
+        const termsGroup = document.getElementById('auth-terms-group');
         if (isSignUp) {
           title.textContent = 'Create an Account';
           subtitle.textContent = 'Sign up for a new developer account';
           submitBtn.textContent = 'Sign Up';
           switchText.textContent = 'Already have an account?';
           switchLink.textContent = 'Sign In';
+          if (termsGroup) termsGroup.style.display = 'flex';
         } else {
           title.textContent = 'Sign In to Control Room';
           subtitle.textContent = 'Access the live multi-agent engineering pipeline';
           submitBtn.textContent = 'Sign In';
           switchText.textContent = "Don't have an account?";
           switchLink.textContent = 'Sign Up';
+          if (termsGroup) termsGroup.style.display = 'none';
         }
       });
+
+      const authTermsLink = document.getElementById('auth-terms-link');
+      const authPrivacyLink = document.getElementById('auth-privacy-link');
+      if (authTermsLink) {
+        authTermsLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          openTermsModal('terms');
+        });
+      }
+      if (authPrivacyLink) {
+        authPrivacyLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          openTermsModal('privacy');
+        });
+      }
 
       submitBtn.addEventListener('click', async () => {
         const email = emailInput.value.trim();
@@ -711,6 +735,15 @@
           errorDiv.textContent = 'Please fill in all fields.';
           errorDiv.style.display = 'block';
           return;
+        }
+
+        if (isSignUp) {
+          const termsCheckbox = document.getElementById('auth-terms-checkbox');
+          if (!termsCheckbox || !termsCheckbox.checked) {
+            errorDiv.textContent = 'You must accept the Terms & Conditions and Privacy Policy to register.';
+            errorDiv.style.display = 'block';
+            return;
+          }
         }
 
         submitBtn.disabled = true;
@@ -745,14 +778,10 @@
         localBypassActive = true;
         currentSession = null;
         overlay.classList.remove('show');
-        showToast('info', 'Local Bypass Active', 'Using local mock authorization.');
+        showToast('info', 'Guest Mode Active', 'Using local guest authorization.');
         if (onSuccess) onSuccess();
       });
     }
-
-    document.getElementById('auth-email').value = '';
-    document.getElementById('auth-password').value = '';
-    document.getElementById('auth-error').style.display = 'none';
     overlay.classList.add('show');
   }
 
@@ -2028,7 +2057,13 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
         }
         currentSession = null;
         localBypassActive = false;
-        localStorage.removeItem('devflow_active_session_id'); // Clear active session on signout
+        
+        // Clear cached profile and active session
+        localStorage.removeItem('devflow_profile_name');
+        localStorage.removeItem('devflow_profile_email');
+        localStorage.removeItem('devflow_profile_bio');
+        localStorage.removeItem('devflow_active_session_id');
+        
         showToast('info', 'Signed Out', 'You have been signed out.');
         updateAuthUI();
       } else {
@@ -2654,6 +2689,9 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     setupSidebarAuth();
     setupBandRoomSettings();
     setupStatsModal();
+    setupProfileSettings();
+    setupSettingsToggles();
+    setupTermsModal();
     updateAuthUI();
     recoverSession();
 
@@ -2666,6 +2704,144 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     appendLog('tag-info', 'BOOT', 'Connected to Band room: devflow-ai-room-01', false);
 
     setTimeout(ambientTick, 4000);
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     PROFILE SETTINGS & GUEST INTERFACE
+     ────────────────────────────────────────────────────────── */
+  function setupProfileSettings() {
+    const nameInput = document.getElementById('profile-name-input');
+    const emailInput = document.getElementById('profile-email-input');
+    const bioInput = document.getElementById('profile-bio-input');
+    const saveBtn = document.getElementById('save-profile-btn');
+
+    if (!nameInput || !emailInput || !bioInput || !saveBtn) return;
+
+    // Load initial values from localStorage
+    nameInput.value = localStorage.getItem('devflow_profile_name') || '';
+    emailInput.value = localStorage.getItem('devflow_profile_email') || '';
+    bioInput.value = localStorage.getItem('devflow_profile_bio') || '';
+
+    saveBtn.addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const bio = bioInput.value.trim();
+
+      if (!name || !email) {
+        showToast('error', 'Validation Error', 'Display Name and Email Address are required.');
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showToast('error', 'Validation Error', 'Please enter a valid email address.');
+        return;
+      }
+
+      localStorage.setItem('devflow_profile_name', name);
+      localStorage.setItem('devflow_profile_email', email);
+      localStorage.setItem('devflow_profile_bio', bio);
+
+      showToast('success', 'Profile Updated', 'Your developer profile has been saved.');
+      updateAuthUI();
+    });
+  }
+
+  function setupSettingsToggles() {
+    const mockModeToggle = document.getElementById('mock-mode-toggle');
+    if (!mockModeToggle) return;
+
+    mockModeToggle.checked = localBypassActive;
+
+    mockModeToggle.addEventListener('change', () => {
+      if (mockModeToggle.checked) {
+        localBypassActive = true;
+        currentSession = null;
+        showToast('info', 'Guest Mode Active', 'Using local guest authorization.');
+        updateAuthUI();
+      } else {
+        localBypassActive = false;
+        currentSession = null;
+        localStorage.removeItem('supabase.auth.token');
+        showToast('info', 'Signed Out', 'Guest session ended. Please sign in.');
+        updateAuthUI();
+        showAuthModal();
+      }
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     TERMS & PRIVACY POPUPS
+     ────────────────────────────────────────────────────────── */
+  function openTermsModal(type) {
+    const overlay = document.getElementById('terms-modal-overlay');
+    const title = document.getElementById('terms-modal-title');
+    const body = document.getElementById('terms-modal-body');
+
+    if (!overlay || !title || !body) return;
+
+    if (type === 'terms') {
+      title.textContent = 'Terms & Conditions';
+      body.innerHTML = `
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing or using V7-Twin.ai, you agree to be bound by these Terms & Conditions. If you do not agree, you must not access or use the platform.</p>
+        <h3>2. Services Provided</h3>
+        <p>V7-Twin.ai provides a multi-agent digital twin simulation console for developer workspace testing and simulation. All generated code and behaviors are simulated and provided "as-is".</p>
+        <h3>3. User Accounts</h3>
+        <p>You are responsible for keeping your account credentials secure. You must immediately notify us of any unauthorized use of your account.</p>
+        <h3>4. Intellectual Property</h3>
+        <p>All content, code templates, designs, and tools on V7-Twin.ai are the intellectual property of V7-Twin.ai or its licensors. You retain rights to code generated specifically for your workspace.</p>
+        <h3>5. Limitation of Liability</h3>
+        <p>Under no circumstances shall V7-Twin.ai be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use the platform.</p>
+      `;
+    } else {
+      title.textContent = 'Privacy Policy';
+      body.innerHTML = `
+        <h3>1. Information We Collect</h3>
+        <p>We collect information you provide directly, such as your display name, email address, and developer bio when saving your profile or creating an account.</p>
+        <h3>2. How We Use Information</h3>
+        <p>We use your information to personalize your simulation logs, maintain your session history, run digital twin workspace logs, and provide technical support.</p>
+        <h3>3. Data Storage & Security</h3>
+        <p>Your profile settings are stored locally in your browser's <code>localStorage</code>. Authenticated account data is secured using Supabase database encryption and industry-standard security protocols.</p>
+        <h3>4. Sharing of Data</h3>
+        <p>We do not sell, rent, or trade your personal information with third parties. Data is only shared as required to provide platform services or comply with legal obligations.</p>
+        <h3>5. Your Rights</h3>
+        <p>You have the right to access, edit, or delete your personal information. You can clear your profile details and local session history at any time from the Settings panel.</p>
+      `;
+    }
+
+    overlay.classList.add('show');
+  }
+
+  function setupTermsModal() {
+    const overlay = document.getElementById('terms-modal-overlay');
+    const closeBtn = document.getElementById('terms-modal-close-btn');
+
+    if (!overlay || !closeBtn) return;
+
+    closeBtn.addEventListener('click', () => {
+      overlay.classList.remove('show');
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('show');
+      }
+    });
+
+    const footerLinks = document.querySelectorAll('.footer-link');
+    footerLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (href === '#terms') {
+          e.preventDefault();
+          openTermsModal('terms');
+        } else if (href === '#privacy') {
+          e.preventDefault();
+          openTermsModal('privacy');
+        }
+      });
+    });
   }
 
   document.addEventListener('DOMContentLoaded', init);

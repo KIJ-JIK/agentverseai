@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -435,7 +435,7 @@
         <input type="text" id="feature-input" placeholder='Describe a feature, e.g. &quot;Add a JWT-authenticated user profile dashboard&quot;' />
       </div>
       <button type="button" class="btn-trigger" id="trigger-btn">
-        <svg viewBox="0 0 24 24" fill="currentColor" class="bolt-icon"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="trigger-icon"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
         <span>Trigger Pipeline</span>
       </button>
     </section>
@@ -688,31 +688,17 @@ client = TestClient(app)
       <div class="settings-grid glass-card">
         <div class="setting-row">
           <div>
-            <span class="setting-label">Mock Mode</span>
-            <span class="setting-desc">Run the dashboard with simulated agent events, no API keys required.</span>
+            <span class="setting-label">Guest Mode</span>
+            <span class="setting-desc">Run the console in Guest Mode, or sign in to use personalized workspace records.</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="mock-mode-toggle" checked>
             <span class="switch-track"><span class="switch-thumb"></span></span>
           </label>
         </div>
-        <div class="setting-row" style="border-bottom: 1px solid var(--border); padding-bottom: var(--sp-4);">
-          <div>
-            <span class="setting-label">Band Room ID</span>
-            <span class="setting-desc">Active coordination channel for agent event bus (default room).</span>
-          </div>
-          <div class="band-input-group" style="display: flex; gap: var(--sp-2); align-items: center; width: 100%; max-width: 380px;">
-            <input class="setting-input" type="text" id="band-room-input" value="3f060ffa-8a5e-487b-b462-5669677baf03" readonly style="flex: 1; background: var(--border-strong); opacity: 0.85; cursor: not-allowed; min-width: 0;" />
-            <button type="button" class="btn btn-secondary" id="copy-band-id-btn" style="padding: 10px 16px; font-size: 0.8rem; background: var(--border-strong); border: 1px solid var(--border); border-radius: var(--r-sm); color: var(--text); font-weight: 600;" title="Copy Room ID">Copy</button>
-          </div>
-        </div>
-        <div class="band-instruction-row" style="margin-top: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
-          <span class="setting-desc" style="max-width: 100%;">
-            👉 <strong>Instruction:</strong> To monitor real-time agent conversations, copy the Room ID above and open the Band Room. 
-            <a href="https://app.band.ai/chats/3f060ffa-8a5e-487b-b462-5669677baf03" target="_blank" class="accent-link" style="color: var(--cyan); text-decoration: underline; margin-left: 4px; font-weight: 600;">Open Band Room</a>
-          </span>
-        </div>
-        <div class="setting-row">
+        <!-- Hidden developer controls to ensure API Gateway compatibility -->
+        <input type="hidden" id="band-room-input" value="3f060ffa-8a5e-487b-b462-5669677baf03" />
+        <div class="setting-row" style="border-bottom: none; padding-bottom: 0;">
           <div>
             <span class="setting-label">Notifications</span>
             <span class="setting-desc">Show toast alerts for pipeline milestones.</span>
@@ -721,6 +707,37 @@ client = TestClient(app)
             <input type="checkbox" id="notif-toggle" checked>
             <span class="switch-track"><span class="switch-thumb"></span></span>
           </label>
+        </div>
+      </div>
+
+      <div class="section-header" style="margin-top: var(--sp-5);">
+        <h2>Profile Settings</h2>
+        <p>Manage your developer identity and details</p>
+      </div>
+      <div class="settings-grid glass-card" style="margin-top: var(--sp-2);">
+        <div class="setting-row" style="flex-direction: column; align-items: stretch; gap: var(--sp-2); border-bottom: 1px solid var(--border); padding-bottom: var(--sp-4);">
+          <div>
+            <span class="setting-label">Display Name</span>
+            <span class="setting-desc">Your nickname displayed in the simulation log output and sidebar.</span>
+          </div>
+          <input class="setting-input" type="text" id="profile-name-input" value="" placeholder="e.g. Ansh Vasant" style="background: var(--bg); border: 1px solid var(--border-strong); padding: 10px 14px; border-radius: var(--r-sm); color: var(--text); font-family: inherit; font-size: 0.85rem;" />
+        </div>
+        <div class="setting-row" style="flex-direction: column; align-items: stretch; gap: var(--sp-2); border-bottom: 1px solid var(--border); padding-bottom: var(--sp-4);">
+          <div>
+            <span class="setting-label">Email Address</span>
+            <span class="setting-desc">Your contact email for simulated git logs.</span>
+          </div>
+          <input class="setting-input" type="email" id="profile-email-input" value="" placeholder="e.g. ansh@example.com" style="background: var(--bg); border: 1px solid var(--border-strong); padding: 10px 14px; border-radius: var(--r-sm); color: var(--text); font-family: inherit; font-size: 0.85rem;" />
+        </div>
+        <div class="setting-row" style="flex-direction: column; align-items: stretch; gap: var(--sp-2); border-bottom: none; padding-bottom: 0;">
+          <div>
+            <span class="setting-label">Developer Bio</span>
+            <span class="setting-desc">Brief personal description for agent pipeline logs.</span>
+          </div>
+          <textarea class="setting-input" id="profile-bio-input" placeholder="e.g. Full Stack Developer specializing in AI agents." style="background: var(--bg); border: 1px solid var(--border-strong); padding: 10px 14px; border-radius: var(--r-sm); color: var(--text); font-family: inherit; font-size: 0.85rem; resize: vertical; min-height: 80px;"></textarea>
+        </div>
+        <div style="margin-top: var(--sp-4); text-align: right;">
+          <button type="button" class="btn-trigger" id="save-profile-btn" style="padding: 10px 20px; font-size: 0.8rem; border-radius: var(--r-sm); display: inline-flex;">Save Profile</button>
         </div>
       </div>
     </section>
@@ -803,6 +820,20 @@ client = TestClient(app)
       <!-- Dynamically populated -->
     </div>
     <button type="button" id="stats-detail-close-btn" class="auth-btn auth-btn-secondary" style="margin-top: 10px; width: 100%;">Close Details</button>
+  </div>
+</div>
+
+<!-- ░░░ TERMS & PRIVACY MODAL OVERLAY ░░░ -->
+<div id="terms-modal-overlay" class="auth-overlay">
+  <div class="auth-card terms-modal-card">
+    <div class="auth-header">
+      <h2 id="terms-modal-title">Terms &amp; Conditions</h2>
+      <p id="terms-modal-subtitle">Last updated: June 2026</p>
+    </div>
+    <div id="terms-modal-body" class="terms-modal-body">
+      <!-- Content populated dynamically via JS -->
+    </div>
+    <button type="button" id="terms-modal-close-btn" class="auth-btn auth-btn-secondary" style="margin-top: var(--sp-3); width: 100%;">Close</button>
   </div>
 </div>
 

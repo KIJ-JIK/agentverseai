@@ -814,8 +814,34 @@ p, .setting-desc, .agent-task {
 }
 .btn-trigger:active { transform: translateY(0); }
 .btn-trigger.is-loading { pointer-events: none; opacity: 0.85; }
-.bolt-icon { width: 16px; height: 16px; }
-.btn-trigger.is-loading .bolt-icon { animation: spin-cw 0.8s linear infinite; }
+.trigger-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  transition: transform var(--transition-fast);
+}
+.btn-trigger:hover .trigger-icon {
+  transform: translate(2px, -2px);
+}
+.btn-trigger.is-loading .trigger-icon {
+  animation: arrow-slide-pulse 1s ease-in-out infinite;
+}
+
+@keyframes arrow-slide-pulse {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(3px, -3px) scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
 
 [data-theme="light"] .btn-trigger {
   background: linear-gradient(135deg, #0F414A 0%, #105666 100%);
@@ -2409,4 +2435,46 @@ p, .setting-desc, .agent-task {
 @keyframes history-empty-sleep {
   0% { transform: scale(1) rotate(0); }
   100% { transform: scale(0.95) rotate(-3deg); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   TERMS & PRIVACY MODAL
+   ════════════════════════════════════════════════════════════ */
+.terms-modal-card {
+  max-width: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+.terms-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  margin: var(--sp-3) 0;
+  padding: var(--sp-3);
+  background: #F8F6F2;
+  border: 1px solid rgba(15, 65, 74, 0.15);
+  border-radius: var(--r-sm);
+  text-align: left;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #0F414A;
+}
+.terms-modal-body h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #7F0303;
+  margin-top: var(--sp-4);
+  margin-bottom: var(--sp-2);
+}
+.terms-modal-body h3:first-child {
+  margin-top: 0;
+}
+.terms-modal-body p {
+  margin-bottom: var(--sp-3);
+}
+.terms-modal-body code {
+  background: rgba(15, 65, 74, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
 }
