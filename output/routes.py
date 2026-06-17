@@ -1,16 +1,18 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
-import os
 
 app = FastAPI()
 
-class KeySubmit(BaseModel):
-    key: str
+class AuthPayload(BaseModel):
+    name: str
+    value: str
 
-@app.post("/api/keys")
-def register_key(data: KeySubmit):
-    if not data.key:
-        raise HTTPException(status_code=400, detail="Key cannot be empty")
-    # Simulate DB write
-    return {"status": "success", "message": "Key registered successfully"}
+@app.post("/api/auth")
+def handle_auth(payload: AuthPayload):
+    if not payload.name:
+        raise HTTPException(status_code=400, detail="Name field is required")
+    return {
+        "status": "success", 
+        "message": "Auth resources mutated successfully",
+        "payload": payload.dict()
+    }

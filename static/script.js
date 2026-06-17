@@ -14,6 +14,7 @@
   let localBypassActive = false;
   let latestDocContent = "";
   let processedEventIds = new Set();
+  let activePollInterval = null;
 
   if (window.supabase) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -37,49 +38,49 @@
       name: 'Architect Agent',     
       role: 'AI/ML API · High Reasoning', 
       task: 'Awaiting feature request',
-      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-arc" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,20 25,15 35,45" fill="url(#g-arc)" opacity="0.95"/><polygon points="50,20 75,15 65,45" fill="url(#g-arc)" opacity="0.8"/><polygon points="50,20 35,45 50,50" fill="url(#g-arc)" opacity="0.7"/><polygon points="50,20 65,45 50,50" fill="url(#g-arc)" opacity="0.6"/><polygon points="25,15 20,40 35,45" fill="url(#g-arc)" opacity="0.5"/><polygon points="75,15 80,40 65,45" fill="url(#g-arc)" opacity="0.45"/><polygon points="42,50 58,50 50,70" fill="url(#g-arc)" opacity="0.9"/><polygon points="20,40 35,75 50,50" fill="url(#g-arc)" opacity="0.65"/><polygon points="80,40 65,75 50,50" fill="url(#g-arc)" opacity="0.55"/><polygon points="35,75 50,85 50,70" fill="url(#g-arc)" opacity="0.85"/><polygon points="65,75 50,85 50,70" fill="url(#g-arc)" opacity="0.75"/></svg>`
+      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-arc" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#15803d"/></linearGradient></defs><ellipse cx="50" cy="45" rx="28" ry="24" fill="url(#char-g-arc)" /><circle cx="34" cy="35" r="10" fill="#facc15" stroke="#1f2937" stroke-width="2" /><polygon points="34,29 37,35 34,41 31,35" fill="#111827" /><circle cx="66" cy="35" r="10" fill="#facc15" stroke="#1f2937" stroke-width="2" /><polygon points="66,29 69,35 66,41 63,35" fill="#111827" /><path d="M 40 55 Q 50 60 60 55" fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round" /><path d="M 30 66 L 70 66 L 75 90 L 25 90 Z" fill="#374151" /><circle cx="50" cy="72" r="2.5" fill="#e5e7eb" /></svg>`
     },
     { 
       id: 'frontend',   
       name: 'Frontend Agent',      
       role: 'Featherless · React',         
       task: 'Idle — waiting on spec', 
-      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-frn" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,35 15,10 5,45" fill="url(#g-frn)" opacity="0.95"/><polygon points="50,35 15,10 50,20" fill="url(#g-frn)" opacity="0.75"/><polygon points="50,55 5,45 20,85" fill="url(#g-frn)" opacity="0.85"/><polygon points="50,55 20,85 50,80" fill="url(#g-frn)" opacity="0.6"/><polygon points="50,35 85,10 95,45" fill="url(#g-frn)" opacity="0.9"/><polygon points="50,35 85,10 50,20" fill="url(#g-frn)" opacity="0.7"/><polygon points="50,55 95,45 80,85" fill="url(#g-frn)" opacity="0.8"/><polygon points="50,55 80,85 50,80" fill="url(#g-frn)" opacity="0.5"/><polygon points="50,20 54,50 50,80 46,50" fill="url(#g-frn)" opacity="1"/></svg>`
+      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-frn" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fbcfe8"/><stop offset="100%" stop-color="#db2777"/></linearGradient></defs><ellipse cx="50" cy="46" rx="27" ry="22" fill="url(#char-g-frn)" /><path d="M 25 36 Q 50 16 75 36 Z" fill="#1f2937" /><circle cx="28" cy="49" r="4.2" fill="#f43f5e" opacity="0.65" /><circle cx="72" cy="49" r="4.2" fill="#f43f5e" opacity="0.65" /><polygon points="35,39 39,42 35,45 31,42" fill="#fbbf24" stroke="#111827" stroke-width="1.5" /><polygon points="65,39 69,42 65,45 61,42" fill="#fbbf24" stroke="#111827" stroke-width="1.5" /><path d="M 45 51 Q 50 54 55 51" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round" /><path d="M 32 63 L 68 63 L 72 90 L 28 90 Z" fill="#2563eb" /></svg>`
     },
     { 
       id: 'backend',    
       name: 'Backend Agent',       
       role: 'Featherless · FastAPI',       
       task: 'Idle — waiting on spec', 
-      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-bck" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,25 35,30 50,60" fill="url(#g-bck)" opacity="0.95"/><polygon points="50,25 65,30 50,60" fill="url(#g-bck)" opacity="0.8"/><polygon points="35,30 44,65 50,60" fill="url(#g-bck)" opacity="0.7"/><polygon points="65,30 56,65 50,60" fill="url(#g-bck)" opacity="0.6"/><polygon points="44,65 45,80 50,85" fill="url(#g-bck)" opacity="0.85"/><polygon points="56,65 55,80 50,85" fill="url(#g-bck)" opacity="0.75"/><polygon points="35,30 10,20 20,45" fill="url(#g-bck)" opacity="0.5"/><polygon points="35,30 20,45 38,45" fill="url(#g-bck)" opacity="0.65"/><polygon points="65,30 90,20 80,45" fill="url(#g-bck)" opacity="0.45"/><polygon points="65,30 80,45 62,45" fill="url(#g-bck)" opacity="0.55"/></svg>`
+      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-bck" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a3e635"/><stop offset="100%" stop-color="#166534"/></linearGradient></defs><ellipse cx="50" cy="45" rx="27" ry="23" fill="url(#char-g-bck)" /><circle cx="33" cy="38" r="9" fill="#f3f4f6" stroke="#111827" stroke-width="2" /><ellipse cx="33" cy="38" rx="2.5" ry="6" fill="#111827" /><circle cx="67" cy="38" r="9" fill="#f3f4f6" stroke="#111827" stroke-width="2" /><ellipse cx="67" cy="38" rx="2.5" ry="6" fill="#111827" /><path d="M 42 54 Q 50 58 58 54" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round" /><path d="M 32 64 L 68 64 L 73 90 L 27 90 Z" fill="#15803d" /></svg>`
     },
     { 
       id: 'reviewer',   
       name: 'Code Reviewer',       
       role: 'AI/ML API · Quality Gate',    
       task: 'Idle — waiting on code', 
-      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-rev" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,40 20,15 35,48" fill="url(#g-rev)" opacity="0.95"/><polygon points="50,40 80,15 65,48" fill="url(#g-rev)" opacity="0.8"/><polygon points="50,40 35,48 50,65" fill="url(#g-rev)" opacity="0.85"/><polygon points="50,40 65,48 50,65" fill="url(#g-rev)" opacity="0.7"/><polygon points="35,48 15,60 50,65" fill="url(#g-rev)" opacity="0.6"/><polygon points="65,48 85,60 50,65" fill="url(#g-rev)" opacity="0.5"/><polygon points="15,60 50,85 50,65" fill="url(#g-rev)" opacity="0.75"/><polygon points="85,60 50,85 50,65" fill="url(#g-rev)" opacity="0.65"/></svg>`
+      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-rev" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/></linearGradient></defs><polygon points="26,29 21,15 33,26" fill="#f1f5f9" stroke="#1f2937" stroke-width="1.5" /><polygon points="74,29 79,15 67,26" fill="#f1f5f9" stroke="#1f2937" stroke-width="1.5" /><ellipse cx="50" cy="46" rx="27" ry="22" fill="#cbd5e1" /><polygon points="35,36 40,43 35,50 30,43" fill="#111827" /><polygon points="65,36 70,43 65,50 60,43" fill="#111827" /><path d="M 32 63 L 68 63 L 72 90 L 28 90 Z" fill="#ea580c" /></svg>`
     },
     { 
       id: 'qa',         
       name: 'QA Tester',           
       role: 'Featherless · Test Suite',    
       task: 'Idle — waiting on approval', 
-      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-qas" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="20,50 30,20 40,42" fill="url(#g-qas)" opacity="0.95"/><polygon points="40,42 30,20 50,40" fill="url(#g-qas)" opacity="0.8"/><polygon points="80,50 70,20 60,42" fill="url(#g-qas)" opacity="0.9"/><polygon points="60,42 70,20 50,40" fill="url(#g-qas)" opacity="0.75"/><polygon points="20,50 50,40 50,65" fill="url(#g-qas)" opacity="0.7"/><polygon points="80,50 50,40 50,65" fill="url(#g-qas)" opacity="0.6"/><polygon points="20,50 50,80 50,65" fill="url(#g-qas)" opacity="0.85"/><polygon points="80,50 50,80 50,65" fill="url(#g-qas)" opacity="0.55"/></svg>`
+      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-qas" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#334155"/></linearGradient></defs><ellipse cx="50" cy="46" rx="27" ry="22" fill="url(#char-g-qas)" /><path d="M 25 36 Q 50 17 75 36 Z" fill="#111827" /><path d="M 44 54 Q 50 49 56 54" fill="none" stroke="#111827" stroke-width="2.5" stroke-linecap="round" /><polygon points="65,45 73,48 71,52 63,49" fill="#fed7aa" stroke="#f97316" stroke-width="1" /><path d="M 32 64 L 68 64 L 72 90 L 28 90 Z" fill="#1e293b" /></svg>`
     },
     { 
       id: 'writer',     
       name: 'Tech Writer',         
       role: 'Featherless · Docs Gen',      
       task: 'Idle — waiting on tests', 
-      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-wri" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,15 30,35 50,35" fill="url(#g-wri)" opacity="0.95"/><polygon points="50,15 70,35 50,35" fill="url(#g-wri)" opacity="0.8"/><polygon points="30,35 44,45 50,35" fill="url(#g-wri)" opacity="0.7"/><polygon points="70,35 56,45 50,35" fill="url(#g-wri)" opacity="0.6"/><polygon points="44,45 50,85 50,35" fill="url(#g-wri)" opacity="0.85"/><polygon points="56,45 50,85 50,35" fill="url(#g-wri)" opacity="0.75"/></svg>`
+      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><circle cx="50" cy="42" r="21" fill="#f3f4f6" stroke="#9ca3af" stroke-width="2" /><rect x="35" y="31" width="30" height="18" rx="5" fill="#1f2937" /><circle cx="43" cy="40" r="2.8" fill="#67e8f9" /><circle cx="57" cy="40" r="2.8" fill="#67e8f9" /><line x1="50" y1="21" x2="50" y2="11" stroke="#9ca3af" stroke-width="2.5" /><circle cx="50" cy="9" r="2.8" fill="#ef4444" /><path d="M 34 62 L 66 62 L 70 90 L 30 90 Z" fill="#cbd5e1" stroke="#9ca3af" stroke-width="1.5" /></svg>`
     },
     { 
       id: 'release',    
       name: 'Release Manager',     
       role: 'AI/ML API · Final Verdict',   
       task: 'Idle — awaiting docs', 
-      icon: `<svg viewBox="0 0 100 100"><defs><linearGradient id="g-rel" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F3ECE7"/><stop offset="50%" stop-color="#C2B2A2"/><stop offset="100%" stop-color="#8E7D6F"/></linearGradient></defs><polygon points="50,15 25,38 50,48" fill="url(#g-rel)" opacity="0.95"/><polygon points="50,15 75,38 50,48" fill="url(#g-rel)" opacity="0.8"/><polygon points="25,38 20,55 40,52" fill="url(#g-rel)" opacity="0.7"/><polygon points="75,38 80,55 60,52" fill="url(#g-rel)" opacity="0.6"/><polygon points="40,52 20,55 50,60" fill="url(#g-rel)" opacity="0.85"/><polygon points="60,52 80,55 50,60" fill="url(#g-rel)" opacity="0.75"/><polygon points="40,52 50,82 50,60" fill="url(#g-rel)" opacity="0.9"/><polygon points="60,52 50,82 50,60" fill="url(#g-rel)" opacity="0.8"/></svg>`
+      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-rel" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#6b21a8"/></linearGradient></defs><ellipse cx="50" cy="45" rx="27" ry="22" fill="url(#char-g-rel)" /><polygon points="32,25 36,13 43,21 50,13 57,21 64,13 68,25" fill="#fbbf24" stroke="#d97706" stroke-width="1.5" /><circle cx="35" cy="41" r="4.5" fill="#111827" /><circle cx="65" cy="41" r="4.5" fill="#111827" /><path d="M 32 62 L 68 62 L 72 90 L 28 90 Z" fill="#7e22ce" /></svg>`
     }
   ];
 
@@ -975,15 +976,17 @@
   }
 
   function startPolling(sessionId, headers) {
+    if (activePollInterval) clearInterval(activePollInterval);
     processedEventIds.clear();
-    let pollInterval = setInterval(async () => {
+    activePollInterval = setInterval(async () => {
       try {
         const state = await getSessionDetail(sessionId, headers);
         updateDashboardFromLiveState(state);
 
         const status = state.status;
         if (status === 'COMPLETE' || status === 'HOLD' || status === 'ERROR') {
-          clearInterval(pollInterval);
+          clearInterval(activePollInterval);
+          activePollInterval = null;
           finalizeLiveRun(status, state);
           localStorage.removeItem('devflow_active_session_id'); // Session complete, remove from active recovery
         }
@@ -1829,6 +1832,22 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
       `;
     }
     
+    // Toggle history navigation and load history if signed in
+    const navHistory = document.getElementById('nav-history');
+    const historySection = document.getElementById('history');
+    if (signedIn) {
+      if (navHistory) navHistory.style.display = '';
+      loadHistory();
+    } else {
+      if (navHistory) navHistory.style.display = 'none';
+      if (historySection) historySection.style.display = 'none';
+      const activeNav = document.querySelector('.nav-item.active');
+      if (activeNav && activeNav.dataset.section === 'history') {
+        const dashNav = document.querySelector('.nav-item[data-section="dashboard"]');
+        if (dashNav) dashNav.click();
+      }
+    }
+    
     // Rebind event listener since we replaced innerHTML
     setupSidebarAuthListeners();
   }
@@ -2056,6 +2075,182 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
   }
 
   /* ──────────────────────────────────────────────────────────
+     USER SESSION HISTORY ACTIONS
+     ────────────────────────────────────────────────────────── */
+  async function loadHistory() {
+    const historyList = document.getElementById('history-list');
+    const historyEmpty = document.getElementById('history-empty');
+    const historyLoading = document.getElementById('history-loading');
+    if (!historyList) return;
+
+    if (historyLoading) historyLoading.style.display = 'block';
+    if (historyEmpty) historyEmpty.style.display = 'none';
+    historyList.innerHTML = '';
+
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (currentSession) {
+        headers['Authorization'] = `Bearer ${currentSession.access_token}`;
+      } else if (localBypassActive) {
+        headers['Authorization'] = `Bearer bypass-local-auth`;
+      } else {
+        if (historyLoading) historyLoading.style.display = 'none';
+        if (historyEmpty) historyEmpty.style.display = 'block';
+        return;
+      }
+
+      const response = await fetch('/api/sessions', { headers });
+      if (!response.ok) throw new Error(`Fetch history error: ${response.status}`);
+      const sessions = await response.json();
+
+      if (historyLoading) historyLoading.style.display = 'none';
+
+      if (!sessions || sessions.length === 0) {
+        if (historyEmpty) historyEmpty.style.display = 'block';
+        return;
+      }
+
+      if (historyEmpty) historyEmpty.style.display = 'none';
+      historyList.innerHTML = sessions.map(s => {
+        const dateStr = new Date(s.created_at).toLocaleString();
+        const status = s.status || 'IDLE';
+        const isComplete = status === 'COMPLETE';
+        const isRunning = status === 'RUNNING' || status === 'PROCESSING';
+        const badgeColor = isComplete ? 'var(--green)' : (isRunning ? 'var(--cyan)' : 'var(--red)');
+        return `
+          <div class="history-card glass-card" data-session-id="${s.session_id}">
+            <div class="history-card-header">
+              <span class="history-card-date">${dateStr}</span>
+              <span class="badge" style="background:${badgeColor}20; color:${badgeColor}; border: 1px solid ${badgeColor}40; font-size:0.75rem; padding: 2px 6px;">${status}</span>
+            </div>
+            <div class="history-card-prompt">"${s.prompt}"</div>
+            <div class="history-card-footer">
+              <span class="history-card-id">ID: ${s.session_id.substring(0, 8)}...</span>
+              <button class="btn btn-secondary load-session-btn" style="padding: 4px 10px; font-size: 0.8rem; background: var(--bg-elevated); border-color: var(--border-strong);">Load Run</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      historyList.querySelectorAll('.history-card').forEach(card => {
+        const loadBtn = card.querySelector('.load-session-btn');
+        loadBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const sessionId = card.dataset.sessionId;
+          await selectHistorySession(sessionId);
+        });
+        card.addEventListener('click', async () => {
+          const sessionId = card.dataset.sessionId;
+          await selectHistorySession(sessionId);
+        });
+      });
+
+    } catch (e) {
+      console.error("Failed to load history:", e);
+      if (historyLoading) historyLoading.style.display = 'none';
+      historyList.innerHTML = `<div style="color:var(--red); padding:20px; text-align:center; font-size: 0.9rem;">Failed to load history: ${e.message}</div>`;
+    }
+  }
+
+  async function selectHistorySession(sessionId) {
+    if (activePollInterval) {
+      clearInterval(activePollInterval);
+      activePollInterval = null;
+    }
+    
+    processedEventIds.clear();
+    const consoleLog = document.getElementById('status-text');
+    if (consoleLog) consoleLog.innerHTML = '';
+    
+    const headers = { 'Content-Type': 'application/json' };
+    if (currentSession) {
+      headers['Authorization'] = `Bearer ${currentSession.access_token}`;
+    } else if (localBypassActive) {
+      headers['Authorization'] = `Bearer bypass-local-auth`;
+    }
+
+    try {
+      showToast('info', 'Loading historic run...');
+      const state = await getSessionDetail(sessionId, headers);
+      updateDashboardFromLiveState(state);
+      localStorage.setItem('devflow_active_session_id', sessionId);
+      
+      if (state.status === 'RUNNING' || state.status === 'PROCESSING') {
+        pipelineRunning = true;
+        triggerBtn.classList.add('is-loading');
+        triggerBtn.querySelector('span').textContent = 'Running...';
+        startPolling(sessionId, headers);
+      } else {
+        triggerBtn.classList.remove('is-loading');
+        triggerBtn.querySelector('span').textContent = 'Trigger Pipeline';
+        pipelineRunning = false;
+      }
+      
+      const dashNav = document.querySelector('.nav-item[data-section="dashboard"]');
+      if (dashNav) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        dashNav.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      showToast('success', 'Run loaded successfully.');
+    } catch (e) {
+      console.error("Failed to load history session:", e);
+      showToast('error', `Failed to load session: ${e.message}`);
+    }
+  }
+
+  async function clearUserHistory() {
+    if (!confirm('Are you sure you want to clear your entire session history? This will delete all past runs, events, and artifacts.')) {
+      return;
+    }
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (currentSession) {
+      headers['Authorization'] = `Bearer ${currentSession.access_token}`;
+    } else if (localBypassActive) {
+      headers['Authorization'] = `Bearer bypass-local-auth`;
+    } else {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/sessions/clear', {
+        method: 'POST',
+        headers
+      });
+      if (!response.ok) throw new Error(`Clear history failed: ${response.status}`);
+      
+      showToast('success', 'Session history cleared.');
+      localStorage.removeItem('devflow_active_session_id');
+      
+      processedEventIds.clear();
+      if (activePollInterval) {
+        clearInterval(activePollInterval);
+        activePollInterval = null;
+      }
+      pipelineRunning = false;
+      triggerBtn.classList.remove('is-loading');
+      triggerBtn.querySelector('span').textContent = 'Trigger Pipeline';
+      
+      const consoleLog = document.getElementById('status-text');
+      if (consoleLog) consoleLog.innerHTML = '';
+      
+      AGENTS.forEach(a => {
+        agentState[a.id] = { state: STATE.IDLE, task: a.task, progress: 0 };
+        updateAgentCard(a.id);
+      });
+      updateVisualizationFromStates({}, 0);
+      setPipelineStatePill('IDLE', '');
+      
+      await loadHistory();
+      
+    } catch (e) {
+      console.error("Failed to clear history:", e);
+      showToast('error', `Failed to clear history: ${e.message}`);
+    }
+  }
+
+  /* ──────────────────────────────────────────────────────────
      SETTINGS ROOM ID CACHE
      ────────────────────────────────────────────────────────── */
   function setupBandRoomSettings() {
@@ -2250,6 +2445,11 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     setupStatsModal();
     updateAuthUI();
     recoverSession();
+
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    if (clearHistoryBtn) {
+      clearHistoryBtn.addEventListener('click', clearUserHistory);
+    }
 
     appendLog('tag-info', 'BOOT', 'DevFlow AI Control Room initialized.', false);
     appendLog('tag-info', 'BOOT', 'Connected to Band room: devflow-ai-room-01', false);
