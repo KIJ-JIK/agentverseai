@@ -8,22 +8,22 @@
 :root {
   /* ---- Core palette (Beach Dark Theme — 5-color) ---- */
   --bg: #0F414A; /* Midnight blue base background */
-  --bg-elevated: rgba(15, 65, 74, 0.55); /* Midnight blue translucent sidebar */
-  --surface: rgba(15, 65, 74, 0.65); /* Midnight blue glassmorphic cards */
-  --surface-2: rgba(15, 65, 74, 0.80);
-  --border: rgba(150, 192, 206, 0.15); /* Light blue thin borders */
-  --border-strong: rgba(150, 192, 206, 0.30);
+  --bg-elevated: rgba(15, 65, 74, 0.60); /* Midnight blue translucent sidebar */
+  --surface: rgba(15, 65, 74, 0.70); /* Midnight blue glassmorphic cards */
+  --surface-2: rgba(15, 65, 74, 0.85);
+  --border: rgba(150, 192, 206, 0.18); /* Light blue thin borders */
+  --border-strong: rgba(150, 192, 206, 0.32);
 
   --cyan: #96C0CE; /* Light blue primary accent */
   --cyan-soft: rgba(150, 192, 206, 0.10);
-  --green: #96C0CE; /* Light blue for success states */
-  --green-soft: rgba(150, 192, 206, 0.08);
+  --green: #D8BA98; /* Tan for success states (individually distinct, contrasts with background) */
+  --green-soft: rgba(216, 186, 152, 0.10);
   --red: #7F0303; /* Maroon for errors/rejections */
-  --red-soft: rgba(127, 3, 3, 0.12);
+  --red-soft: rgba(127, 3, 3, 0.15);
   --violet: #D8BA98; /* Tan secondary accent */
   --violet-soft: rgba(216, 186, 152, 0.10);
-  --gray: #D8BA98;
-  --gray-soft: rgba(216, 186, 152, 0.08);
+  --gray: #EFE8DF; /* Alabaster */
+  --gray-soft: rgba(239, 232, 223, 0.08);
 
   --text: #EFE8DF; /* Alabaster high-contrast text */
   --text-dim: #D8BA98; /* Tan secondary text */
@@ -53,7 +53,7 @@
   /* ---- Shadows / glow ---- */
   --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.50);
   --glow-cyan: 0 0 0 1px rgba(150, 192, 206, 0.20), 0 0 20px rgba(150, 192, 206, 0.08);
-  --glow-green: 0 0 0 1px rgba(150, 192, 206, 0.20), 0 0 20px rgba(150, 192, 206, 0.08);
+  --glow-green: 0 0 0 1px rgba(216, 186, 152, 0.20), 0 0 20px rgba(216, 186, 152, 0.08);
   --glow-red: 0 0 0 1px rgba(127, 3, 3, 0.25), 0 0 20px rgba(127, 3, 3, 0.10);
 
   /* ---- Layout ---- */
@@ -412,10 +412,7 @@ p, .setting-desc, .agent-task {
   font-style: normal;
   font-weight: 800;
   font-size: 1.1rem;
-  background: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent !important;
+  color: var(--cyan) !important;
   display: inline-block;
   margin-left: 2px;
 }
@@ -548,7 +545,7 @@ p, .setting-desc, .agent-task {
    ════════════════════════════════════════════════════════════ */
 
 .glass-card {
-  background: linear-gradient(180deg, rgba(30, 31, 32, 0.6), rgba(30, 31, 32, 0.32));
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   backdrop-filter: blur(16px) saturate(140%);
@@ -562,14 +559,14 @@ p, .setting-desc, .agent-task {
   background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
 }
 
-/* gradient border sheen on hover */
+/* solid border sheen on hover */
 .glass-card::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(6,182,212,0.0), rgba(6,182,212,0.0));
+  background: transparent;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -577,7 +574,7 @@ p, .setting-desc, .agent-task {
   transition: background var(--transition-med);
 }
 .glass-card:hover::after {
-  background: linear-gradient(135deg, rgba(6,182,212,0.5), rgba(139,92,246,0.3));
+  background: var(--cyan);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -667,7 +664,7 @@ p, .setting-desc, .agent-task {
   padding: 6px 14px;
   border-radius: var(--r-pill);
   background: var(--green-soft);
-  border: 1px solid rgba(16,185,129,0.3);
+  border: 1px solid rgba(216, 186, 152, 0.3);
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--green);
@@ -681,8 +678,8 @@ p, .setting-desc, .agent-task {
 }
 .status-dot.pulse { animation: dot-pulse 1.6s ease-in-out infinite; }
 @keyframes dot-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.6); }
-  50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(216, 186, 152, 0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(216, 186, 152, 0); }
 }
 
 .token-meter {
@@ -703,10 +700,10 @@ p, .setting-desc, .agent-task {
 .token-bar-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--cyan), var(--violet));
+  background: var(--cyan);
   border-radius: var(--r-pill);
   transition: width 0.6s ease;
-  box-shadow: 0 0 8px rgba(6,182,212,0.6);
+  box-shadow: 0 0 8px rgba(150, 192, 206, 0.6);
 }
 
 .pipeline-state-pill {
@@ -731,7 +728,7 @@ p, .setting-desc, .agent-task {
 }
 .pipeline-state-pill.complete {
   background: var(--green-soft);
-  border-color: rgba(16,185,129,0.35);
+  border-color: rgba(216, 186, 152, 0.35);
   color: var(--green);
   box-shadow: var(--glow-green);
 }
@@ -799,19 +796,21 @@ p, .setting-desc, .agent-task {
   gap: var(--sp-2);
   padding: 14px 28px;
   border-radius: var(--r-pill); /* Pill shaped button */
-  background: linear-gradient(135deg, #0F414A 0%, #D8BA98 100%);
-  color: #EFE8DF;
+  background: var(--violet); /* Solid Tan (#D8BA98) */
+  color: var(--bg); /* Midnight Blue (#0F414A) */
   font-weight: 700;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;
-  box-shadow: 0 4px 18px rgba(15, 65, 74, 0.35);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  box-shadow: 0 4px 18px rgba(216, 186, 152, 0.25);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
 }
 .btn-trigger:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(216, 186, 152, 0.35);
+  background: var(--cyan); /* Solid Light Blue (#96C0CE) */
+  color: var(--bg); /* Midnight Blue (#0F414A) */
+  box-shadow: 0 8px 24px rgba(150, 192, 206, 0.35);
 }
 .btn-trigger:active { transform: translateY(0); }
 .btn-trigger.is-loading { pointer-events: none; opacity: 0.85; }
@@ -950,7 +949,7 @@ p, .setting-desc, .agent-task {
 }
 
 .state-processing .agent-avatar { border-color: rgba(6,182,212,0.4); }
-.state-complete .agent-avatar { border-color: rgba(16,185,129,0.4); }
+.state-complete .agent-avatar { border-color: rgba(216, 186, 152, 0.4); }
 .state-rejected .agent-avatar { border-color: rgba(239,68,68,0.4); }
 
 .agent-status-badge {
@@ -1021,14 +1020,8 @@ p, .setting-desc, .agent-task {
 }
 .state-idle .agent-progress-fill { background: var(--gray); }
 .state-processing .agent-progress-fill {
-  background: linear-gradient(90deg, var(--cyan), #38bdf8);
-  box-shadow: 0 0 8px rgba(6,182,212,0.6);
-  background-size: 200% 100%;
-  animation: progress-shimmer 1.6s linear infinite;
-}
-@keyframes progress-shimmer {
-  0% { background-position: 0% 0; }
-  100% { background-position: -200% 0; }
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(150, 192, 206, 0.6);
 }
 .state-complete .agent-progress-fill { background: var(--green); }
 .state-rejected .agent-progress-fill { background: var(--red); }
@@ -1923,7 +1916,7 @@ p, .setting-desc, .agent-task {
 .preloader-bar-fill {
   width: 0%;
   height: 100%;
-  background: linear-gradient(90deg, var(--cyan) 0%, var(--violet) 100%);
+  background: var(--cyan);
   transition: width 0.1s ease;
 }
 .preloader-percent {
