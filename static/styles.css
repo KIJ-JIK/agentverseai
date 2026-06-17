@@ -6,32 +6,32 @@
    ════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ---- Core palette (Soft Modern Tech Dark Theme - inspired by Image 3) ---- */
-  --bg: #090d16; /* Soft slate dark space */
-  --bg-elevated: #101524; /* Muted navy-gray sidebar */
-  --surface: #151c2d; /* Cool tech slate card surface */
-  --surface-2: rgba(21, 28, 45, 0.65);
-  --border: rgba(255, 255, 255, 0.05); /* Extra thin soft border */
-  --border-strong: rgba(255, 255, 255, 0.1);
+  /* ---- Core palette (Soft Lavender Glassmorphic Dark Theme - inspired by Pic 4) ---- */
+  --bg: #0d0e15; /* Soft dark violet-black */
+  --bg-elevated: rgba(24, 22, 40, 0.7); /* Lilac-tinted translucent sidebar */
+  --surface: rgba(30, 27, 54, 0.45); /* Soft lavender glassmorphic card surface */
+  --surface-2: rgba(38, 34, 68, 0.55);
+  --border: rgba(167, 139, 250, 0.12); /* Soft lilac border */
+  --border-strong: rgba(167, 139, 250, 0.22);
 
-  --cyan: #38bdf8; /* Soft light cyan */
-  --cyan-soft: rgba(56, 189, 248, 0.1);
+  --cyan: #c084fc; /* Lavender lilac accent instead of blue */
+  --cyan-soft: rgba(192, 132, 252, 0.08);
   --green: #34d399; /* Soft green */
-  --green-soft: rgba(52, 211, 153, 0.1);
-  --red: #f87171; /* Soft coral red */
-  --red-soft: rgba(248, 113, 113, 0.1);
-  --violet: #a78bfa; /* Soft lavender violet */
-  --violet-soft: rgba(167, 139, 250, 0.1);
-  --gray: #94a3b8;
-  --gray-soft: rgba(148, 163, 184, 0.1);
+  --green-soft: rgba(52, 211, 153, 0.08);
+  --red: #f87171; /* Soft red */
+  --red-soft: rgba(248, 113, 113, 0.08);
+  --violet: #e879f9; /* Pastel pink/violet */
+  --violet-soft: rgba(232, 121, 249, 0.08);
+  --gray: #a78bfa; /* Lavender-grey tint */
+  --gray-soft: rgba(167, 139, 250, 0.08);
 
-  --text: #f1f5f9; /* Soft crisp off-white */
-  --text-dim: #94a3b8; /* Cool gray secondary text */
-  --text-faint: #64748b; /* Muted description text */
+  --text: #f3f4f6; /* Crisp off-white */
+  --text-dim: #cbd5e1; /* Soft slate gray secondary */
+  --text-faint: #94a3b8; /* Muted description text */
 
   /* ---- Typography ---- */
-  --font-display: 'Orbitron', sans-serif;
-  --font-secondary-display: 'Space Grotesk', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-secondary-display: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
@@ -97,10 +97,11 @@ body {
   font-family: var(--font-body);
   background-color: var(--bg);
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    radial-gradient(circle at 100% 0%, rgba(96, 165, 250, 0.08) 0%, rgba(192, 132, 252, 0.03) 50%, #03050c 100%);
-  background-size: 30px 30px, 30px 30px, 100% 100%;
+    linear-gradient(rgba(167, 139, 250, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(167, 139, 250, 0.02) 1px, transparent 1px),
+    radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(232, 121, 249, 0.08) 0%, transparent 50%);
+  background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
   background-attachment: fixed;
   color: var(--text);
   min-height: 100vh;
@@ -110,12 +111,12 @@ body {
 }
 
 [data-theme="light"] body {
-  background-color: #FAF8F5 !important;
+  background-color: #faf9f6 !important;
   background-image: 
     linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
-    radial-gradient(circle at 100% 0%, rgba(229, 75, 80, 0.12) 0%, rgba(255, 139, 114, 0.04) 50%, #FAF8F5 100%) !important;
-  background-size: 30px 30px, 30px 30px, 100% 100% !important;
+    radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.06) 0%, rgba(212, 163, 115, 0.02) 50%, #faf9f6 100%) !important;
+  background-size: 24px 24px, 24px 24px, 100% 100% !important;
   background-attachment: fixed !important;
 }
 
@@ -144,15 +145,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 
 /* Premium Typography & Heading Gradients */
-h1 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-h2, h3, h4, h5, h6 {
-  font-family: var(--font-secondary-display);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
 }
 
 .hero-titles h1, 
@@ -191,6 +186,7 @@ p, .setting-desc, .agent-task {
    ════════════════════════════════════════════════════════════ */
 
 #particle-canvas {
+  display: none !important;
   position: fixed;
   inset: 0;
   z-index: 0;

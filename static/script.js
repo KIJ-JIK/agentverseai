@@ -32,55 +32,191 @@
   /* ──────────────────────────────────────────────────────────
      AGENT DEFINITIONS
      ────────────────────────────────────────────────────────── */
+  /* ──────────────────────────────────────────────────────────
+     PIXEL ART SVG HELPER
+     ────────────────────────────────────────────────────────── */
+  function makePixelArt(gridStr, colors) {
+    const lines = gridStr.trim().split('\n');
+    let rects = '';
+    lines.forEach((line, y) => {
+      const pixels = line.trim().split(/\s+/);
+      pixels.forEach((pixel, x) => {
+        if (pixel !== '.' && colors[pixel]) {
+          rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${colors[pixel]}" />`;
+        }
+      });
+    });
+    return `<svg viewBox="0 0 16 16" class="agent-char-svg">${rects}</svg>`;
+  }
+
   const AGENTS = [
     { 
       id: 'architect',  
       name: 'Architect Agent',     
       role: 'AI/ML API · High Reasoning', 
       task: 'Awaiting feature request',
-      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-arc" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#15803d"/></linearGradient></defs><ellipse cx="50" cy="45" rx="28" ry="24" fill="url(#char-g-arc)" /><circle cx="34" cy="35" r="10" fill="#facc15" stroke="#1f2937" stroke-width="2" /><polygon points="34,29 37,35 34,41 31,35" fill="#111827" /><circle cx="66" cy="35" r="10" fill="#facc15" stroke="#1f2937" stroke-width="2" /><polygon points="66,29 69,35 66,41 63,35" fill="#111827" /><path d="M 40 55 Q 50 60 60 55" fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round" /><path d="M 30 66 L 70 66 L 75 90 L 25 90 Z" fill="#374151" /><circle cx="50" cy="72" r="2.5" fill="#e5e7eb" /></svg>`
+      icon: makePixelArt(`
+        . . . . . k k k k . . . . . .
+        . . . . k r r r r k . . . . .
+        . . . k r r r r r r k . . . .
+        . . k r o o o o o o r k . . .
+        . . k o o o o o o o o k . . .
+        . k o o o o o o o o o o k . .
+        . k o g g g g g g g g o k . .
+        . k r g g g g g g g g r k . .
+        . k r k k k k k k k k r k . .
+        . k r r r r r r r r r r k . .
+        . k r r k r r r r k r r k . .
+        . . k r k r r r r k r k . . .
+        . . k r r k k k k r r k . . .
+        . . . k r r r r r r k . . . .
+        . . . . k k k k k k . . . . .
+        . . . . . . . . . . . . . . .
+      `, { k: '#1e293b', r: '#f43f5e', o: '#fbbf24', g: '#22c55e' })
     },
     { 
       id: 'frontend',   
       name: 'Frontend Agent',      
       role: 'Featherless · React',         
       task: 'Idle — waiting on spec', 
-      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-frn" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fbcfe8"/><stop offset="100%" stop-color="#db2777"/></linearGradient></defs><ellipse cx="50" cy="46" rx="27" ry="22" fill="url(#char-g-frn)" /><path d="M 25 36 Q 50 16 75 36 Z" fill="#1f2937" /><circle cx="28" cy="49" r="4.2" fill="#f43f5e" opacity="0.65" /><circle cx="72" cy="49" r="4.2" fill="#f43f5e" opacity="0.65" /><polygon points="35,39 39,42 35,45 31,42" fill="#fbbf24" stroke="#111827" stroke-width="1.5" /><polygon points="65,39 69,42 65,45 61,42" fill="#fbbf24" stroke="#111827" stroke-width="1.5" /><path d="M 45 51 Q 50 54 55 51" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round" /><path d="M 32 63 L 68 63 L 72 90 L 28 90 Z" fill="#2563eb" /></svg>`
+      icon: makePixelArt(`
+        . . . k k k k k k . . . . . .
+        . . k k k k k k k k . . . . .
+        . k k d k d k d k k k . . . .
+        . k d d d d d d d d k . . . .
+        . k d s s s s s s d k . . . .
+        . k s s s s s s s s k . . . .
+        . k s k s s s s k s k . . . .
+        . k s s s s s s s s k . . . .
+        . k w s s s s s s w k . . . .
+        . . r k s s s s k r . . . . .
+        . . k g k g k g k g . . . . .
+        . . g k g k g k g k . . . . .
+        . . k g k g k g k g . . . . .
+        . . g k g k g k g k . . . . .
+        . . . k k k k k k . . . . . .
+        . . . . . . . . . . . . . . .
+      `, { k: '#111827', d: '#7f1d1d', s: '#ffedd5', g: '#10b981', w: '#ffffff', r: '#ef4444' })
     },
     { 
       id: 'backend',    
       name: 'Backend Agent',       
       role: 'Featherless · FastAPI',       
       task: 'Idle — waiting on spec', 
-      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-bck" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a3e635"/><stop offset="100%" stop-color="#166534"/></linearGradient></defs><ellipse cx="50" cy="45" rx="27" ry="23" fill="url(#char-g-bck)" /><circle cx="33" cy="38" r="9" fill="#f3f4f6" stroke="#111827" stroke-width="2" /><ellipse cx="33" cy="38" rx="2.5" ry="6" fill="#111827" /><circle cx="67" cy="38" r="9" fill="#f3f4f6" stroke="#111827" stroke-width="2" /><ellipse cx="67" cy="38" rx="2.5" ry="6" fill="#111827" /><path d="M 42 54 Q 50 58 58 54" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round" /><path d="M 32 64 L 68 64 L 73 90 L 27 90 Z" fill="#15803d" /></svg>`
+      icon: makePixelArt(`
+        . . . k k . . . . k k . . . .
+        . . k p b k . . k b p k . . .
+        . k l l d d k k d d l l k . .
+        . k l l l d d d d l l l k . .
+        . k l l l l l l l l l l k . .
+        k l l d d d d d d d d l l k .
+        k l d w k d d d d k w d l k .
+        k l d y k d d d d k y d l k .
+        k l d d d p p p p d d d l k .
+        . k d d p p p p p p d d k . .
+        . k d d p k d d k p d d k . .
+        . . k d d d d d d d d k . . .
+        . . . k k d d d d k k . . . .
+        . . k b b k k k k b b k . . .
+        . . k b b b b b b b b k . . .
+        . . . k k k k k k k k . . . .
+      `, { k: '#0f172a', l: '#94a3b8', d: '#475569', b: '#2563eb', p: '#f472b6', y: '#facc15', w: '#ffffff' })
     },
     { 
       id: 'reviewer',   
       name: 'Code Reviewer',       
       role: 'AI/ML API · Quality Gate',    
       task: 'Idle — waiting on code', 
-      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-rev" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/></linearGradient></defs><polygon points="26,29 21,15 33,26" fill="#f1f5f9" stroke="#1f2937" stroke-width="1.5" /><polygon points="74,29 79,15 67,26" fill="#f1f5f9" stroke="#1f2937" stroke-width="1.5" /><ellipse cx="50" cy="46" rx="27" ry="22" fill="#cbd5e1" /><polygon points="35,36 40,43 35,50 30,43" fill="#111827" /><polygon points="65,36 70,43 65,50 60,43" fill="#111827" /><path d="M 32 63 L 68 63 L 72 90 L 28 90 Z" fill="#ea580c" /></svg>`
+      icon: makePixelArt(`
+        . . . y y y y y y . . . . . .
+        . . y y y y y y y y . . . . .
+        . y y y y y y y y y y . . . .
+        . y o y o y o y o y y . . . .
+        . y o s s s s s s o y . . . .
+        . . s s s s s s s s . . . . .
+        . . s k s s s s k s . . . . .
+        . . s s s s s s s s . . . . .
+        . . s s w w w w s s . . . . .
+        . . k y k y k y k y . . . . .
+        . k y w y w y w y w k . . . .
+        . k y y w y y w y y k . . . .
+        . k w y y w y y w y k . . . .
+        . . k y y y y y y k . . . . .
+        . . . k k k k k k . . . . . .
+        . . . . . . . . . . . . . . .
+      `, { k: '#1e293b', y: '#fbbf24', o: '#f97316', s: '#ffedd5', w: '#ffffff' })
     },
     { 
       id: 'qa',         
       name: 'QA Tester',           
       role: 'Featherless · Test Suite',    
       task: 'Idle — waiting on approval', 
-      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-qas" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#334155"/></linearGradient></defs><ellipse cx="50" cy="46" rx="27" ry="22" fill="url(#char-g-qas)" /><path d="M 25 36 Q 50 17 75 36 Z" fill="#111827" /><path d="M 44 54 Q 50 49 56 54" fill="none" stroke="#111827" stroke-width="2.5" stroke-linecap="round" /><polygon points="65,45 73,48 71,52 63,49" fill="#fed7aa" stroke="#f97316" stroke-width="1" /><path d="M 32 64 L 68 64 L 72 90 L 28 90 Z" fill="#1e293b" /></svg>`
+      icon: makePixelArt(`
+        . . . . . k k k k . . . . . .
+        . . . . k r r r r k . . . . .
+        . . . k r r r r r r k . . . .
+        . . k r r r r r r r r k . . .
+        . . k r r r r r r r r k . . .
+        . k r r k k r r k k r r k . .
+        . k r r k k k k k k r r k . .
+        . k r r k w k k w k r r k . .
+        . k r d k k k k k k d r k . .
+        . k d d r k k k k r d d k . .
+        . . k d r r r r r r d k . . .
+        . . . k d d d d d d k . . . .
+        . . . k r r k k r r k . . . .
+        . . . k r r r r r r k . . . .
+        . . . . k k k k k k . . . . .
+        . . . . . . . . . . . . . . .
+      `, { k: '#0f172a', r: '#dc2626', w: '#ffffff', d: '#7f1d1d' })
     },
     { 
       id: 'writer',     
       name: 'Tech Writer',         
       role: 'Featherless · Docs Gen',      
       task: 'Idle — waiting on tests', 
-      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><circle cx="50" cy="42" r="21" fill="#f3f4f6" stroke="#9ca3af" stroke-width="2" /><rect x="35" y="31" width="30" height="18" rx="5" fill="#1f2937" /><circle cx="43" cy="40" r="2.8" fill="#67e8f9" /><circle cx="57" cy="40" r="2.8" fill="#67e8f9" /><line x1="50" y1="21" x2="50" y2="11" stroke="#9ca3af" stroke-width="2.5" /><circle cx="50" cy="9" r="2.8" fill="#ef4444" /><path d="M 34 62 L 66 62 L 70 90 L 30 90 Z" fill="#cbd5e1" stroke="#9ca3af" stroke-width="1.5" /></svg>`
+      icon: makePixelArt(`
+        . . k w k . . . . k w k . . .
+        . k w p w k . . k w p w k . .
+        . k w p w k . . k w p w k . .
+        . k w w w k . . k w w w k . .
+        . . k w w k k k k w w k . . .
+        . k w w w w w w w w w w k . .
+        . k w w w w w w w w w w k . .
+        . k w k w w w w w w k w k . .
+        . k w w w p w w p w w w k . .
+        . . k w w w w w w w w k . . .
+        . . k b b b b b b b b k . . .
+        . k b b b b b b b b b b k . .
+        . k b b w w w w w w b b k . .
+        . . k b w b b b b w b k . . .
+        . . . k k k k k k k k . . . .
+        . . . . . . . . . . . . . . .
+      `, { k: '#1e293b', w: '#ffffff', p: '#f472b6', b: '#60a5fa' })
     },
     { 
       id: 'release',    
       name: 'Release Manager',     
       role: 'AI/ML API · Final Verdict',   
       task: 'Idle — awaiting docs', 
-      icon: `<svg viewBox="0 0 100 100" class="agent-char-svg"><defs><linearGradient id="char-g-rel" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#6b21a8"/></linearGradient></defs><ellipse cx="50" cy="45" rx="27" ry="22" fill="url(#char-g-rel)" /><polygon points="32,25 36,13 43,21 50,13 57,21 64,13 68,25" fill="#fbbf24" stroke="#d97706" stroke-width="1.5" /><circle cx="35" cy="41" r="4.5" fill="#111827" /><circle cx="65" cy="41" r="4.5" fill="#111827" /><path d="M 32 62 L 68 62 L 72 90 L 28 90 Z" fill="#7e22ce" /></svg>`
+      icon: makePixelArt(`
+        . . . k k k k k k . . . . . .
+        . . k k k k k k k k . . . . .
+        . k k p p k k p p k k . . . .
+        . k k s s s s s s k k . . . .
+        . k s s s s s s s s k . . . .
+        . k s s s s s s s s k . . . .
+        . k s g g g g g g s k . . . .
+        . k o k g k k g k o k . . . .
+        . k o o s s s s o o k . . . .
+        . . k o p p p p o k . . . . .
+        . . k p p p p p p k . . . . .
+        . k p w p w p w p w k . . . .
+        . k p p w p p w p p k . . . .
+        . . k p p p p p p k . . . . .
+        . . . k k k k k k . . . . . .
+        . . . . . . . . . . . . . . .
+      `, { k: '#111827', p: '#f472b6', s: '#ffedd5', g: '#10b981', o: '#f97316', w: '#ffffff' })
     }
   ];
 
@@ -1026,7 +1162,7 @@
       resetAgents();
       resetArtifactHub();
       appendLog('tag-info', 'PIPELINE', 'Trigger received — initializing mock run', false);
-      showToast('info', 'Pipeline triggered', 'DevFlow AI is processing your feature request.');
+      showToast('info', 'Pipeline triggered', 'V7-Twin.ai is processing your feature request.');
 
       const mockState = {
         session_id: 'mock-session',
@@ -1453,7 +1589,7 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
         resetArtifactHub();
         
         appendLog('tag-info', 'PIPELINE', 'Sending feature trigger to API Gateway...', false);
-        showToast('info', 'Pipeline Triggered', 'DevFlow AI is triggering backend agents.');
+        showToast('info', 'Pipeline Triggered', 'V7-Twin.ai is triggering backend agents.');
 
         try {
           const bandRoomInput = document.getElementById('band-room-input');
@@ -2257,27 +2393,18 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
     const bandRoomInput = document.getElementById('band-room-input');
     if (!bandRoomInput) return;
 
-    const savedRoom = localStorage.getItem('devflow_band_room_id');
-    if (savedRoom) {
-      bandRoomInput.value = savedRoom;
-    }
+    // Force the default live Band Room ID
+    bandRoomInput.value = '3f060ffa-8a5e-487b-b462-5669677baf03';
 
-    bandRoomInput.addEventListener('input', () => {
-      localStorage.setItem('devflow_band_room_id', bandRoomInput.value.trim());
-    });
-
-    const bandGuideToggle = document.getElementById('band-guide-toggle');
-    const bandGuideContent = document.getElementById('band-guide-content');
-    if (bandGuideToggle && bandGuideContent) {
-      bandGuideToggle.addEventListener('click', () => {
-        const isCollapsed = bandGuideContent.style.display === 'none';
-        if (isCollapsed) {
-          bandGuideContent.style.display = 'block';
-          bandGuideToggle.querySelector('.toggle-icon').style.transform = 'rotate(90deg)';
-        } else {
-          bandGuideContent.style.display = 'none';
-          bandGuideToggle.querySelector('.toggle-icon').style.transform = 'rotate(0deg)';
-        }
+    const copyBtn = document.getElementById('copy-band-id-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText('3f060ffa-8a5e-487b-b462-5669677baf03').then(() => {
+          showToast('success', 'Room ID Copied', 'Band Room ID copied to clipboard.');
+        }).catch(err => {
+          console.error('Failed to copy Room ID: ', err);
+          showToast('error', 'Copy Failed', 'Failed to copy Room ID to clipboard.');
+        });
       });
     }
   }
@@ -2451,7 +2578,7 @@ def test_update_${info.entity.toLowerCase()}_success(auth_headers):
       clearHistoryBtn.addEventListener('click', clearUserHistory);
     }
 
-    appendLog('tag-info', 'BOOT', 'DevFlow AI Control Room initialized.', false);
+    appendLog('tag-info', 'BOOT', 'V7-Twin.ai Platform initialized.', false);
     appendLog('tag-info', 'BOOT', 'Connected to Band room: devflow-ai-room-01', false);
 
     setTimeout(ambientTick, 4000);
